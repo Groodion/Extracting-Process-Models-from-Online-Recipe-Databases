@@ -1,0 +1,18 @@
+<!ELEMENT Root (Werkzeuge, Zutaten, Tätigkeiten)>
+<!ELEMENT Werkzeuge (Werkzeug)*>
+<!ELEMENT Werkzeug (Name)*>
+<!ATTLIST Werkzeug
+	name CDATA #REQUIRED
+>
+<!ELEMENT Zutaten (Zutat)*>
+<!ELEMENT Zutat (Name | Eigenschaft)*>
+<!ATTLIST Zutat
+	name CDATA #REQUIRED
+>
+<!ELEMENT Eigenschaft (#PCDATA)>
+<!ELEMENT Tätigkeiten (Tätigkeit)*>
+<!ELEMENT Tätigkeit (Name)*>
+<!ATTLIST Tätigkeit
+	name CDATA #REQUIRED
+>
+<!ELEMENT Name (#PCDATA)>

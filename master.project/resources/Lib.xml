@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Rezept SYSTEM "C:\Users\Martin Käppel\workspace\LingPipeTest\src\rezept.dtd">
+<Root>
+<Werkzeuge>
+	<Werkzeug name="Backofen">
+		<Name>Backroehre</Name>
+		<Name>Roehre</Name>
+		<Name>Backrohr<Name/>
+		<Name>Ofen</Name>
+	</Werkzeug>
+	<Werkzeug name="Backblech">
+		<Name>Blech</Name>
+		<Name>Kuchenblech</Name>
+	</Werkzeug>
+	<Werkzeug name="Bratpfanne">
+		<Name>Pfanne</Name>
+	</Werkzeug>
+	<Werkzeug name="Schüssel">
+		<Name>Schale</Name>
+		<Name>Gefäß</Name>
+	</Werkzeug>
+	<Werkzeug name="Topf"></Werkzeug>	
+	<Werkzeug name="Kanne"></Werkzeug>
+	<Werkzeug name="Form"></Werkzeug>
+	<Werkzeug name="Backpinsel">
+		<Name>Pinsel</Name>
+	</Werkzeug>
+	<Werkzeug name="Backschaufel"></Werkzeug>
+	<Werkzeug name="Drahtlöffel"></Werkzeug>
+	<Werkzeug name="Eisportionierer"></Werkzeug>
+	<Werkzeug name="Fischentschupper"></Werkzeug>
+	<Werkzeug name="Fleischgabel"></Werkzeug>
+	<Werkzeug name=Fleischhammer"></Werkzeug>
+	<Werkzeug name="Grillzange"></Werkzeug>
+	<Werkzeug name="Kochlöffel"></Werkzeug>
+	<Werkzeug name="Messer"></Werkzeug>
+	<Werkzeug name=Nudelholz>
+		<Name>Teigrolle</Name>
+	</Werkzeug>
+	<Werkzeug name="Pfannenwender"></Werkzeug>
+	<Werkzeug name="Palette">
+		<Name>Spachtel</Name>
+		<Name>Schaber</Name>
+	</Werkzeug>
+	<Werkzeug name="Quirl">
+	</Werkzeug>
+	<Werkzeug name="Schaumkelle"></Werkzeug>
+	<Werkzeug name="Schneebesen"></Werkzeug>
+	<Werkzeug name="Schöpfkelle"></Werkzeug>
+	<Werkzeug name="Spagettiheber"></Werkzeug>
+	<Werkzeug name="Spagehttizange"></Werkzeug>
+	<Werkzeug name="Teigschaber"></Werkzeug>
+	<Werkzeug name="Tortenhber"></Werkzeug>
+	<Werkzeug name="Schneibrett"></Werkzeug>
+	<Werkzeug name="Salatschleuder"></Werkzeug>
+	<Werkzeug name="Spritzbeutel">
+		<Name>Dressiersack</Name>
+	</Werkzeug>
+	<Werkzeug name="Trichter"></Werkzeug>
+	<Werkzeug name="Sieb">
+		<Name>Küchensieb</Name>
+		<Name>Abtropfsieb</Name>
+	</Werkzeug>
+	<Werkzeug name="Apfelentkerner"></Werkzeug>
+	<Werkzeug name="Apfelteiler"></Werkzeug>
+	<Werkzeug name="Käsehobel"></Werkzeug>
+	<Werkzeug name="Pizzaschneider"></Werkzeug>
+	<Werkzeug name="Ananasschneider"></Werkzeug>
+	<Werkzeug name="Eierschneider"></Werkzeug>
+	<Werkzeug name="Gemüseschneider"></Werkzeug>
+	<Werkzeug name="Gemüsehobel"></Werkzeug>
+	<Werkzeug name="Entsteiner"></Werkzeug>
+	<Werkzeug name="Nussknacker"></Werkzeug>
+	<Werkzeug name="Kugelausstecher"></Werkzeug>
+	<Werkzeug name="Küchenschere">
+		<Name>Schere</Name>
+	</Werkzeug>	
+	<Werkzeug name="Holzspieß"></Werkzeug>
+	<Werkzeug name="Metallspieß"></Werkzeug>
+	<Werkzeug name="Rouladenklammer"></Werkzeug>
+	<Werkzeug name="Getreidemühle"></Werkzeug>
+	<Werkzeug name="Gewürzmühle"></Werkzeug>
+	<Werkzeug name="Gemüsemühle"></Werkzeug>
+	<Werkzeug name="Kaffeemühle"></Werkzeug>
+	<Werkzeug name="Kräutermühle"></Werkzeug>
+	<Werkzeug name="Küchenreibe"></Werkzeug>
+	<Werkzeug name="Küchenmaschine">
+		<Name>Spülmaschine</Name>
+		<Name>Minna</Name>
+	</Werkzeug>
+	<Werkzeug name="Pfeffermühle"></Werkzeug>
+	<Werkzeug name="Trommelreibe"></Werkzeug>
+	<Werkzeug name="Eiscrusher"></Werkzeug>
+	<Werkzeug name="Entenpresse"></Werkzeug>
+	<Werkzeug name="Fleischhammer"></Werkzeug>
+	<Werkzeug name="Fleischklopfer"></Werkzeug>
+	<Werkzeug name="Fleischwolf"></Werkzeug>
+	<Werkzeug name="Flocker"></Werkzeug>
+	<Werkzeug name="Kartoffelstampfer"></Werkzeug>
+	<Werkzeug name="Kartoffelpresse"></Werkzeug>
+	<Werkzeug name="Knoblauchpresse"></Werkzeug>
+	<Werkzeug name="Mörser"></Werkzeug>
+	<Werkzeug name="Passierwiege"></Werkzeug>
+	<Werkzeug name="Semmelreibe"></Werkzeug>
+	<Werkzeug name="Spätzlepresse"></Werkzeug>
+	<Werkzeug name="Tomatenpresse"></Werkzeug>
+	<Werkzeug name="Zitronenpresse"></Werkzeug>
+	<Werkzeug name="Zwiebelhacker"></Werkzeug>
+	<Werkzeug name="Champagnersäbel"></Werkzeug>
+	<Werkzeug name="Dosenöffner"></Werkzeug>
+	<Werkzeug name="Dostenstecher"></Werkzeug>
+	<Werkzeug name="Eierstecher"></Werkzeug>
+	<Werkzeug name="Kapselheber">
+		<Name>Flaschenöffner</Name>
+	</Werkzeug>
+	<Werkzeug name="Korkenzieher"></Werkzeug>
+	<Werkzeug name="Universalöffner"></Werkzeug>
+	<Werkzeug name="Backoffenthermometer"></Werkzeug>
+	<Werkzeug name="Bratenthermometer"></Werkzeug>
+	<Werkzeug name="Küchenwaage">
+		<Name>Waage</Name>
+	</Werkzeug>
+	<Werkzeug name="Messbecher"></Werkzeug>
+	<Werkzeug name="Uhr">
+		<Name>Kurzzeitwecker</Name>
+		<Name>Küchenwecker</Name>
+		<Name>Eieruhr</Name>
+	</Werkzeug>
+	<Werkzeug name="Kaffeelot">
+		<Name>Kaffeemaß</Name>
+	</Werkzeug>
+	<Werkzeug name="Kaffeefilter"></Werkzeug>
+	<Werkzeug name="Passiertuch"></Werkzeug>
+	<Werkzeug name="Pressack"></Werkzeug>
+	<Werkzeug name="Schaumlöffel"></Werkzeug>
+	<Werkzeug name="Sieb"></Werkzeug>
+	<Werkzeug name="Quirl"></Werkzeug>
+	<Werkzeug name="Standmixer">
+		<Name>Pürierstab</Name>
+		<Name>Stabmixer</Name>
+	</Werkzeug>
+	<Werkzeug name="Rührgerät">
+		<Name>Handrührgerät</Name>
+		<Name>Standrührgerät</Name>
+	</Werkzeug>
+	<Werkzeug name="Knethaken"></Werkzeug>
+	<Werkzeug name="Rührbesen"></Werkzeug>
+	<Werkzeug name="Teigknetmaschine"></Werkzeug>
+	<Werkzeug name="Cocktail-Shaker"></Werkzeug>
+	<Werkzeug name="Wasserbad">
+		<Name>Bain-Marie</Name>
+	</Werkzeug>	
+	<Werkzeug name="Bierwärmer"></Werkzeug>
+	<Werkzeug name="Dampfgarer"></Werkzeug>
+	<Werkzeug name="Eierkocher"></Werkzeug>
+	<Werkzeug name="Elektrogrill"></Werkzeug>
+	<Werkzeug name="Elektroherd"></Werkzeug>
+	<Werkzeug name="Espressomaschine"></Werkzeug>
+	<Werkzeug name="Fritteuse"></Werkzeug>
+		<Name>Fritte</Name>
+	<Werkzeug name="Gasherd"></Werkzeug>
+	<Werkzeug name="Geschirrwärmer"></Werkzeug>
+	<Werkzeug name="Induktionskochfeld"></Werkzeug>
+	<Werkzeug name="Kaffeemaschine"></Werkzeug>
+	<Werkzeug name="Mikrowelle">
+		<Name>Mikro</Name>
+		<Name>Mikrowellenherd</Name>
+	</Werkzeug>
+	<Werkzeug name="Toaster"></Werkzeug>
+	<Werkzeug name="Waffeleisen"></Werkzeug>
+	<Werkzeug name="Wasserkocher"></Werkzeug>
+	<Werkzeug name="Abkühlgitter"></Werkzeug>
+	<Werkzeug name="Gefriertruhe"></Werkzeug>
+	<Werkzeug name="Kühlschrank"></Werkzeug>
+	<Werkzeug name="Schockkühler"></Werkzeug>
+	<Werkzeug name="Eismaschine"></Werkzeug>
+	<Werkzeug name="Spülbürste"></Werkzeug>
+	<Werkzeug name="Topfkratzer"></Werkzeug>
+	<Werkzeug name="Schneidemaschine"></Werkzeug>
+	<Werkzeug name="Entsafter"></Werkzeug>
+	<Werkzeug name="Nudelmaschine"></Werkzeug>
+	<Werkzeug name="Geschirrtuch">
+		<Name>Handtuch</Name>
+		<Name>Tuch</Name>
+	</Werkzeug>
+	<Werkzeug name="Schürze"></Werkzeug>
+	<Werkzeug name="Topflappen"></Werkzeug>
+		<Name>Lappen</Name>
+	<Werkzeug name="Topfhandschuh"></Werkzeug>
+</Werkzeuge>	
+</Root>
