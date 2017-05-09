@@ -1,5 +1,6 @@
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import recipe.Recipe;
 import requests.RecipeGetter;
 
 public class Main {
@@ -11,11 +12,13 @@ public class Main {
 
         String ids = RecipeGetter.recipeGetterFactory().getRecipeIDs("käse", 5);
         String[] splittedIds = ids.split(",");
+        Recipe recipe = new Recipe();
         for (String id :
                 splittedIds) {
             if (!id.equals("") && id != null) {
                 System.out.println("id:" + id);
-                System.out.println(RecipeGetter.recipeGetterFactory().getRecipePreparation(id));
+                System.out.println(RecipeGetter.recipeGetterFactory().getRecipePreparation(id, recipe));
+                System.out.println(RecipeGetter.recipeGetterFactory().getRecipeIngredigents(id, recipe));
             }
 
         }

@@ -10,6 +10,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import recipe.Recipe;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -46,13 +47,14 @@ public class RecipeGetter {
     /**
      * Finds a maximumNumber of recipeIds for the given searchstring using chefkoch api. Will return a list in csv format.
      *
-     * @param searchString
-     * @param maximumNumber
+     * @param searchString the string to look for at the chefkoch database
+     * @param maximumNumber maximum number of recipes to return
      * @return a String in the format id1,id2,id3,..,idn. Null, if nothing was found or an error was thrown.
      */
     public String getRecipeIDs(String searchString, int maximumNumber) {
         String[] seperatedSearchInput = searchString.split(" ");
         StringBuilder stringBuilder = new StringBuilder();
+        /* If the search string uses empty spaces, we replace them by "%20" */
         for (int i = 0; i < seperatedSearchInput.length; i++) {
             stringBuilder.append(seperatedSearchInput[i]);
             stringBuilder.append("%20");
@@ -73,9 +75,10 @@ public class RecipeGetter {
      * Finds the preparation process for a given recipe id and returns it.
      *
      * @param id the id for the recipe.
-     * @return the preparation
+     * @param recipe the recipe to save the preparation in
+     * @return the preparation as a string in case you need it for debug purposes
      */
-    public String getRecipePreparation(String id) {
+    public String getRecipePreparation(String id, Recipe recipe) {
         StringBuilder preparation = new StringBuilder();
         String response = getHttpRequestBody(REZEPTE_API_STRING + id);
         JSONArray resultList = this.getJsonResultList(response);
@@ -88,10 +91,48 @@ public class RecipeGetter {
         JSONObject firstResult = resultListIterator.next();
         preparation.append(firstResult.get("rezept_zubereitung"));
 
-
-        return preparation.toString();
+        recipe.setPreparation(preparation.toString());
+        return recipe.getPreparation();
     }
 
+
+    /**
+     * Saves all ingredigents of a recipe in the given recipe instance.
+     * Format is [name] [menge] [einheit]
+     *
+     * @param id     the id of the recipe
+     * @param recipe the recipe instance to be used
+     * @return all ingredigents as a string for debug purposes
+     */
+    public String getRecipeIngredigents(String id, Recipe recipe) {
+        StringBuilder stringBuilder = new StringBuilder();
+        String response = getHttpRequestBody(REZEPTE_API_STRING + id);
+        JSONArray resultList = this.getJsonResultList(response);
+
+        Iterator<JSONObject> resultListIterator = resultList.iterator();
+        if (!resultListIterator.hasNext()) {
+            return null;
+        }
+
+        JSONObject firstResult = resultListIterator.next();
+        JSONArray recipeIngredigents = (JSONArray) firstResult.get("rezept_zutaten");
+        System.out.println(recipeIngredigents);
+        Iterator<JSONObject> ingredigentsIterator = recipeIngredigents.iterator();
+
+        while (ingredigentsIterator.hasNext()) {
+            JSONObject ingredigent = ingredigentsIterator.next();
+            stringBuilder.append(ingredigent.get("name"));
+            stringBuilder.append(" ");
+            stringBuilder.append(ingredigent.get("menge"));
+            stringBuilder.append(" ");
+            stringBuilder.append(ingredigent.get("einheit"));
+            stringBuilder.append("\n");
+            recipe.addIngredigent(stringBuilder.toString());
+
+        }
+
+        return stringBuilder.toString();
+    }
 
     /*
     Returns the JSONArray returnlist. Implemented here to remove redundancy.
