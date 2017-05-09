@@ -46,13 +46,40 @@
 			<artifactId>stanford-corenlp</artifactId>
 			<version>3.7.0</version>
 		</dependency>
+		<dependency>
+			<groupId>edu.stanford.nlp</groupId>
+			<artifactId>stanford-corenlp</artifactId>
+			<version>3.7.0</version>
+			<classifier>models</classifier>
+		</dependency>
+
+
+
+
+
 		<!-- https://mvnrepository.com/artifact/edu.stanford.nlp/stanford-parser -->
 		<dependency>
 			<groupId>edu.stanford.nlp</groupId>
 			<artifactId>stanford-parser</artifactId>
 			<version>3.7.0</version>
 		</dependency>
-	</dependencies>
 
+<!--  
+		<dependency>
+			<groupId>stanford-german-corenlp-2016-10-31-models</groupId>
+			<artifactId>stanford-german-corenlp-2016-10-31-models</artifactId>
+			<scope>system</scope>
+			<version>3.7.0</version>
+			<systemPath>${basedir}\lib\stanford-german-corenlp-2016-10-31-models.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>stanford-postagger-3.7.0</groupId>
+			<artifactId>stanford-postagger-3.7.0</artifactId>
+			<scope>system</scope>
+			<version>3.7.0</version>
+			<systemPath>${basedir}\lib\stanford-postagger-3.7.0.jar</systemPath>
+		</dependency>
+-->
+	</dependencies>
 
 </project>
