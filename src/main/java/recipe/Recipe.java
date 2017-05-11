@@ -24,4 +24,18 @@ public class Recipe {
         this.ingredigents = new ArrayList<String>();
         this.preparation = "";
     }
+
+
+    public void addIngredigent(String ingredigent) {
+        if (ingredigents != null)
+            ingredigents.add(ingredigent);
+    }
+
+    @Override
+    public String toString() {
+        return "Recipe{" +
+                "ingredigents=" + ingredigents +
+                ", preparation='" + preparation + '\'' +
+                '}';
+    }
 }
