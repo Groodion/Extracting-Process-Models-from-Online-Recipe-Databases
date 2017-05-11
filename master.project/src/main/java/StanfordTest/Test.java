@@ -1,22 +1,27 @@
 package StanfordTest;
 
-import java.io.IOException;
 
-import edu.stanford.nlp.tagger.maxent.MaxentTagger;
+public class Test {
+	
+	
+	public static void main(String args[]) {
+		Parser p = new Parser("lib/models/german-fast.tagger");
+		
+		System.out.println(p.getSentencesFromFile("test.txt"));
+		System.out.println(p.getSentencesFromString("Das ist ein Satz. Dies ist ein weiterer Satz. Und noch einer hintendran!?"));
+		System.out.println("---------------------------");
+		
+		System.out.println(p.getSplittedSentencesFromUrl("test.txt"));
+		System.out.println("---------------------------");
+		
+		p.analyzeText("test.txt");
+		System.out.println("---------------------------");
+		System.out.println(p.getNouns());
+		System.out.println(p.getVerbs());
+		System.out.println(p.getAdjectives());
+		
+	}
 
-public class Test  {
 
-  /** A logger for this class */
-  //private static Redwood.RedwoodChannels log = Redwood.channels(Test.class);
-
-  private Test() {}
-
-  public static void main(String[] args) throws IOException,
-  ClassNotFoundException {
-
-	  String a = "Die Stangen in die Suppe rühren!";
-	  MaxentTagger tagger =  new MaxentTagger("lib/models/german-ud.tagger");
-	  String tagged = tagger.tagString(a);
-	  System.out.println(tagged);
-}
+	
 }
