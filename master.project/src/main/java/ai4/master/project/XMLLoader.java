@@ -12,7 +12,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.input.sax.XMLReaders;
 
-import ai4.master.project.model.*;
+import ai4.master.project.recipe.*;
 
 
 public class XMLLoader {

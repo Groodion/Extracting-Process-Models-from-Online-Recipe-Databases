@@ -1,4 +1,4 @@
-package recipe;
+package ai4.master.project.recipe;
 
 import lombok.Getter;
 import lombok.Setter;

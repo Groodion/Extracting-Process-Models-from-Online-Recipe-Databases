@@ -1,8 +1,10 @@
+package ai4.master.project;
+
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import requests.RecipeGetter;
+import ai4.master.project.RecipeGetter;
 
-public class Main {
+public class RecipeGetterTest {
 
     /*
     Main will get 5 IDs for "Käse" and will print the recipes for it.

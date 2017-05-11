@@ -1,4 +1,4 @@
-package ai4.master.project.model;
+package ai4.master.project.recipe;
 
 import java.util.HashSet;
 import java.util.Set;

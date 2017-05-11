@@ -1,4 +1,4 @@
-package requests;
+package ai4.master.project;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
