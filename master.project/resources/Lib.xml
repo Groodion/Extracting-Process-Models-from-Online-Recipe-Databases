@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Rezept SYSTEM "C:\Users\Martin Käppel\workspace\LingPipeTest\src\rezept.dtd">
+<!DOCTYPE Root SYSTEM "rezept.dtd" >
 <Root>
 <Werkzeuge>
 	<Werkzeug name="Backofen">
 		<Name>Backroehre</Name>
 		<Name>Roehre</Name>
-		<Name>Backrohr<Name/>
+		<Name>Backrohr</Name>
 		<Name>Ofen</Name>
 	</Werkzeug>
 	<Werkzeug name="Backblech">
@@ -30,11 +30,11 @@
 	<Werkzeug name="Eisportionierer"></Werkzeug>
 	<Werkzeug name="Fischentschupper"></Werkzeug>
 	<Werkzeug name="Fleischgabel"></Werkzeug>
-	<Werkzeug name=Fleischhammer"></Werkzeug>
+	<Werkzeug name="Fleischhammer"></Werkzeug>
 	<Werkzeug name="Grillzange"></Werkzeug>
 	<Werkzeug name="Kochlöffel"></Werkzeug>
 	<Werkzeug name="Messer"></Werkzeug>
-	<Werkzeug name=Nudelholz>
+	<Werkzeug name="Nudelholz">
 		<Name>Teigrolle</Name>
 	</Werkzeug>
 	<Werkzeug name="Pfannenwender"></Werkzeug>
@@ -156,8 +156,9 @@
 	<Werkzeug name="Elektrogrill"></Werkzeug>
 	<Werkzeug name="Elektroherd"></Werkzeug>
 	<Werkzeug name="Espressomaschine"></Werkzeug>
-	<Werkzeug name="Fritteuse"></Werkzeug>
+	<Werkzeug name="Fritteuse">
 		<Name>Fritte</Name>
+	</Werkzeug>
 	<Werkzeug name="Gasherd"></Werkzeug>
 	<Werkzeug name="Geschirrwärmer"></Werkzeug>
 	<Werkzeug name="Induktionskochfeld"></Werkzeug>
@@ -184,8 +185,11 @@
 		<Name>Tuch</Name>
 	</Werkzeug>
 	<Werkzeug name="Schürze"></Werkzeug>
-	<Werkzeug name="Topflappen"></Werkzeug>
+	<Werkzeug name="Topflappen">
 		<Name>Lappen</Name>
+	</Werkzeug>
 	<Werkzeug name="Topfhandschuh"></Werkzeug>
-</Werkzeuge>	
+</Werkzeuge>
+<Zutaten/>
+<Tätigkeiten/>
 </Root>
