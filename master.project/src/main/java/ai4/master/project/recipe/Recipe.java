@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by René Bärnreuther on 04.05.2017. TODO Use me and implement me, of
- * course.
+ * Created by René Bärnreuther on 04.05.2017.
+ * .
  */
 public class Recipe {
 
@@ -29,6 +29,11 @@ public class Recipe {
 		this.preparation = preparation;
 	}
 
+	public void addIngredient(String ingredient){
+		Ingredient ingredient1 = new Ingredient();
+		ingredient1.setName(ingredient);
+		ingredients.add(ingredient1);
+	}
 	public List<Ingredient> getIngredients() {
 		return ingredients;
 	}

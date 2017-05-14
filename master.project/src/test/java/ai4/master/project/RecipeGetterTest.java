@@ -1,8 +1,9 @@
 package ai4.master.project;
 
+import ai4.master.project.apirequests.RecipeGetterChefkoch;
+import ai4.master.project.recipe.Recipe;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import ai4.master.project.RecipeGetter;
 
 public class RecipeGetterTest {
 
@@ -11,17 +12,18 @@ public class RecipeGetterTest {
      */
     public static void main(String[] args) {
 
-        String ids = RecipeGetter.recipeGetterFactory().getRecipeIDs("käse", 5);
+        String ids = RecipeGetterChefkoch.recipeGetterFactory().getRecipeIDs("käse", 5);
         String[] splittedIds = ids.split(",");
+        Recipe recipe = new Recipe();
         for (String id :
                 splittedIds) {
             if (!id.equals("") && id != null) {
                 System.out.println("id:" + id);
-                System.out.println(RecipeGetter.recipeGetterFactory().getRecipePreparation(id));
+                System.out.println(RecipeGetterChefkoch.recipeGetterFactory().getRecipePreparation(id, recipe));
             }
 
         }
-        //System.out.println(RecipeGetter.recipeGetterFactory().getRecipePreparation("1256061231073046"));
+        //System.out.println(RecipeGetterChefkoch.recipeGetterFactory().getRecipePreparation("1256061231073046"));
 
         /* Creating a model instance via framework */
         BpmnModelInstance modelInstance = Bpmn.createEmptyModel(); // Just to show that the framework is here..

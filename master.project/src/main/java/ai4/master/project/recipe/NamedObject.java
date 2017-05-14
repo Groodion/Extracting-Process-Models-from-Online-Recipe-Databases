@@ -14,4 +14,8 @@ public class NamedObject {
 	public Set<String> getNames() {
 		return names;
 	}
+
+	public void setName(String name){
+		names.add(name);
+	}
 }
