@@ -1,35 +1,43 @@
-package recipe;
-
-import lombok.Getter;
-import lombok.Setter;
+package ai4.master.project.recipe;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by René Bärnreuther on 04.05.2017.
+ * .
  */
-//Getter and Setter is via lombook and creates them while compiling. Plugin makes it usable without showing errors.
-@Getter
-@Setter
 public class Recipe {
 
-    private List<String> ingredigents;
+	private List<Ingredient> ingredients;
+	private List<Step> steps;
 
-    private String preparation;
+	private String preparation;
 
 
-    public Recipe() {
-        this.ingredigents = new ArrayList<String>();
-        this.preparation = "";
-    }
+	public Recipe() {
+		ingredients = new ArrayList<Ingredient>();
+		steps = new ArrayList<Step>();
+		
+		preparation = "";
+	}
 
-    /**
-     * Add an ingredigent to the list of ingredigents.
-     * @param ingredigent ingredigent in Format [name] [qty] [einheit]
-     */
-    public void addIngredigent(String ingredigent){
-        if(ingredigents!=null)
-         ingredigents.add(ingredigent);
-    }
+	public String getPreparation() {
+		return preparation;
+	}
+	public void setPreparation(String preparation) {
+		this.preparation = preparation;
+	}
+
+	public void addIngredient(String ingredient){
+		Ingredient ingredient1 = new Ingredient();
+		ingredient1.setName(ingredient);
+		ingredients.add(ingredient1);
+	}
+	public List<Ingredient> getIngredients() {
+		return ingredients;
+	}
+	public List<Step> getSteps() {
+		return steps;
+	}
 }
