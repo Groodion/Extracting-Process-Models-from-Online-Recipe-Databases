@@ -1,5 +1,6 @@
 package ai4.master.project.apirequests;
 
+import ai4.master.project.recipe.Recipe;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -10,7 +11,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import ai4.master.project.recipe.Recipe;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -22,7 +22,7 @@ import java.util.Iterator;
  * http://www.pebra.net/blog/2012/10/31/how-to-get-recipes-fromchefkoch-dot-de/
  * http://www.pebra.net/blog/2013/03/13/Get-recipes-from-chefkoch.de-using-ruby-Part-2/
  */
-public class RecipeGetterChefkoch {
+public class RecipeGetterChefkoch implements RecipeGetter {
 
     private static final String BASE_API_STRING = "http://api.chefkoch.de/api/1.1/api-recipe-search.php?Suchbegriff=";
     private static final String REZEPTE_API_STRING = "http://api.chefkoch.de/api/1.1/api-recipe.php?ID=";
@@ -101,7 +101,7 @@ public class RecipeGetterChefkoch {
      * @param recipe the recipe instance to be used
      * @return all ingredigents as a string for debug purposes
      */
-    public String getRecipeIngredigents(String id, Recipe recipe) {
+    public String getRecipeIngredients(String id, Recipe recipe) {
         StringBuilder stringBuilder = new StringBuilder();
         String response = getHttpRequestBody(REZEPTE_API_STRING + id);
         JSONArray resultList = this.getJsonResultList(response);
