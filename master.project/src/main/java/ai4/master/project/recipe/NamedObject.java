@@ -18,4 +18,9 @@ public class NamedObject {
 	public void setName(String name){
 		names.add(name);
 	}
+	
+	@Override
+	public String toString() {
+		return names.iterator().next();
+	}
 }

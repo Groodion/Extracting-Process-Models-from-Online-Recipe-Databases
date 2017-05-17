@@ -22,6 +22,7 @@ public class Parser {
 	private List<String> nouns = new ArrayList<String>();
 	private List<String> verbs = new ArrayList<String>();
 	private List<String> adjectives = new ArrayList<String>();
+	private List<String> connectedNouns = new ArrayList<String>();
 
 	public Parser(String taggerUrl) {
 		tagger = new MaxentTagger(taggerUrl);

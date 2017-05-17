@@ -2,8 +2,6 @@ package ai4.master.project;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -15,12 +13,20 @@ import org.jdom2.input.sax.XMLReaders;
 import ai4.master.project.recipe.*;
 
 
-public class XMLLoader {
+public class XMLLoader {	
 	
-	private List<Tool> tools = new ArrayList<Tool>();
-	private List<Ingredient> ingredients = new ArrayList<Ingredient>();
-	private List<CookingAction> cookingActions = new ArrayList<CookingAction>();
-	
+	public static final String ELEMENT_TOOLS = "tools";
+	public static final String ELEMENT_TOOL = "Tool";
+	public static final String ELEMENT_INGREDIENTS = "ingredients";
+	public static final String ELEMENT_INGREDIENT = "Ingredient";
+	public static final String ELEMENT_COOKING_ACTIONS = "cookingActions";
+	public static final String ELEMENT_COOKING_ACTION = "CookingAction";
+	public static final String ELEMENT_PART_INDICATORS = "partIndicators";
+	public static final String ELEMENT_PART_INDICATOR = "PartIndicator";
+	public static final String ELEMENT_LAST_SENTENCE_REFERENCES = "lastSentenceReferences";
+	public static final String ELEMENT_LAST_SENTENCE_REFERENCE = "LastSentenceReference";
+	public static final String ELEMENT_NAME = "Name";
+	public static final String ATTRIBUTE_NAME = "name";
 	
 	/**
 	 * Loads XML-File from URL and puts the elements into lists
@@ -29,40 +35,47 @@ public class XMLLoader {
 	 * @throws IOException 
 	 * @throws JDOMException 
 	 */
-	public void load(URL url) throws JDOMException, IOException {
+	public KeyWordDatabase load(URL url) throws JDOMException, IOException {
+		KeyWordDatabase kwdb = new KeyWordDatabase();
+		
 		SAXBuilder builder = new SAXBuilder(XMLReaders.DTDVALIDATING);
 		Document document = builder.build(url);
-		
 		
 		Element root = document.getRootElement();
 		
 		for(Element child : root.getChildren()) {
-			if(child.getName().equals("Werkzeuge")) {
-				readTools(child);
-			} else if(child.getName().equals("Zutaten")) {
-				readIngredients(child);
-			} else if(child.getName().equals("Tätigkeiten")) {
-				readCookingActions(child);
+			if(child.getName().equals(ELEMENT_TOOLS)) {
+				readTools(child, kwdb);
+			} else if(child.getName().equals(ELEMENT_INGREDIENTS)) {
+				readIngredients(child, kwdb);
+			} else if(child.getName().equals(ELEMENT_COOKING_ACTIONS)) {
+				readCookingActions(child, kwdb);
+			} else if(child.getName().equals(ELEMENT_PART_INDICATORS)) {
+				readPartIndicators(child, kwdb);
+			} else if(child.getName().equals(ELEMENT_LAST_SENTENCE_REFERENCES)) {
+				readLastSentenceReferences(child, kwdb);
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + root.getName());
 			}
 		}
+		
+		return kwdb;
 	}
 	
-	private void readTools(Element element) {
+	private void readTools(Element element, KeyWordDatabase kwdb) {
 		for(Element child : element.getChildren()) {
-			if(child.getName().equals("Werkzeug")) {
-				readTool(child);
+			if(child.getName().equals(ELEMENT_TOOL)) {
+				readTool(child, kwdb);
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}
 		}
 	}
-	private void readTool(Element element) {
+	private void readTool(Element element, KeyWordDatabase kwdb) {
 		Tool tool = new Tool();
 		
 		for(Attribute att : element.getAttributes()) {
-			if(att.getName().equals("name")) {
+			if(att.getName().equals(ATTRIBUTE_NAME)) {
 				tool.getNames().add(att.getValue());
 			} else {
 				System.err.println("Unknown Attribute");
@@ -70,29 +83,29 @@ public class XMLLoader {
 		}		
 
 		for(Element child : element.getChildren()) {
-			if(child.getName().equals("Name")) {
+			if(child.getName().equals(ELEMENT_NAME)) {
 				tool.getNames().add(child.getText());
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}
 		}
 		
-		tools.add(tool);
+		kwdb.getTools().add(tool);
 	}
-	private void readIngredients(Element element) {
+	private void readIngredients(Element element, KeyWordDatabase kwdb) {
 		for(Element child : element.getChildren()) {
-			if(child.getName().equals("Zutat")) {
-				readIngredient(child);
+			if(child.getName().equals(ELEMENT_INGREDIENT)) {
+				readIngredient(child, kwdb);
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}
 		}		
 	}
-	private void readIngredient(Element element) {
+	private void readIngredient(Element element, KeyWordDatabase kwdb) {
 		Ingredient ingredient = new Ingredient();
 		
 		for(Attribute att : element.getAttributes()) {
-			if(att.getName().equals("name")) {
+			if(att.getName().equals(ATTRIBUTE_NAME)) {
 				ingredient.getNames().add(att.getValue());
 			} else {
 				System.err.println("Unknown Attribute");
@@ -100,29 +113,29 @@ public class XMLLoader {
 		}		
 
 		for(Element child : element.getChildren()) {
-			if(child.getName().equals("Name")) {
+			if(child.getName().equals(ELEMENT_NAME)) {
 				ingredient.getNames().add(child.getText());
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}
 		}
 		
-		ingredients.add(ingredient);
+		kwdb.getIngredients().add(ingredient);
 	}
-	private void readCookingActions(Element element) {
+	private void readCookingActions(Element element, KeyWordDatabase kwdb) {
 		for(Element child : element.getChildren()) {
-			if(child.getName().equals("Tätigkeit")) {
-				readCookingAction(child);
+			if(child.getName().equals(ELEMENT_COOKING_ACTION)) {
+				readCookingAction(child, kwdb);
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}
 		}		
 	}
-	private void readCookingAction(Element element) {
+	private void readCookingAction(Element element, KeyWordDatabase kwdb) {
 		CookingAction cookingAction = new CookingAction();
 		
 		for(Attribute att : element.getAttributes()) {
-			if(att.getName().equals("name")) {
+			if(att.getName().equals(ATTRIBUTE_NAME)) {
 				cookingAction.getNames().add(att.getValue());
 			} else {
 				System.err.println("Unknown Attribute");
@@ -130,23 +143,38 @@ public class XMLLoader {
 		}		
 
 		for(Element child : element.getChildren()) {
-			if(child.getName().equals("Name")) {
+			if(child.getName().equals(ELEMENT_NAME)) {
 				cookingAction.getNames().add(child.getText());
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}
 		}
 		
-		cookingActions.add(cookingAction);
+		kwdb.getCookingActions().add(cookingAction);
 	}
-	
-	public List<Tool> getTools() {
-		return tools;
+	private void readPartIndicators(Element element, KeyWordDatabase kwdb) {
+		for(Element child : element.getChildren()) {
+			if(child.getName().equals(ELEMENT_PART_INDICATOR)) {
+				readPartIndicator(child, kwdb);
+			} else {
+				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
+			}
+		}		
 	}
-	public List<Ingredient> getIngredients() {
-		return ingredients;
+	private void readPartIndicator(Element element, KeyWordDatabase kwdb) {
+		kwdb.getPartIndicators().add(element.getValue());
 	}
-	public List<CookingAction> getCookingActions() {
-		return cookingActions;
+	private void readLastSentenceReferences(Element element, KeyWordDatabase kwdb) {
+		for(Element child : element.getChildren()) {
+			if(child.getName().equals(ELEMENT_LAST_SENTENCE_REFERENCE)) {
+				readLastSentenceReference(child, kwdb);
+			} else {
+				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
+			}
+		}		
 	}
+	private void readLastSentenceReference(Element element, KeyWordDatabase kwdb) {
+		kwdb.getLastSentenceReferences().add(element.getValue());
+	}
+
 }

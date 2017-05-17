@@ -6,7 +6,7 @@ import java.util.List;
 public class Step {
 	
 	private List<Ingredient> ingredients;
-	private Tool tool;
+	private List<Tool> tools;
 	private CookingAction cookingAction;
 	
 	private Ingredient product;
@@ -16,13 +16,11 @@ public class Step {
 	
 	public Step() {
 		ingredients = new ArrayList<Ingredient>();
+		tools = new ArrayList<Tool>();
 	}
 	
-	public Tool getTool() {
-		return tool;
-	}
-	public void setTool(Tool tool) {
-		this.tool = tool;
+	public List<Tool> getTools() {
+		return tools;
 	}
 	public CookingAction getCookingAction() {
 		return cookingAction;
@@ -45,5 +43,10 @@ public class Step {
 	public List<Ingredient> getIngredients() {
 		return ingredients;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "Step [ingredients=" + ingredients + ", tools=" + tools + ", cookingAction=" + cookingAction + ", product="
+				+ product + ", \'" + text + "']";
+	}
 }

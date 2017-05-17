@@ -1,18 +1,23 @@
-<!ELEMENT Root (Werkzeuge, Zutaten, Tätigkeiten)>
-<!ELEMENT Werkzeuge (Werkzeug)*>
-<!ELEMENT Werkzeug (Name)*>
-<!ATTLIST Werkzeug
+<!ELEMENT root (tools, ingredients, cookingActions, partIndicators, lastSentenceReferences)>
+<!ELEMENT tools (Tool)*>
+<!ELEMENT Tool (Name)*>
+<!ATTLIST Tool
 	name CDATA #REQUIRED
 >
-<!ELEMENT Zutaten (Zutat)*>
-<!ELEMENT Zutat (Name | Eigenschaft)*>
-<!ATTLIST Zutat
+<!ELEMENT ingredients (Ingredient)*>
+<!ELEMENT Ingredient (Name | Property)*>
+<!ATTLIST Ingredient
 	name CDATA #REQUIRED
 >
-<!ELEMENT Eigenschaft (#PCDATA)>
-<!ELEMENT Tätigkeiten (Tätigkeit)*>
-<!ELEMENT Tätigkeit (Name)*>
-<!ATTLIST Tätigkeit
+<!ELEMENT Property (#PCDATA)>
+<!ELEMENT cookingActions (CookingAction)*>
+<!ELEMENT CookingAction (Name*, Result?)>
+<!ATTLIST CookingAction
 	name CDATA #REQUIRED
 >
+<!ELEMENT Result (#PCDATA)>
 <!ELEMENT Name (#PCDATA)>
+<!ELEMENT partIndicators (PartIndicator)*>
+<!ELEMENT PartIndicator (#PCDATA)>
+<!ELEMENT lastSentenceReferences (LastSentenceReference)*>
+<!ELEMENT LastSentenceReference (#PCDATA)>
