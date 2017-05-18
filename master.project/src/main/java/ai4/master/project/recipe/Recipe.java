@@ -14,11 +14,12 @@ public class Recipe {
 
 	private String preparation;
 
+	private LANG_FLAG language = LANG_FLAG.DE;
 
-	public Recipe() {
+	public Recipe(LANG_FLAG language) {
 		ingredients = new ArrayList<Ingredient>();
 		steps = new ArrayList<Step>();
-		
+		this.language = language;
 		preparation = "";
 	}
 
@@ -39,5 +40,13 @@ public class Recipe {
 	}
 	public List<Step> getSteps() {
 		return steps;
+	}
+
+	public LANG_FLAG getLanguage(){
+		return this.language;
+	}
+
+	public void setLanguage(LANG_FLAG language){
+		this.language = language;
 	}
 }
