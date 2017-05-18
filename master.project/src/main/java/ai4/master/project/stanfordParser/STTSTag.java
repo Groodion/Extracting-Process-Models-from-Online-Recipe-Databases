@@ -1,6 +1,6 @@
 package ai4.master.project.stanfordParser;
 
-public enum STTSTags {
+public enum STTSTag {
 	ADJA("attributives Adjektiv"),
 	ADJD("adverbiales oder prädikatives Adjektiv"),
 	ADV("Adverb"),
@@ -55,7 +55,7 @@ public enum STTSTags {
 
 	private String description;
 
-	private STTSTags(String description) {
+	private STTSTag(String description) {
 		this.description = description;
 	}
 

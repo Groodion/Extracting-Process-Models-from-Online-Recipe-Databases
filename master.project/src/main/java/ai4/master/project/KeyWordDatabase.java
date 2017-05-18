@@ -6,6 +6,7 @@ import java.util.List;
 import ai4.master.project.recipe.CookingAction;
 import ai4.master.project.recipe.Ingredient;
 import ai4.master.project.recipe.Tool;
+import ai4.master.project.stanfordParser.sentence.Role;
 
 public class KeyWordDatabase {
 	
@@ -144,5 +145,18 @@ public class KeyWordDatabase {
 		return dif;
 	}
 
-
+	public Role identify(String text) {
+		Ingredient i = findIngredient(text);
+		Tool t = findTool(text);
+		
+		if(i != null && t != null) {
+			return Role.UNDECIDABLE_OBJECT;
+		} else if(i != null) {
+			return Role.INGREDIENT;
+		} else if(t != null) {
+			return Role.TOOL;
+		} else {
+			return null;
+		}
+	}
 }

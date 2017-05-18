@@ -192,6 +192,9 @@
 		<Name>Lappen</Name>
 	</Tool>
 	<Tool name="Topfhandschuh"></Tool>
+	<Tool name="Tarteform">
+		<Name>Tarte-Form</Name>
+	</Tool>
 </tools>
 <ingredients>
 	<Ingredient name="Blätterteig" />
