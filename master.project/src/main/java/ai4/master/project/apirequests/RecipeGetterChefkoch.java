@@ -10,7 +10,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import ai4.master.project.recipe.Recipe;
+
+import ai4.master.project.recipe.baseObject.BaseRecipe;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -75,7 +76,7 @@ public class RecipeGetterChefkoch {
      * @param recipe the recipe to save the preparation in
      * @return the preparation as a string in case you need it for debug purposes
      */
-    public String getRecipePreparation(String id, Recipe recipe) {
+    public String getRecipePreparation(String id, BaseRecipe recipe) {
         StringBuilder preparation = new StringBuilder();
         String response = getHttpRequestBody(REZEPTE_API_STRING + id);
         JSONArray resultList = this.getJsonResultList(response);
@@ -101,7 +102,7 @@ public class RecipeGetterChefkoch {
      * @param recipe the recipe instance to be used
      * @return all ingredigents as a string for debug purposes
      */
-    public String getRecipeIngredigents(String id, Recipe recipe) {
+    public String getRecipeIngredigents(String id, BaseRecipe recipe) {
         StringBuilder stringBuilder = new StringBuilder();
         String response = getHttpRequestBody(REZEPTE_API_STRING + id);
         JSONArray resultList = this.getJsonResultList(response);

@@ -3,34 +3,34 @@ package ai4.master.project;
 import java.util.ArrayList;
 import java.util.List;
 
-import ai4.master.project.recipe.CookingAction;
-import ai4.master.project.recipe.Ingredient;
-import ai4.master.project.recipe.Tool;
+import ai4.master.project.recipe.baseObject.BaseCookingAction;
+import ai4.master.project.recipe.baseObject.BaseIngredient;
+import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.stanfordParser.sentence.Role;
 
 public class KeyWordDatabase {
 	
-	private List<Tool> tools;
-	private List<Ingredient> ingredients;
-	private List<CookingAction> cookingActions;
+	private List<BaseTool> tools;
+	private List<BaseIngredient> ingredients;
+	private List<BaseCookingAction> cookingActions;
 	private List<String> partIndicators;
 	private List<String> lastSentenceReferences;
 	
 	public KeyWordDatabase() {
-		tools = new ArrayList<Tool>();
-		ingredients = new ArrayList<Ingredient>();
-		cookingActions = new ArrayList<CookingAction>();
+		tools = new ArrayList<BaseTool>();
+		ingredients = new ArrayList<BaseIngredient>();
+		cookingActions = new ArrayList<BaseCookingAction>();
 		partIndicators = new ArrayList<String>();
 		lastSentenceReferences = new ArrayList<String>();
 	}
 
-	public List<Tool> getTools() {
+	public List<BaseTool> getTools() {
 		return tools;
 	}
-	public List<Ingredient> getIngredients() {
+	public List<BaseIngredient> getIngredients() {
 		return ingredients;
 	}
-	public List<CookingAction> getCookingActions() {
+	public List<BaseCookingAction> getCookingActions() {
 		return cookingActions;
 	}
 
@@ -41,16 +41,16 @@ public class KeyWordDatabase {
 		return lastSentenceReferences;
 	}
 	
-	public Tool findTool(String text) {
+	public BaseTool findTool(String text) {
 		return findTool(text, 0d);
 	}
-	public Tool findTool(String text, double error) {
+	public BaseTool findTool(String text, double error) {
 		if(text == null) return null;
 		
-		Tool bestMatch = null;
+		BaseTool bestMatch = null;
 		double e = 1.0;
 		
-		for(Tool tool : tools) {
+		for(BaseTool tool : tools) {
 			if(tool.getStemmedNames().contains(text)) {
 				return tool;
 			}
@@ -66,16 +66,16 @@ public class KeyWordDatabase {
 		}
 		return bestMatch;
 	}
-	public Ingredient findIngredient(String text) {
+	public BaseIngredient findIngredient(String text) {
 		return findIngredient(text, 0d);
 	}
-	public Ingredient findIngredient(String text, double error) {
+	public BaseIngredient findIngredient(String text, double error) {
 		if(text == null) return null;
 
-		Ingredient bestMatch = null;
+		BaseIngredient bestMatch = null;
 		double e = 1.0;
 
-		for(Ingredient ingredient : ingredients) {
+		for(BaseIngredient ingredient : ingredients) {
 			System.out.println(text + " " + ingredient.getStemmedNames());
 			if(ingredient.getStemmedNames().contains(text)) {
 				return ingredient;
@@ -92,16 +92,16 @@ public class KeyWordDatabase {
 		}
 		return bestMatch;
 	}
-	public CookingAction findCookingAction(String text) {
+	public BaseCookingAction findCookingAction(String text) {
 		return findCookingAction(text, 0d);
 	}
-	public CookingAction findCookingAction(String text, double error) {
+	public BaseCookingAction findCookingAction(String text, double error) {
 		if(text == null) return null;
 
-		CookingAction bestMatch = null;
+		BaseCookingAction bestMatch = null;
 		double e = 1.0;
 
-		for(CookingAction cookingAction : cookingActions) {
+		for(BaseCookingAction cookingAction : cookingActions) {
 			if(cookingAction.getStemmedNames().contains(text)) {
 				return cookingAction;
 			}
@@ -147,8 +147,8 @@ public class KeyWordDatabase {
 	}
 
 	public Role identify(String text) {
-		Ingredient i = findIngredient(text);
-		Tool t = findTool(text);
+		BaseIngredient i = findIngredient(text);
+		BaseTool t = findTool(text);
 		
 		if(i != null && t != null) {
 			return Role.UNDECIDABLE_OBJECT;

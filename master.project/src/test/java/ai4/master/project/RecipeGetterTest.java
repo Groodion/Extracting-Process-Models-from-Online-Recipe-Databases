@@ -1,7 +1,8 @@
 package ai4.master.project;
 
 import ai4.master.project.apirequests.RecipeGetterChefkoch;
-import ai4.master.project.recipe.Recipe;
+import ai4.master.project.recipe.baseObject.BaseRecipe;
+
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
@@ -14,7 +15,7 @@ public class RecipeGetterTest {
 
         String ids = RecipeGetterChefkoch.recipeGetterFactory().getRecipeIDs("käse", 5);
         String[] splittedIds = ids.split(",");
-        Recipe recipe = new Recipe();
+        BaseRecipe recipe = new BaseRecipe();
         for (String id :
                 splittedIds) {
             if (!id.equals("") && id != null) {

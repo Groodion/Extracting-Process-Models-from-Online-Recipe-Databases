@@ -1,22 +1,24 @@
-package ai4.master.project.recipe;
+package ai4.master.project.recipe.baseObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import ai4.master.project.recipe.Step;
 
 /**
  * Created by René Bärnreuther on 04.05.2017.
  * .
  */
-public class Recipe {
+public class BaseRecipe {
 
-	private List<Ingredient> ingredients;
+	private List<BaseIngredient> ingredients;
 	private List<Step> steps;
 
 	private String preparation;
 
 
-	public Recipe() {
-		ingredients = new ArrayList<Ingredient>();
+	public BaseRecipe() {
+		ingredients = new ArrayList<BaseIngredient>();
 		steps = new ArrayList<Step>();
 		
 		preparation = "";
@@ -30,11 +32,11 @@ public class Recipe {
 	}
 
 	public void addIngredient(String ingredient){
-		Ingredient ingredient1 = new Ingredient();
+		BaseIngredient ingredient1 = new BaseIngredient();
 		ingredient1.setName(ingredient);
 		ingredients.add(ingredient1);
 	}
-	public List<Ingredient> getIngredients() {
+	public List<BaseIngredient> getIngredients() {
 		return ingredients;
 	}
 	public List<Step> getSteps() {

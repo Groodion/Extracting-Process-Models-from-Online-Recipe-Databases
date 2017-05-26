@@ -6,9 +6,9 @@ import java.util.List;
 import org.tartarus.snowball.ext.German2Stemmer;
 
 import ai4.master.project.KeyWordDatabase;
-import ai4.master.project.recipe.CookingAction;
-import ai4.master.project.recipe.Ingredient;
-import ai4.master.project.recipe.Tool;
+import ai4.master.project.recipe.baseObject.BaseCookingAction;
+import ai4.master.project.recipe.baseObject.BaseIngredient;
+import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.stanfordParser.STTSTag;
 
 
@@ -36,9 +36,9 @@ public class Word extends PartialObject<Word> {
 	
 	private boolean isVerb = false;
 	
-	private CookingAction cookingAction;
-	private List<Tool> tools;
-	private List<Ingredient> ingredients;
+	private BaseCookingAction cookingAction;
+	private List<BaseTool> tools;
+	private List<BaseIngredient> ingredients;
 	
 	
 	public Word(String text, STTSTag pos, SentencePart sentencePart) {
@@ -52,8 +52,8 @@ public class Word extends PartialObject<Word> {
 		referenceTargets = new ArrayList<Word>();
 		connections = new ArrayList<Word>();
 		
-		tools = new ArrayList<Tool>();
-		ingredients = new ArrayList<Ingredient>();
+		tools = new ArrayList<BaseTool>();
+		ingredients = new ArrayList<BaseIngredient>();
 		
 		setSentencePart(sentencePart);
 	}
@@ -389,7 +389,7 @@ public class Word extends PartialObject<Word> {
 		}
 	}
 	
-	public CookingAction getCookingAction() {
+	public BaseCookingAction getCookingAction() {
 		return cookingAction;
 	}
 
@@ -438,10 +438,10 @@ public class Word extends PartialObject<Word> {
 		return null;
 	}
 
-	public List<Tool> getTools() {
+	public List<BaseTool> getTools() {
 		return tools;
 	}
-	public List<Ingredient> getIngredients() {
+	public List<BaseIngredient> getIngredients() {
 		return ingredients;
 	}
 	

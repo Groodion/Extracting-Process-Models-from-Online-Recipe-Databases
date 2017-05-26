@@ -1,10 +1,11 @@
 package ai4.master.project.process;
 
-import ai4.master.project.recipe.Recipe;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.GatewayDirection;
 import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
+
+import ai4.master.project.recipe.baseObject.BaseRecipe;
 
 /**
  * Created by René Bärnreuther on 15.05.2017.
@@ -24,7 +25,7 @@ public class ProcessModelerImpl implements ProcessModeler {
      * @param recipe The recipe containing the steps annd other informations for convesion
      * @return
      */
-    public BpmnModelInstance convertToProcess(Recipe recipe) {
+    public BpmnModelInstance convertToProcess(BaseRecipe recipe) {
         //this.modelInstance = Bpmn.createProcess("Test").name("TestProzess").startEvent().userTask("Kochen").name("Some cooking to do").endEvent().done();
         //System.out.println(createXml());
         // System.out.println("---");

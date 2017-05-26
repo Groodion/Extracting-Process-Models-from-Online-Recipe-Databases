@@ -1,16 +1,17 @@
-package ai4.master.project.recipe;
+package ai4.master.project.recipe.baseObject;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import ai4.master.project.recipe.object.NamedObject;
 import ai4.master.project.stanfordParser.sentence.Word;
 
-public class NamedObject {
+public abstract class BaseNamedObject<N extends NamedObject<B>, B extends BaseNamedObject<N, B>> {
 	
 	private Set<String> names;
 	private Set<String> stemmedNames;
 	
-	public NamedObject() {
+	public BaseNamedObject() {
 		names = new HashSet<String>();
 		stemmedNames = new HashSet<String>();
 	}
@@ -36,4 +37,6 @@ public class NamedObject {
 	public String toString() {
 		return names.iterator().next();
 	}
+
+	public abstract N toObject();
 }

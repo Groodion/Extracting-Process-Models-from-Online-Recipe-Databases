@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ai4.master.project.KeyWordDatabase;
-import ai4.master.project.recipe.CookingAction;
-import ai4.master.project.recipe.Ingredient;
-import ai4.master.project.recipe.Tool;
+import ai4.master.project.recipe.baseObject.BaseCookingAction;
+import ai4.master.project.recipe.baseObject.BaseIngredient;
+import ai4.master.project.recipe.baseObject.BaseTool;
+import ai4.master.project.recipe.object.Ingredient;
+import ai4.master.project.recipe.object.Tool;
 import ai4.master.project.stanfordParser.STTSTag;
 
 public class SentencePart extends PartialObject<SentencePart> {
@@ -187,7 +189,7 @@ public class SentencePart extends PartialObject<SentencePart> {
 		
 		return nSB;
 	}
-	public CookingAction getCookingAction() {
+	public BaseCookingAction getCookingAction() {
 		for(Word word : words) {
 			if(word.getRole() == Role.ACTION) {
 				return word.getCookingAction();
@@ -199,7 +201,9 @@ public class SentencePart extends PartialObject<SentencePart> {
 		List<Tool> tools = new ArrayList<Tool>();
 		
 		for(Word word : words) {
-			tools.addAll(word.getTools());
+			for(BaseTool bTool : word.getTools()) {
+				tools.add(new Tool(word.getText(), bTool));				
+			}
 		}
 		
 		return tools;
@@ -208,9 +212,20 @@ public class SentencePart extends PartialObject<SentencePart> {
 		List<Ingredient> ingredients = new ArrayList<Ingredient>();
 		
 		for(Word word : words) {
-			ingredients.addAll(word.getIngredients());
+			for(BaseIngredient bIngredient : word.getIngredients()) {
+				ingredients.add(new Ingredient(word.getText(), bIngredient));				
+			}
 		}
 		
 		return ingredients;
+	}
+	public Word getMainVerb() {
+		for(Word word : words) {
+			if(word.getRole() == Role.ACTION) {
+				return word;
+			}
+		}
+		
+		return null;
 	}
 }

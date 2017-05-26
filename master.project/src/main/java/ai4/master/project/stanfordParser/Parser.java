@@ -6,9 +6,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import ai4.master.project.KeyWordDatabase;
-import ai4.master.project.recipe.CookingAction;
-import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
+import ai4.master.project.recipe.baseObject.BaseCookingAction;
+import ai4.master.project.recipe.baseObject.BaseRecipe;
+import ai4.master.project.recipe.object.CookingAction;
 import ai4.master.project.stanfordParser.sentence.PunctuationMark;
 import ai4.master.project.stanfordParser.sentence.Sentence;
 import ai4.master.project.stanfordParser.sentence.SentencePart;
@@ -94,8 +95,8 @@ public class Parser {
 		this.kwdb = kwdb;
 	}
 
-	public Recipe parseText(String text) {		
-		Recipe recipe = new Recipe();
+	public BaseRecipe parseText(String text) {		
+		BaseRecipe recipe = new BaseRecipe();
 		
 		recipe.setPreparation(text);
 
@@ -109,10 +110,10 @@ public class Parser {
 			for(SentencePart sP : s.getParts()) {
 				System.out.println(sP.getText());
 				Step step = new Step();
-				CookingAction action = sP.getCookingAction();
+				BaseCookingAction action = sP.getCookingAction();
 				
 				step.setText(sP.getText());
-				step.setCookingAction(action);
+				step.setCookingAction(new CookingAction(sP.getMainVerb().getText(), action));
 				
 				step.getIngredients().addAll(sP.getIngredients());
 				step.getTools().addAll(sP.getTools());

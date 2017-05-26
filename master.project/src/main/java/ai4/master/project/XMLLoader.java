@@ -11,6 +11,9 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.input.sax.XMLReaders;
 
 import ai4.master.project.recipe.*;
+import ai4.master.project.recipe.baseObject.BaseCookingAction;
+import ai4.master.project.recipe.baseObject.BaseIngredient;
+import ai4.master.project.recipe.baseObject.BaseTool;
 
 
 public class XMLLoader {	
@@ -73,7 +76,7 @@ public class XMLLoader {
 		}
 	}
 	private void readTool(Element element, KeyWordDatabase kwdb) {
-		Tool tool = new Tool();
+		BaseTool tool = new BaseTool();
 		
 		for(Attribute att : element.getAttributes()) {
 			if(att.getName().equals(ATTRIBUTE_NAME)) {
@@ -103,7 +106,7 @@ public class XMLLoader {
 		}		
 	}
 	private void readIngredient(Element element, KeyWordDatabase kwdb) {
-		Ingredient ingredient = new Ingredient();
+		BaseIngredient ingredient = new BaseIngredient();
 		
 		for(Attribute att : element.getAttributes()) {
 			if(att.getName().equals(ATTRIBUTE_NAME)) {
@@ -133,7 +136,7 @@ public class XMLLoader {
 		}		
 	}
 	private void readCookingAction(Element element, KeyWordDatabase kwdb) {
-		CookingAction cookingAction = new CookingAction();
+		BaseCookingAction cookingAction = new BaseCookingAction();
 		
 		for(Attribute att : element.getAttributes()) {
 			if(att.getName().equals(ATTRIBUTE_NAME)) {
