@@ -7,6 +7,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -134,6 +135,7 @@ public class RecipeGetterChefkoch implements RecipeGetter {
     /*
     Returns the JSONArray returnlist. Implemented here to remove redundancy.
      */
+    @Nullable
     private JSONArray getJsonResultList(String jsonString) {
         try {
             JSONParser jsonParser = new JSONParser();
@@ -152,6 +154,7 @@ public class RecipeGetterChefkoch implements RecipeGetter {
     Returns null, if nothing was given back.
     Can be moved into another file in case we implement more than chefkoch.
      */
+    @Nullable
     private String getHttpRequestBody(String url) {
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet request = new HttpGet(url);
