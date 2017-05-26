@@ -6,23 +6,20 @@ import java.util.List;
 public class Step {
 	
 	private List<Ingredient> ingredients;
-	private Tool tool;
+	private List<Tool> tools;
 	private CookingAction cookingAction;
 	
-	private Ingredient product;
+	private List<Ingredient> products;
 	
-	private String text;
+	private String completePrep;
 	
 	
 	public Step() {
 		ingredients = new ArrayList<Ingredient>();
 	}
 	
-	public Tool getTool() {
-		return tool;
-	}
-	public void setTool(Tool tool) {
-		this.tool = tool;
+	public List<Tool> getTools() {
+		return tools;
 	}
 	public CookingAction getCookingAction() {
 		return cookingAction;
@@ -30,17 +27,14 @@ public class Step {
 	public void setCookingAction(CookingAction cookingAction) {
 		this.cookingAction = cookingAction;
 	}
-	public Ingredient getProduct() {
-		return product;
+	public List<Ingredient> getProducts() {
+		return products;
 	}
-	public void setProduct(Ingredient product) {
-		this.product = product;
+	public String getCompletePrep() {
+		return completePrep;
 	}
-	public String getText() {
-		return text;
-	}
-	public void setText(String text) {
-		this.text = text;
+	public void setCompletePrep(String completePrep) {
+		this.completePrep = completePrep;
 	}
 	public List<Ingredient> getIngredients() {
 		return ingredients;
