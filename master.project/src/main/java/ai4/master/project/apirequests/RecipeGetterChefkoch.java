@@ -6,12 +6,14 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import ai4.master.project.recipe.baseObject.BaseRecipe;
+import ai4.master.project.recipe.Recipe;
+import ai4.master.project.recipe.object.Ingredient;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -23,7 +25,7 @@ import java.util.Iterator;
  * http://www.pebra.net/blog/2012/10/31/how-to-get-recipes-fromchefkoch-dot-de/
  * http://www.pebra.net/blog/2013/03/13/Get-recipes-from-chefkoch.de-using-ruby-Part-2/
  */
-public class RecipeGetterChefkoch {
+public class RecipeGetterChefkoch implements RecipeGetter {
 
     private static final String BASE_API_STRING = "http://api.chefkoch.de/api/1.1/api-recipe-search.php?Suchbegriff=";
     private static final String REZEPTE_API_STRING = "http://api.chefkoch.de/api/1.1/api-recipe.php?ID=";
@@ -76,7 +78,7 @@ public class RecipeGetterChefkoch {
      * @param recipe the recipe to save the preparation in
      * @return the preparation as a string in case you need it for debug purposes
      */
-    public String getRecipePreparation(String id, BaseRecipe recipe) {
+    public String getRecipePreparation(String id, Recipe recipe) {
         StringBuilder preparation = new StringBuilder();
         String response = getHttpRequestBody(REZEPTE_API_STRING + id);
         JSONArray resultList = this.getJsonResultList(response);
@@ -102,7 +104,7 @@ public class RecipeGetterChefkoch {
      * @param recipe the recipe instance to be used
      * @return all ingredigents as a string for debug purposes
      */
-    public String getRecipeIngredigents(String id, BaseRecipe recipe) {
+    public String getRecipeIngredients(String id, Recipe recipe) {
         StringBuilder stringBuilder = new StringBuilder();
         String response = getHttpRequestBody(REZEPTE_API_STRING + id);
         JSONArray resultList = this.getJsonResultList(response);
@@ -125,7 +127,7 @@ public class RecipeGetterChefkoch {
             stringBuilder.append(" ");
             stringBuilder.append(ingredigent.get("einheit"));
             stringBuilder.append("\n");
-            recipe.addIngredient(stringBuilder.toString());
+            recipe.getIngredients().add(new Ingredient(stringBuilder.toString(), null));
 
         }
 
@@ -135,6 +137,7 @@ public class RecipeGetterChefkoch {
     /*
     Returns the JSONArray returnlist. Implemented here to remove redundancy.
      */
+    @Nullable
     private JSONArray getJsonResultList(String jsonString) {
         try {
             JSONParser jsonParser = new JSONParser();
@@ -153,6 +156,7 @@ public class RecipeGetterChefkoch {
     Returns null, if nothing was given back.
     Can be moved into another file in case we implement more than chefkoch.
      */
+    @Nullable
     private String getHttpRequestBody(String url) {
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet request = new HttpGet(url);

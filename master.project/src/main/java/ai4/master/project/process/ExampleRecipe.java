@@ -1,8 +1,9 @@
 package ai4.master.project.process;
 
-import ai4.master.project.recipe.Recipe;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+
+import ai4.master.project.recipe.Recipe;
 
 /**
  * Created by René Bärnreuther on 16.05.2017.

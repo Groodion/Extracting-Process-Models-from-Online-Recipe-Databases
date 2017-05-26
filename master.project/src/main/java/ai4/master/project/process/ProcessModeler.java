@@ -2,7 +2,8 @@ package ai4.master.project.process;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
-import ai4.master.project.recipe.baseObject.BaseRecipe;
+import ai4.master.project.recipe.Recipe;
+
 
 /**
  * Created by René Bärnreuther on 15.05.2017.
@@ -15,5 +16,5 @@ public interface ProcessModeler {
      * Converts a given process to a bpmn model
      * @param recipe The recipe containing the steps annd other informations for convesion
      */
-    BpmnModelInstance convertToProcess(BaseRecipe recipe);
+    BpmnModelInstance convertToProcess(Recipe recipe);
 }
