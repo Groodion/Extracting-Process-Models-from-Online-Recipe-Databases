@@ -11,6 +11,9 @@ public class Block extends PartialObject<Block> {
 	private BlockRole role;
 	private Word descriptionTarget;
 	
+	private boolean subject = false;
+	private boolean object = false;
+	
 	
 	public Block(SentencePart sentencePart) {
 		this.sentencePart = sentencePart;
@@ -53,7 +56,27 @@ public class Block extends PartialObject<Block> {
 		this.descriptionTarget = descriptionTarget;
 	}
 
+	public boolean isSubject() {
+		return subject;
+	}
+	public void setSubject(boolean subject) {
+		this.subject = subject;
+	}
 
+	public boolean isObject() {
+		return object;
+	}
+	public void setObject(boolean object) {
+		this.object = object;
+	}
+
+	public Word getFirstWord() {
+		return words.get(0);
+	}
+	public Word getLastWord() {
+		return words.get(words.size() - 1);
+	}
+	
 	@Override
 	public String toString() {
 		return "Block [role=" + role + ", size: " + words.size() + "]";

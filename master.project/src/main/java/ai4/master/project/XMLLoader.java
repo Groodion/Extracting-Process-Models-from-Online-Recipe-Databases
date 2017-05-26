@@ -27,6 +27,7 @@ public class XMLLoader {
 	public static final String ELEMENT_LAST_SENTENCE_REFERENCE = "LastSentenceReference";
 	public static final String ELEMENT_NAME = "Name";
 	public static final String ATTRIBUTE_NAME = "name";
+	public static final String ATTRIBUTE_RESULT_FINDER = "resultFinder";
 	
 	/**
 	 * Loads XML-File from URL and puts the elements into lists
@@ -76,7 +77,7 @@ public class XMLLoader {
 		
 		for(Attribute att : element.getAttributes()) {
 			if(att.getName().equals(ATTRIBUTE_NAME)) {
-				tool.getNames().add(att.getValue());
+				tool.addName(att.getValue());
 			} else {
 				System.err.println("Unknown Attribute");
 			}
@@ -84,7 +85,7 @@ public class XMLLoader {
 
 		for(Element child : element.getChildren()) {
 			if(child.getName().equals(ELEMENT_NAME)) {
-				tool.getNames().add(child.getText());
+				tool.addName(child.getText());
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}
@@ -106,7 +107,7 @@ public class XMLLoader {
 		
 		for(Attribute att : element.getAttributes()) {
 			if(att.getName().equals(ATTRIBUTE_NAME)) {
-				ingredient.getNames().add(att.getValue());
+				ingredient.addName(att.getValue());
 			} else {
 				System.err.println("Unknown Attribute");
 			}
@@ -114,7 +115,7 @@ public class XMLLoader {
 
 		for(Element child : element.getChildren()) {
 			if(child.getName().equals(ELEMENT_NAME)) {
-				ingredient.getNames().add(child.getText());
+				ingredient.addName(child.getText());
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}
@@ -136,7 +137,13 @@ public class XMLLoader {
 		
 		for(Attribute att : element.getAttributes()) {
 			if(att.getName().equals(ATTRIBUTE_NAME)) {
-				cookingAction.getNames().add(att.getValue());
+				cookingAction.addName(att.getValue());
+			} else if(att.getName().equals(ATTRIBUTE_RESULT_FINDER)) {
+				if(att.getValue().equals("Subjekt")) {
+					cookingAction.setResultFinder(ResultType.SUBJECT);
+				} else {
+					cookingAction.setResultFinder(ResultType.OBJECT);	
+				}
 			} else {
 				System.err.println("Unknown Attribute");
 			}
@@ -144,7 +151,7 @@ public class XMLLoader {
 
 		for(Element child : element.getChildren()) {
 			if(child.getName().equals(ELEMENT_NAME)) {
-				cookingAction.getNames().add(child.getText());
+				cookingAction.addName(child.getText());
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}
@@ -176,5 +183,4 @@ public class XMLLoader {
 	private void readLastSentenceReference(Element element, KeyWordDatabase kwdb) {
 		kwdb.getLastSentenceReferences().add(element.getValue());
 	}
-
 }

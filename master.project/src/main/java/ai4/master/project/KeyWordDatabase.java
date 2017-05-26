@@ -51,7 +51,7 @@ public class KeyWordDatabase {
 		double e = 1.0;
 		
 		for(Tool tool : tools) {
-			if(tool.getNames().contains(text)) {
+			if(tool.getStemmedNames().contains(text)) {
 				return tool;
 			}
 			for(String name : tool.getNames()) {
@@ -76,7 +76,8 @@ public class KeyWordDatabase {
 		double e = 1.0;
 
 		for(Ingredient ingredient : ingredients) {
-			if(ingredient.getNames().contains(text)) {
+			System.out.println(text + " " + ingredient.getStemmedNames());
+			if(ingredient.getStemmedNames().contains(text)) {
 				return ingredient;
 			}
 			for(String name : ingredient.getNames()) {
@@ -101,7 +102,7 @@ public class KeyWordDatabase {
 		double e = 1.0;
 
 		for(CookingAction cookingAction : cookingActions) {
-			if(cookingAction.getNames().contains(text)) {
+			if(cookingAction.getStemmedNames().contains(text)) {
 				return cookingAction;
 			}
 			for(String name : cookingAction.getNames()) {

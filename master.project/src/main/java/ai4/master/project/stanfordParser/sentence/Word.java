@@ -3,10 +3,25 @@ package ai4.master.project.stanfordParser.sentence;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.tartarus.snowball.ext.German2Stemmer;
+
 import ai4.master.project.KeyWordDatabase;
+import ai4.master.project.recipe.CookingAction;
+import ai4.master.project.recipe.Ingredient;
+import ai4.master.project.recipe.Tool;
 import ai4.master.project.stanfordParser.STTSTag;
 
+
 public class Word extends PartialObject<Word> {
+	
+	private static final German2Stemmer STEMMER = new German2Stemmer();
+	
+	public static String stem(String word) {
+		STEMMER.setCurrent(word);
+		STEMMER.stem();
+		return STEMMER.getCurrent();
+	}
+	
 	
 	private String text;
 	
@@ -19,7 +34,13 @@ public class Word extends PartialObject<Word> {
 	
 	private Block block;
 	
-
+	private boolean isVerb = false;
+	
+	private CookingAction cookingAction;
+	private List<Tool> tools;
+	private List<Ingredient> ingredients;
+	
+	
 	public Word(String text, STTSTag pos, SentencePart sentencePart) {
 		this(text, pos, null, sentencePart);
 	}
@@ -30,6 +51,9 @@ public class Word extends PartialObject<Word> {
 
 		referenceTargets = new ArrayList<Word>();
 		connections = new ArrayList<Word>();
+		
+		tools = new ArrayList<Tool>();
+		ingredients = new ArrayList<Ingredient>();
 		
 		setSentencePart(sentencePart);
 	}
@@ -202,6 +226,10 @@ public class Word extends PartialObject<Word> {
 		}
 	}
 	
+	public boolean isVerb() {
+		return isVerb;
+	}
+	
 	public SentencePart getSentencePart() {
 		return sentencePart;
 	}
@@ -235,7 +263,8 @@ public class Word extends PartialObject<Word> {
 		case APZR:
 			break;
 		case ART:
-			connections.add(getNextNoun());
+			Word noun = getNextNoun();
+			connections.add(noun);
 			break;
 		case CARD:
 			break;
@@ -263,7 +292,12 @@ public class Word extends PartialObject<Word> {
 			break;
 		case NE:
 		case NN:
-			role = kwdb.identify(text);
+			role = kwdb.identify(stem(text));
+			if(role == Role.TOOL) {
+				tools.add(kwdb.findTool(stem(getText())));
+			} else if(role == Role.INGREDIENT) {
+				ingredients.add(kwdb.findIngredient(stem(getText())));
+			}
 			break;
 		case PDAT:
 			break;
@@ -275,6 +309,7 @@ public class Word extends PartialObject<Word> {
 			break;
 		case PPER:
 			getReferenceTargets().add(getLastIngredient());
+			getIngredients().addAll(getLastIngredient().getIngredients());
 			break;
 		case PPOSAT:
 			break;
@@ -324,42 +359,57 @@ public class Word extends PartialObject<Word> {
 			break;
 		case TRUNC:
 			break;
-		case VAFIN:
-			break;
-		case VAIMP:
-			break;
-		case VAINF:
-			break;
-		case VAPP:
-			break;
-		case VMFIN:
-			break;
-		case VMINF:
-			break;
-		case VMPP:
-			break;
-		case VVFIN:
-			break;
-		case VVIMP:
-			break;
 		case VVINF:
 			role = Role.ACTION;
-			break;
+			cookingAction = kwdb.findCookingAction(stem(getText()));
+		case VAFIN:
+		case VAIMP:
+		case VAINF:
+		case VAPP:
+		case VMFIN:
+		case VMINF:
+		case VMPP:
+		case VVFIN:
+		case VVIMP:
 		case VVIZU:
-			break;
 		case VVPP:
+			isVerb = true;
 			break;
 		case XY:
 			break;
 		default:
 			break;
-		
 		}
-		System.out.println(this);
+	}
+	public void lexConnectTo(Word word) {
+		if(word.isVerb()) {
+			if(getBlock().getRole() == BlockRole.INGREDIENT_TOOL_COLLECTION) {
+				getBlock().setSubject(true);
+			}
+		}
 	}
 	
+	public CookingAction getCookingAction() {
+		return cookingAction;
+	}
+
 	public void deepBlockGeneration(KeyWordDatabase kwdb) {
-		
+		if(getPos() == STTSTag.KON) {
+			if(getNext() != null && getPrev() != null && getNext().getRole() == Role.INGREDIENT && getPrev().getRole() == Role.INGREDIENT) {
+				Block enumerationBlock = new Block(sentencePart);
+				
+				Word lastIngredient = getNext().getConnections().size() == 0 ? getNext() : getNext().getConnections().get(0);
+				
+				enumerationBlock.setRole(BlockRole.INGREDIENT_TOOL_COLLECTION);
+				Word sWord = null;
+				for(Word word = getPrev(); word != null && (word.getRole() == Role.INGREDIENT || word.getRole() == Role.UNDECIDABLE_OBJECT); word = word.getPrev()) {
+					sWord = word;
+				}
+				for(Word word = sWord; word != lastIngredient.getNext(); word = word.getNext()) {
+					word.setBlock(enumerationBlock);
+				}
+			}
+		}
 	}
 	
 	public List<Word> getLastSubjectWords() {
@@ -388,6 +438,12 @@ public class Word extends PartialObject<Word> {
 		return null;
 	}
 
+	public List<Tool> getTools() {
+		return tools;
+	}
+	public List<Ingredient> getIngredients() {
+		return ingredients;
+	}
 	
 	@Override
 	public String toString() {

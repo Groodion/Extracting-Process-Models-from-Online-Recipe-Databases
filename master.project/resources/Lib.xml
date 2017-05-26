@@ -197,10 +197,14 @@
 	</Tool>
 </tools>
 <ingredients>
-	<Ingredient name="Blätterteig" />
+	<Ingredient name="Blätterteig">
+		<Name>Teig</Name>
+		<Name>Teighälfte</Name>
+	</Ingredient>
 	<Ingredient name="Schmand" />
-	<Ingredient name="Käse" />
-	<Ingredient name="Teig" />
+	<Ingredient name="Käse">
+		<Name>Käseraspel</Name>
+	</Ingredient>
 	<Ingredient name="Schinkenwürfel" />
 	<Ingredient name="Kartoffel"></Ingredient>
 	<Ingredient name="Wasser"></Ingredient>
@@ -221,23 +225,35 @@
 	<Ingredient name="Zimt"></Ingredient>
 </ingredients>
 <cookingActions>
-	<CookingAction name="rollen">
+	<CookingAction name="rollen" resultFinder="Subjekt">
 		<Name>aufrollen</Name>
+		<regs>
+			<Regex result="first">.*~INGREDIENT.*~ACTION.*</Regex>
+		</regs>
 	</CookingAction>
-	<CookingAction name="bestreichen" />
-	<CookingAction name="klappen" />
-	<CookingAction name="geben" />
-	<CookingAction name="schneiden" />
-	<CookingAction name="drehen" />
-	<CookingAction name="legen" />
-	<CookingAction name="backen" />
-	<CookingAction name="verteilen" />
-	<CookingAction name="verrühren" />
-	<CookingAction name="einkochen" />
-	<CookingAction name="abschmecken" />
-	<CookingAction name="herstellen" />
-	<CookingAction name="hochziehen" />
-	<CookingAction name="untermischen" />
+	<CookingAction name="streichen" resultFinder="Subjekt">
+		<Name>bestreichen</Name>
+		<regs>
+			<Regex>.*~INGREDIENT.*mit.*~INGREDIENT.*~ACTION.*</Regex>
+		</regs>
+	</CookingAction>
+	<CookingAction name="klappen" resultFinder="Subjekt">
+		<regs>
+			<Regex></Regex>
+		</regs>
+	</CookingAction>
+	<CookingAction name="geben" resultFinder="Objekt" />
+	<CookingAction name="schneiden" resultFinder="Subjekt" />
+	<CookingAction name="drehen" resultFinder="Subjekt" />
+	<CookingAction name="legen" resultFinder="Objekt" />
+	<CookingAction name="backen" resultFinder="Subjekt" />
+	<CookingAction name="verteilen" resultFinder="Objekt" />
+	<CookingAction name="verrühren" resultFinder="Objekt" />
+	<CookingAction name="einkochen" resultFinder="Subjekt" />
+	<CookingAction name="abschmecken" resultFinder="Subjekt" />
+	<CookingAction name="herstellen" resultFinder="Subjekt" />
+	<CookingAction name="hochziehen" resultFinder="Subjekt" />
+	<CookingAction name="untermischen" resultFinder="Objekt" />
 </cookingActions>
 <partIndicators>
 	<PartIndicator>Teil</PartIndicator>

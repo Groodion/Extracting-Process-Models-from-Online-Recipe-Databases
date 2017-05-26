@@ -6,7 +6,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import ai4.master.project.KeyWordDatabase;
+import ai4.master.project.recipe.CookingAction;
 import ai4.master.project.recipe.Recipe;
+import ai4.master.project.recipe.Step;
+import ai4.master.project.stanfordParser.sentence.PunctuationMark;
 import ai4.master.project.stanfordParser.sentence.Sentence;
 import ai4.master.project.stanfordParser.sentence.SentencePart;
 import ai4.master.project.stanfordParser.sentence.Word;
@@ -15,6 +18,7 @@ import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.process.DocumentPreprocessor;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 
+
 public class Parser {
 
 	public static final double ERROR = .20;
@@ -22,6 +26,7 @@ public class Parser {
 	private MaxentTagger tagger;
 	private KeyWordDatabase kwdb;
 
+	
 	public Parser(String taggerUrl) {
 		tagger = new MaxentTagger(taggerUrl);
 		kwdb = new KeyWordDatabase();
@@ -32,7 +37,7 @@ public class Parser {
 		List<List<TaggedWord>> taggedList = tagger.process(getSplittedSentencesFromString(text));
 		Sentence sentence = null;
 		
-		for(List<TaggedWord> taggedSentence : taggedList) {
+		for(List<TaggedWord> taggedSentence : taggedList) {			
 			sentence = new Sentence(sentence);
 			SentencePart part = new SentencePart(sentence);
 			
@@ -47,7 +52,9 @@ public class Parser {
 				try {
 					STTSTag tag = STTSTag.valueOf(taggedWord.tag());
 					word = new Word(taggedWord.word(), tag, word, part);
-				} catch(Exception e) { }
+				} catch(Exception e) {
+					new PunctuationMark(taggedWord.word(), part);
+				}
 			}
 			
 			for(int j = 0; j < sentence.getParts().size() - 1; j++) {
@@ -57,9 +64,10 @@ public class Parser {
 				}
 			}
 			
+			
 			sentences.add(sentence);
 		}
-		
+				
 		return sentences;
 	}
 	
@@ -97,7 +105,22 @@ public class Parser {
 			sentence.init(kwdb);
 		}
 		
+		for(Sentence s : sentences) {
+			for(SentencePart sP : s.getParts()) {
+				System.out.println(sP.getText());
+				Step step = new Step();
+				CookingAction action = sP.getCookingAction();
+				
+				step.setText(sP.getText());
+				step.setCookingAction(action);
+				
+				step.getIngredients().addAll(sP.getIngredients());
+				step.getTools().addAll(sP.getTools());
+				
+				recipe.getSteps().add(step);
+			}
+		}
+		
 		return recipe;
 	}
-	
 }

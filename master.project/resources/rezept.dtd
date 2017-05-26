@@ -11,11 +11,17 @@
 >
 <!ELEMENT Property (#PCDATA)>
 <!ELEMENT cookingActions (CookingAction)*>
-<!ELEMENT CookingAction (Name*, Result?)>
+<!ELEMENT CookingAction (Name*, Result?, regs?)>
 <!ATTLIST CookingAction
 	name CDATA #REQUIRED
+	resultFinder (Subjekt|Objekt) "Subjekt"
 >
 <!ELEMENT Result (#PCDATA)>
+<!ELEMENT regs (Regex+)>
+<!ELEMENT Regex (#PCDATA)>
+<!ATTLIST Regex
+	result (first|last) "first"
+>
 <!ELEMENT Name (#PCDATA)>
 <!ELEMENT partIndicators (PartIndicator)*>
 <!ELEMENT PartIndicator (#PCDATA)>
