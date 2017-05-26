@@ -3,6 +3,10 @@ package ai4.master.project.recipe;
 import java.util.ArrayList;
 import java.util.List;
 
+import ai4.master.project.recipe.object.CookingAction;
+import ai4.master.project.recipe.object.Ingredient;
+import ai4.master.project.recipe.object.Tool;
+
 public class Step {
 	
 	private List<Ingredient> ingredients;
@@ -11,11 +15,14 @@ public class Step {
 	
 	private List<Ingredient> products;
 	
-	private String completePrep;
+	private String text;
+	
+	private CookingEvent event;
 	
 	
 	public Step() {
 		ingredients = new ArrayList<Ingredient>();
+		tools = new ArrayList<Tool>();
 	}
 	
 	public List<Tool> getTools() {
@@ -30,14 +37,27 @@ public class Step {
 	public List<Ingredient> getProducts() {
 		return products;
 	}
-	public String getCompletePrep() {
-		return completePrep;
+
+	public String getText() {
+		return text;
 	}
-	public void setCompletePrep(String completePrep) {
-		this.completePrep = completePrep;
+	public void setText(String text) {
+		this.text = text;
 	}
 	public List<Ingredient> getIngredients() {
 		return ingredients;
 	}
+
+	public CookingEvent getEvent() {
+		return event;
+	}
+	public void setEvent(CookingEvent event) {
+		this.event = event;
+	}
 	
+	@Override
+	public String toString() {
+		return "Step [ingredients=" + ingredients + ", tools=" + tools + ", cookingAction=" + cookingAction + ", products="
+				+ products + ", \'" + text + "']";
+	}
 }

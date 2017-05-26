@@ -1,46 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>ai4</groupId>
-    <artifactId>master.project</artifactId>
-    <version>1.0-SNAPSHOT</version>
+	<groupId>ai4</groupId>
+	<artifactId>master.project</artifactId>
+	<version>1.0-SNAPSHOT</version>
 
-    <dependencies>
+	<dependencies>
 		<!-- https://mvnrepository.com/artifact/org.jdom/jdom2 -->
 		<dependency>
-		    <groupId>org.jdom</groupId>
-		    <artifactId>jdom2</artifactId>
-		    <version>2.0.6</version>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom2</artifactId>
+			<version>2.0.6</version>
 		</dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.16.16</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations-java5</artifactId>
-            <version>RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.camunda.bpm.model</groupId>
-            <artifactId>camunda-bpmn-model</artifactId>
-            <version>7.7.0-alpha1</version>
-        </dependency>
-    </dependencies>
-
-
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.16.16</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains</groupId>
+			<artifactId>annotations-java5</artifactId>
+			<version>RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.camunda.bpm.model</groupId>
+			<artifactId>camunda-bpmn-model</artifactId>
+			<version>7.7.0-alpha1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/edu.stanford.nlp/stanford-corenlp -->
+		<dependency>
+			<groupId>edu.stanford.nlp</groupId>
+			<artifactId>stanford-corenlp</artifactId>
+			<version>3.7.0</version>
+		</dependency>
+<!-- 		<dependency>
+			<groupId>com.github.rholder</groupId>
+			<artifactId>snowball-stemmer</artifactId>
+			<version>1.3.0.581.1</version>
+		</dependency>
+ -->		<dependency>
+			<groupId>stanford-german-corenlp-2016-10-31-models</groupId>
+			<artifactId>stanford-german-corenlp-2016-10-31-models</artifactId>
+			<scope>system</scope>
+			<version>3.7.0</version>
+			<systemPath>${basedir}\lib\stanford-german-corenlp-2016-10-31-models.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>stanford-postagger-3.7.0</groupId>
+			<artifactId>stanford-postagger-3.7.0</artifactId>
+			<scope>system</scope>
+			<version>3.7.0</version>
+			<systemPath>${basedir}\lib\stanford-postagger-3.7.0.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.opennlp</groupId>
+			<artifactId>opennlp-tools</artifactId>
+			<version>1.8.0</version>
+		</dependency>
+	</dependencies>
 </project>
