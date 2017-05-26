@@ -18,4 +18,6 @@ public class NamedObject {
 	public void setName(String name){
 		names.add(name);
 	}
+
+
 }
