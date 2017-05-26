@@ -18,8 +18,6 @@ public class ParserTest {
 		Parser parser = new Parser("lib/models/german-fast.tagger");
 		parser.setKwdb(kwdb);
 				
-		for(Step step : parser.parseText(text).getSteps())
-			System.out.println(step);
 		
 		//System.out.println(Word.stem("Käse") + " " + Word.stem("Käses"));
 	}

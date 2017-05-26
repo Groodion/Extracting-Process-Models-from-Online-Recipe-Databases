@@ -6,9 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import ai4.master.project.KeyWordDatabase;
+import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
-import ai4.master.project.recipe.baseObject.BaseRecipe;
 import ai4.master.project.recipe.object.CookingAction;
 import ai4.master.project.stanfordParser.sentence.PunctuationMark;
 import ai4.master.project.stanfordParser.sentence.Sentence;
@@ -95,9 +95,8 @@ public class Parser {
 		this.kwdb = kwdb;
 	}
 
-	public BaseRecipe parseText(String text) {		
-		BaseRecipe recipe = new BaseRecipe();
-		
+	public void parseRecipe(Recipe recipe ) {
+		String text = recipe.getPreparation();
 		recipe.setPreparation(text);
 
 		List<Sentence> sentences =  analyzeText(text);
@@ -121,7 +120,5 @@ public class Parser {
 				recipe.getSteps().add(step);
 			}
 		}
-		
-		return recipe;
 	}
 }
