@@ -2,8 +2,8 @@ package ai4.master.project.stanfordParser.sentence;
 
 public abstract class PartialObject<T extends PartialObject<T>> {
 
-	private T prev;
-	private T next;
+	 T prev;
+	 T next;
 	
 	
 	public PartialObject() {

@@ -19,5 +19,15 @@ public class NamedObject {
 		names.add(name);
 	}
 
+	/**
+	 * @returnt he FIRST name in the names set.
+	 */
+	public String getName(){
+		if(names.size() == 0){
+			return "";
+		}
+		return (String) getNames().toArray()[0];
+	}
+
 
 }
