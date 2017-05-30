@@ -1,5 +1,7 @@
 package ai4.master.project.apirequests;
 
+import ai4.master.project.recipe.Recipe;
+import ai4.master.project.recipe.object.Ingredient;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -11,9 +13,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
-import ai4.master.project.recipe.Recipe;
-import ai4.master.project.recipe.object.Ingredient;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -32,17 +31,8 @@ public class RecipeGetterChefkoch implements RecipeGetter {
 
     private static RecipeGetterChefkoch recipeGetterChefkoch = null;
 
-    private RecipeGetterChefkoch() {}
+    public RecipeGetterChefkoch() {}
 
-    /**
-     * Returns a RecipeGetterChefkoch. Used to prevent too many API Requests at once by using different instances, but can be done otherwise, too.
-     */
-    public static RecipeGetterChefkoch recipeGetterFactory() {
-        if (recipeGetterChefkoch == null) {
-            recipeGetterChefkoch = new RecipeGetterChefkoch();
-        }
-        return recipeGetterChefkoch;
-    }
 
     /**
      * Finds a maximumNumber of recipeIds for the given searchstring using chefkoch api. Will return a list in csv format.
@@ -92,6 +82,7 @@ public class RecipeGetterChefkoch implements RecipeGetter {
         preparation.append(firstResult.get("rezept_zubereitung"));
 
         recipe.setPreparation(preparation.toString());
+        System.out.println("Preparation" + preparation.toString());
         return recipe.getPreparation();
     }
 
