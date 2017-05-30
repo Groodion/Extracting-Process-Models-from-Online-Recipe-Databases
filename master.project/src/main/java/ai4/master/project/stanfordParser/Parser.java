@@ -95,7 +95,7 @@ public class Parser {
 		this.kwdb = kwdb;
 	}
 
-	public void parseRecipe(Recipe recipe ) {
+	public void parseRecipe(Recipe recipe) {
 		String text = recipe.getPreparation();
 		recipe.setPreparation(text);
 

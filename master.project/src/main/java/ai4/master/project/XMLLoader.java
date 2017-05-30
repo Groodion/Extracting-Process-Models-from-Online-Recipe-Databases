@@ -80,7 +80,7 @@ public class XMLLoader {
 		
 		for(Attribute att : element.getAttributes()) {
 			if(att.getName().equals(ATTRIBUTE_NAME)) {
-				tool.addName(att.getValue());
+				tool.getNames().add(att.getValue());
 			} else {
 				System.err.println("Unknown Attribute");
 			}
@@ -88,7 +88,7 @@ public class XMLLoader {
 
 		for(Element child : element.getChildren()) {
 			if(child.getName().equals(ELEMENT_NAME)) {
-				tool.addName(child.getText());
+				tool.getNames().add(child.getText());
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}
@@ -110,7 +110,7 @@ public class XMLLoader {
 		
 		for(Attribute att : element.getAttributes()) {
 			if(att.getName().equals(ATTRIBUTE_NAME)) {
-				ingredient.addName(att.getValue());
+				ingredient.getNames().add(att.getValue());
 			} else {
 				System.err.println("Unknown Attribute");
 			}
@@ -118,7 +118,7 @@ public class XMLLoader {
 
 		for(Element child : element.getChildren()) {
 			if(child.getName().equals(ELEMENT_NAME)) {
-				ingredient.addName(child.getText());
+				ingredient.getNames().add(child.getText());
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}
@@ -140,7 +140,7 @@ public class XMLLoader {
 		
 		for(Attribute att : element.getAttributes()) {
 			if(att.getName().equals(ATTRIBUTE_NAME)) {
-				cookingAction.addName(att.getValue());
+				cookingAction.getNames().add(att.getValue());
 			} else if(att.getName().equals(ATTRIBUTE_RESULT_FINDER)) {
 				if(att.getValue().equals("Subjekt")) {
 					cookingAction.setResultFinder(ResultType.SUBJECT);
@@ -154,7 +154,7 @@ public class XMLLoader {
 
 		for(Element child : element.getChildren()) {
 			if(child.getName().equals(ELEMENT_NAME)) {
-				cookingAction.addName(child.getText());
+				cookingAction.getNames().add(child.getText());
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}

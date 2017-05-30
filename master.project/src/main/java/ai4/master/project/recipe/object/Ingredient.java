@@ -18,6 +18,15 @@ public class Ingredient extends NamedObject<BaseIngredient> {
 		return tags;
 	}
 
+	public Ingredient tag(IngredientTag tag) {
+		Ingredient taggedIngredient = new Ingredient(getName(), getBaseObject());
+		
+		taggedIngredient.getTags().addAll(tags);
+		taggedIngredient.getTags().add(tag);
+		
+		return taggedIngredient;
+	}
+	
 	@Override
 	public String toString() {
 		return "Ingredient [name=" + getName() + ", tags=" + tags + "]";
