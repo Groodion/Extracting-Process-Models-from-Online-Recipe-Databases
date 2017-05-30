@@ -3,8 +3,8 @@ package ai4.master.project;
 import ai4.master.project.apirequests.RecipeGetterChefkoch;
 import ai4.master.project.process.ProcessModeler;
 import ai4.master.project.process.ProcessModelerImpl;
-import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.LANG_FLAG;
+import ai4.master.project.recipe.Recipe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +30,8 @@ public class Main {
         }
 
         ProcessModeler processModeler = new ProcessModelerImpl();
-        //processModeler.convertToProcess(new Recipe());
 
-        //ProcessModeler example = new ExampleRecipe();
-       // example.convertToProcess(new Recipe(LANG_FLAG.DE));
+        //processModeler.convertToProcess(new Recipe());
 
     }
 }

@@ -1,9 +1,10 @@
 package ai4.master.project.recipe.object;
 
-import java.util.List;
-
 import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.object.ingredientTag.IngredientTag;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Ingredient extends NamedObject<BaseIngredient> {
 
@@ -12,6 +13,7 @@ public class Ingredient extends NamedObject<BaseIngredient> {
 	
 	public Ingredient(String name, BaseIngredient baseObject) {
 		super(name, baseObject);
+		tags = new ArrayList<IngredientTag>();
 	}
 
 	public List<IngredientTag> getTags() {
@@ -21,5 +23,10 @@ public class Ingredient extends NamedObject<BaseIngredient> {
 	@Override
 	public String toString() {
 		return "Ingredient [name=" + getName() + ", tags=" + tags + "]";
-	}	
+	}
+
+
+	public String getIngredientName(){
+	    return this.getName();
+    }
 }

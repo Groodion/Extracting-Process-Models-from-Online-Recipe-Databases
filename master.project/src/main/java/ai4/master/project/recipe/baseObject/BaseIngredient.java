@@ -11,6 +11,7 @@ public class BaseIngredient extends BaseNamedObject<Ingredient, BaseIngredient> 
 		if(getNames().size() != 0) {
 			name = getNames().iterator().next();
 		}
+
 		return new Ingredient(name, this);
 	}
 

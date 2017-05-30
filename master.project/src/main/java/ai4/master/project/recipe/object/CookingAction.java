@@ -12,4 +12,6 @@ public class CookingAction extends NamedObject<BaseCookingAction> {
 	public String toString() {
 		return "CookingAction [name=" + getName() + "]";
 	}
+
+
 }

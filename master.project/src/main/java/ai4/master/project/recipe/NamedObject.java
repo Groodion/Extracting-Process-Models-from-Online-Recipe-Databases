@@ -20,7 +20,7 @@ public class NamedObject {
 	}
 
 	/**
-	 * @returnt he FIRST name in the names set.
+	 * @return the FIRST name in the names set.
 	 */
 	public String getName(){
 		if(names.size() == 0){
