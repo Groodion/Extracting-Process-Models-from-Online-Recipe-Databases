@@ -1,5 +1,6 @@
 package ai4.master.project.process;
 
+import ai4.master.project.output.XMLWriter;
 import ai4.master.project.recipe.Step;
 import ai4.master.project.recipe.baseObject.BaseRecipe;
 import ai4.master.project.recipe.object.Ingredient;
@@ -21,7 +22,7 @@ public class RecipeConverter {
     private BaseRecipe recipe;
 
     public BpmnModelInstance convertToBpmn(BaseRecipe recipe){
-        sortProducts(recipe);
+        //sortProducts(recipe);
         BpmnModelInstance currentModel = Bpmn.createEmptyModel();
         ProcessBuilder currentBuilder = Bpmn.createProcess("Recipe");
         StartEventBuilder startEventBuilder = currentBuilder.startEvent("Start");
@@ -44,7 +45,9 @@ public class RecipeConverter {
         currentModel = currentBuilder.done();
 
         Bpmn.validateModel(currentModel);
+        String xml = Bpmn.convertToString(currentModel);
         Bpmn.writeModelToStream(System.out, currentModel);
+        XMLWriter xmlWriter = new XMLWriter("example").writeTo(xml);
         return currentModel;
     }
 
