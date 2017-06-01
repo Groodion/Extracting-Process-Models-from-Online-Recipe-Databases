@@ -1,7 +1,7 @@
 package ai4.master.project.process;
 
 import ai4.master.project.recipe.Step;
-import ai4.master.project.recipe.baseObject.BaseRecipe;
+import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.object.Ingredient;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -18,9 +18,9 @@ import java.util.List;
 public class RecipeConverter {
 
 
-    private BaseRecipe recipe;
+    private Recipe recipe;
 
-    public BpmnModelInstance convertToBpmn(BaseRecipe recipe){
+    public BpmnModelInstance convertToBpmn(Recipe recipe){
         BpmnModelInstance currentModel = Bpmn.createEmptyModel();
         ProcessBuilder currentBuilder = Bpmn.createProcess("Recipe");
         StartEventBuilder startEventBuilder = currentBuilder.startEvent("Start");
@@ -48,7 +48,7 @@ public class RecipeConverter {
 
 
 
-    private void sortProducts(BaseRecipe baseRecipe){
+    private void sortProducts(Recipe baseRecipe){
         List<Step> orderdSteps = new ArrayList<Step>();
 
         for (Step s :

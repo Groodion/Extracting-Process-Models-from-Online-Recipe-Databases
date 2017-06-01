@@ -2,7 +2,7 @@ package ai4.master.project.recipe;
 
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
-import ai4.master.project.recipe.baseObject.BaseRecipe;
+import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.recipe.object.CookingAction;
 import ai4.master.project.recipe.object.Ingredient;
@@ -15,8 +15,8 @@ import java.util.List;
 
 public class TestRecipeFactory {
 	
-	public BaseRecipe createRecipe() {
-		BaseRecipe recipe = new BaseRecipe();
+	public Recipe createRecipe() {
+		Recipe recipe = new Recipe(LANG_FLAG.DE);
 		
 		BaseIngredient bI_schmand = new BaseIngredient();
 		bI_schmand.getNames().add("Schmand");
@@ -243,10 +243,10 @@ public class TestRecipeFactory {
 		recipe.getSteps().add(step10);
 		recipe.getSteps().add(step11);
 		
-		recipe.getIngredients().add(bI_blaetterTeig);
-		recipe.getIngredients().add(bI_kaese);
-		recipe.getIngredients().add(bI_schinkenwuerfel);
-		recipe.getIngredients().add(bI_schmand);
+		recipe.getIngredients().add(bI_blaetterTeig.toObject());
+		recipe.getIngredients().add(bI_kaese.toObject());
+		recipe.getIngredients().add(bI_schinkenwuerfel.toObject());
+		recipe.getIngredients().add(bI_schmand.toObject());
 		
 		return recipe;
 	}
