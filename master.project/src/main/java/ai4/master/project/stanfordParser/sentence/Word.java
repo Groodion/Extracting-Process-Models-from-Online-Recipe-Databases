@@ -35,6 +35,7 @@ public class Word extends PartialObject<Word> {
 	private Block block;
 	
 	private boolean isVerb = false;
+	private boolean lastProductReference = false;
 	
 	private BaseCookingAction cookingAction;
 	private List<BaseTool> tools;
@@ -229,6 +230,9 @@ public class Word extends PartialObject<Word> {
 	public boolean isVerb() {
 		return isVerb;
 	}
+	public boolean isLastProductReference() {
+		return lastProductReference;
+	}
 	
 	public SentencePart getSentencePart() {
 		return sentencePart;
@@ -246,6 +250,10 @@ public class Word extends PartialObject<Word> {
 	}
 
 	public void init(KeyWordDatabase kwdb) {
+		if(kwdb.isLastSentenceRefernece(getText())) {
+			lastProductReference = true;
+		}
+		
 		switch(pos) {
 		case ADJA:
 			connections.add(getNextNoun());

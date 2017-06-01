@@ -128,15 +128,12 @@ public class SentencePart extends PartialObject<SentencePart> {
 						if(word.getRole() != null) {
 							nCombs.add(combine(sB, word.getRole()));
 						}
-						nCombs.add(combine(sB, word.getPos()));
 					}
 						
 					combinations = nCombs;
 				}
 			}
-			
 			String[] c = new String[combinations.size()];
-			
 			for(int i = 0; i < c.length; i++) {
 				c[i] = combinations.get(i).toString().trim();
 			}
@@ -158,6 +155,10 @@ public class SentencePart extends PartialObject<SentencePart> {
 		
 		return false;
 	}
+	public void clearMemory() {
+		this.combinations = null;
+	}
+	
 	public List<Object> identify(String reg) {
 		for(String combination : combinations) {
 			if(combination.matches(reg)) {
@@ -227,5 +228,15 @@ public class SentencePart extends PartialObject<SentencePart> {
 		}
 		
 		return null;
+	}
+	
+	public boolean containsLastSentenceProductReference() {
+		for(Word word : words) {
+			if(word.isLastProductReference()) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 }

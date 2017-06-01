@@ -9,7 +9,9 @@ import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
+import ai4.master.project.recipe.baseObject.Regex;
 import ai4.master.project.recipe.object.CookingAction;
+import ai4.master.project.recipe.object.Ingredient;
 import ai4.master.project.stanfordParser.sentence.PunctuationMark;
 import ai4.master.project.stanfordParser.sentence.Sentence;
 import ai4.master.project.stanfordParser.sentence.SentencePart;
@@ -105,19 +107,76 @@ public class Parser {
 			sentence.init(kwdb);
 		}
 		
+		Step lastStep = null;
+		
 		for(Sentence s : sentences) {
 			for(SentencePart sP : s.getParts()) {
-				System.out.println(sP.getText());
-				Step step = new Step();
-				BaseCookingAction action = sP.getCookingAction();
-				
-				step.setText(sP.getText());
-				step.setCookingAction(new CookingAction(sP.getMainVerb().getText(), action));
-				
-				step.getIngredients().addAll(sP.getIngredients());
-				step.getTools().addAll(sP.getTools());
-				
-				recipe.getSteps().add(step);
+				if(sP.getCookingAction() == null) {
+//					System.err.println("Can't convert to Step:");
+//					System.err.println(sP.getText());
+				} else {
+					Step step = new Step();
+					BaseCookingAction action = sP.getCookingAction();
+					
+					step.setText(sP.getText());
+					step.setCookingAction(new CookingAction(sP.getMainVerb().getText(), action));
+					
+					step.getIngredients().addAll(sP.getIngredients());
+					step.getTools().addAll(sP.getTools());
+					
+					if(sP.containsLastSentenceProductReference()) {
+						if(lastStep == null) {
+							System.err.println("LastSentenceReference in first sentence!");
+						} else {
+							step.getIngredients().addAll(lastStep.getProducts());
+						}
+					}
+					
+					if(lastStep != null) {
+						for(int i = 0; i < step.getIngredients().size(); i++) {
+							for(Ingredient product : lastStep.getProducts()) {
+								if(step.getIngredients().get(i).getBaseObject() == product.getBaseObject() && step.getIngredients().get(i).getTags().isEmpty()) {
+									step.getIngredients().set(i, product);
+								}
+							}
+						}
+					}					
+					for(Regex regex : action.getRegexList()) {
+						if(sP.matches(regex.getExpression(), false)) {
+							switch(regex.getResult()) {
+							case ALL:
+								for(Ingredient ingredient : step.getIngredients()) {
+									step.getProducts().add(action.transform(ingredient, step.getIngredients()));
+								}
+								break;
+							case FIRST:
+								step.getProducts().add(action.transform(step.getIngredients().get(0), step.getIngredients()));
+								break;
+							case LAST:
+								step.getProducts().add(action.transform(step.getIngredients().get(step.getIngredients().size() - 1), step.getIngredients()));
+								break;
+							default:
+								break;
+							}
+							break;
+						}
+					}
+					
+					sP.clearMemory();
+					if(step.getIngredients().isEmpty()) {
+						step.getIngredients().addAll(lastStep.getProducts());
+					}
+					if(step.getProducts().isEmpty()) {
+						for(Ingredient ingredient : lastStep.getProducts()) {
+							if(ingredient != null)
+								step.getProducts().add(action.transform(ingredient, step.getIngredients()));
+						}
+					}
+										
+					recipe.getSteps().add(step);
+					
+					lastStep = step;
+				}
 			}
 		}
 	}

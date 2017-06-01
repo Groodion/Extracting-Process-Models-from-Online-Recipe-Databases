@@ -77,6 +77,13 @@ public class Block extends PartialObject<Block> {
 		return words.get(words.size() - 1);
 	}
 	
+	public Word getPrevWord() {
+		return getFirstWord().getPrev();
+	}
+	public Word getNextWord() {
+		return getLastWord().getNext();
+	}
+	
 	@Override
 	public String toString() {
 		return "Block [role=" + role + ", size: " + words.size() + "]";

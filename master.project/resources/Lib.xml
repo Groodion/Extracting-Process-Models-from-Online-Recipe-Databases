@@ -45,6 +45,7 @@
 	</Tool>
 	<Tool name="Quirl">
 	</Tool>
+	<Tool name="Gabel"></Tool>
 	<Tool name="Schaumkelle"></Tool>
 	<Tool name="Schneebesen"></Tool>
 	<Tool name="Schöpfkelle"></Tool>
@@ -203,8 +204,11 @@
 	</Ingredient>
 	<Ingredient name="Schmand" />
 	<Ingredient name="Käse">
+		<Name>Käsewürfel</Name>
 		<Name>Käseraspel</Name>
 	</Ingredient>
+	<Ingredient name="Fett"></Ingredient>
+	<Ingredient name="Paniermehl"></Ingredient>
 	<Ingredient name="Schinkenwürfel" />
 	<Ingredient name="Kartoffel"></Ingredient>
 	<Ingredient name="Wasser"></Ingredient>
@@ -223,37 +227,63 @@
 	<Ingredient name="Zwieback"><Name>Zwiebackbrösel</Name></Ingredient>
 	<Ingredient name="Ei"><Name>Eier</Name></Ingredient>
 	<Ingredient name="Zimt"></Ingredient>
+	<Ingredient name="Öl"></Ingredient>
 </ingredients>
 <cookingActions>
-	<CookingAction name="rollen" resultFinder="Subjekt">
+	<CookingAction name="rollen">
 		<Name>aufrollen</Name>
 		<regs>
 			<Regex result="first">.*~INGREDIENT.*~ACTION.*</Regex>
 		</regs>
+		<transformations>
+			<Transformation>
+				<AddIngredientTag>aufgerollt</AddIngredientTag>
+			</Transformation>
+		</transformations>
 	</CookingAction>
-	<CookingAction name="streichen" resultFinder="Subjekt">
+	<CookingAction name="streichen">
 		<Name>bestreichen</Name>
 		<regs>
-			<Regex>.*~INGREDIENT.*mit.*~INGREDIENT.*~ACTION.*</Regex>
+			<Regex result="first">.*~INGREDIENT.*mit.*~INGREDIENT.*~ACTION.*</Regex>
+			<Regex result="last">.*~INGREDIENT.*auf.*~INGREDIENT.*~ACTION.*</Regex>
 		</regs>
+		<transformations>
+			<Transformation>
+				<AddIngredientTag>bestrichen</AddIngredientTag>
+			</Transformation>
+		</transformations>
 	</CookingAction>
-	<CookingAction name="klappen" resultFinder="Subjekt">
-		<regs>
-			<Regex></Regex>
-		</regs>
+	<CookingAction name="klappen">
+		<transformations>
+			<Transformation>
+				<AddIngredientTag>geklappt</AddIngredientTag>
+			</Transformation>
+		</transformations>
 	</CookingAction>
-	<CookingAction name="geben" resultFinder="Objekt" />
-	<CookingAction name="schneiden" resultFinder="Subjekt" />
-	<CookingAction name="drehen" resultFinder="Subjekt" />
-	<CookingAction name="legen" resultFinder="Objekt" />
-	<CookingAction name="backen" resultFinder="Subjekt" />
-	<CookingAction name="verteilen" resultFinder="Objekt" />
-	<CookingAction name="verrühren" resultFinder="Objekt" />
-	<CookingAction name="einkochen" resultFinder="Subjekt" />
-	<CookingAction name="abschmecken" resultFinder="Subjekt" />
-	<CookingAction name="herstellen" resultFinder="Subjekt" />
-	<CookingAction name="hochziehen" resultFinder="Subjekt" />
-	<CookingAction name="untermischen" resultFinder="Objekt" />
+	<CookingAction name="geben">
+		<transformations>
+			<Transformation>
+				<AddIngredientTag>mit INGREDIENT</AddIngredientTag>
+			</Transformation>
+		</transformations>
+	</CookingAction>
+	<CookingAction name="schneiden" />
+	<CookingAction name="drehen" />
+	<CookingAction name="legen" />
+	<CookingAction name="backen" />
+	<CookingAction name="verteilen">
+		<transformations>
+			<Transformation>
+				<AddIngredientTag>mit INGREDIENT</AddIngredientTag>
+			</Transformation>
+		</transformations>
+	</CookingAction>
+	<CookingAction name="verrühren" />
+	<CookingAction name="einkochen" />
+	<CookingAction name="abschmecken" />
+	<CookingAction name="herstellen" />
+	<CookingAction name="hochziehen" />
+	<CookingAction name="untermischen" />
 </cookingActions>
 <partIndicators>
 	<PartIndicator>Teil</PartIndicator>
@@ -265,5 +295,6 @@
 	<LastSentenceReference>diese</LastSentenceReference>
 	<LastSentenceReference>darauf</LastSentenceReference>
 	<LastSentenceReference>damit</LastSentenceReference>
+	<LastSentenceReference>dazu</LastSentenceReference>
 </lastSentenceReferences>
 </root>

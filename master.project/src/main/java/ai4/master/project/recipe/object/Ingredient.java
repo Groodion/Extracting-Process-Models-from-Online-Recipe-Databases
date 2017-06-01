@@ -1,5 +1,6 @@
 package ai4.master.project.recipe.object;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ai4.master.project.recipe.baseObject.BaseIngredient;
@@ -12,6 +13,8 @@ public class Ingredient extends NamedObject<BaseIngredient> {
 	
 	public Ingredient(String name, BaseIngredient baseObject) {
 		super(name, baseObject);
+		
+		tags = new ArrayList<IngredientTag>();
 	}
 
 	public List<IngredientTag> getTags() {

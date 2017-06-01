@@ -12,6 +12,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import ai4.master.project.recipe.LANG_FLAG;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.object.Ingredient;
 
@@ -170,4 +171,9 @@ public class RecipeGetterChefkoch implements RecipeGetter {
         }
         return null;
     }
+
+	@Override
+	public LANG_FLAG getLanguage() {
+		return LANG_FLAG.DE;
+	}
 }

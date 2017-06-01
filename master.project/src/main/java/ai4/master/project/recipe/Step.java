@@ -22,6 +22,7 @@ public class Step {
 	
 	public Step() {
 		ingredients = new ArrayList<Ingredient>();
+		products = new ArrayList<Ingredient>();
 		tools = new ArrayList<Tool>();
 	}
 	

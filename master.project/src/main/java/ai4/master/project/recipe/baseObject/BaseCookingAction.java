@@ -5,28 +5,23 @@ import java.util.List;
 
 import ai4.master.project.recipe.ResultType;
 import ai4.master.project.recipe.object.CookingAction;
+import ai4.master.project.recipe.object.Ingredient;
 
 public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookingAction> {
-
-	private String result;
 	
 	private ResultType resultFinder;
 	
 	private List<BaseTool> implicitTools;
+	private List<Regex> regexList;
+	private List<Transformation> transformations;
 	
 	
 	public BaseCookingAction() {
-		result = null;
 		implicitTools = new ArrayList<BaseTool>();
+		regexList = new ArrayList<Regex>();
+		transformations = new ArrayList<Transformation>();
 	}
 	
-	public String getResult() {
-		return result;
-	}
-	public void setResult(String result) {
-		this.result = result;
-	}
-
 	public ResultType getResultFinder() {
 		return resultFinder;
 	}
@@ -37,11 +32,20 @@ public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookin
 	public List<BaseTool> getImplicitTools() {
 		return implicitTools;
 	}
+	public List<Regex> getRegexList() {
+		return regexList;
+	}
+	public List<Transformation> getTransformations() {
+		return transformations;
+	}
 	
-	public BaseIngredient transform(BaseIngredient mainIngredient, List<BaseIngredient> ingredients) {
-		if(result == null) {
-			return mainIngredient;
+	public Ingredient transform(Ingredient ingredient, List<Ingredient> list) {
+		for(Transformation transformation : transformations) {
+			if(transformation.matches(ingredient, list)) {
+				return transformation.transform(ingredient, list);
+			}
 		}
+		
 		return null;
 	}
 

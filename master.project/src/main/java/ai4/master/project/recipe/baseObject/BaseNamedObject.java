@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ai4.master.project.recipe.object.NamedObject;
+import ai4.master.project.stanfordParser.sentence.Word;
 
 public abstract class BaseNamedObject<N extends NamedObject<B>, B extends BaseNamedObject<N, B>> {
 	
@@ -20,6 +21,11 @@ public abstract class BaseNamedObject<N extends NamedObject<B>, B extends BaseNa
 	}
 	public Set<String> getStemmedNames() {
 		return stemmedNames;
+	}
+	
+	public void addName(String name) {
+		names.add(name);
+		stemmedNames.add(Word.stem(name));
 	}
 	
 	@Override

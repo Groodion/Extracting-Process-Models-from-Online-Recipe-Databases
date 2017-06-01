@@ -27,21 +27,24 @@ public abstract class PartialObject<T extends PartialObject<T>> {
 	public T getNext() {
 		return next;
 	}
-
+	protected void setPrev(T prev) {
+		this.prev = prev;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public void setNext(T next) {
 		if(this.next != null) {
-			this.next.prev = null;
+			this.next.setPrev(null);
 		}
 		
 		this.next = next;
 
 		if(this.next != null) {
-			if(this.next.prev != null) {
-				this.next.prev.next = null;
+			if(this.next.getPrev() != null) {
+				this.next.getPrev().setNext(null);
 			}
 			
-			this.next.prev = (T) this;
+			this.next.setPrev((T) this);
 		}
 	}
 }

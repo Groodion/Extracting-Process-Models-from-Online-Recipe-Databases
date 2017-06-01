@@ -76,7 +76,6 @@ public class KeyWordDatabase {
 		double e = 1.0;
 
 		for(BaseIngredient ingredient : ingredients) {
-			System.out.println(text + " " + ingredient.getStemmedNames());
 			if(ingredient.getStemmedNames().contains(text)) {
 				return ingredient;
 			}
@@ -98,6 +97,7 @@ public class KeyWordDatabase {
 	public BaseCookingAction findCookingAction(String text, double error) {
 		if(text == null) return null;
 
+		
 		BaseCookingAction bestMatch = null;
 		double e = 1.0;
 
@@ -133,7 +133,10 @@ public class KeyWordDatabase {
 		
 		return false;
 	}
-
+	public boolean isLastSentenceRefernece(String text) {
+		return lastSentenceReferences.contains(text.toLowerCase());
+	}
+	
 	private static int stringDiff(String a, String b) {
 		int dif = Math.abs(a.length() - b.length());
 		

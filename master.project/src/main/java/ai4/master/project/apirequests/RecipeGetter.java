@@ -1,5 +1,6 @@
 package ai4.master.project.apirequests;
 
+import ai4.master.project.recipe.LANG_FLAG;
 import ai4.master.project.recipe.Recipe;
 
 /**
@@ -25,5 +26,16 @@ public interface RecipeGetter {
      */
     String getRecipeIngredients(String id, Recipe recipe);
 
+    LANG_FLAG getLanguage();
 
+    default Recipe getRecipe(String id) {
+    	Recipe recipe = new Recipe(getLanguage());
+    	
+    	getRecipePreparation(id, recipe);
+    	getRecipeIngredients(id, recipe);
+    	
+    	return recipe;
+    }
+    
+    
 }

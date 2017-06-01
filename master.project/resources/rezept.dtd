@@ -11,16 +11,19 @@
 >
 <!ELEMENT Property (#PCDATA)>
 <!ELEMENT cookingActions (CookingAction)*>
-<!ELEMENT CookingAction (Name*, Result?, regs?)>
+<!ELEMENT CookingAction (Name*, Result?, regs?, transformations?)>
 <!ATTLIST CookingAction
 	name CDATA #REQUIRED
-	resultFinder (Subjekt|Objekt) "Subjekt"
 >
+<!ELEMENT transformations (Transformation*)>
+<!ELEMENT Transformation (ingredients?, (AddIngredientTag | AddQuantifierTag | Ingredient))>
+<!ELEMENT AddIngredientTag (#PCDATA)>
+<!ELEMENT AddQuantifierTag (#PCDATA)>
 <!ELEMENT Result (#PCDATA)>
 <!ELEMENT regs (Regex+)>
 <!ELEMENT Regex (#PCDATA)>
 <!ATTLIST Regex
-	result (first|last) "first"
+	result (first|last|all) "first"
 >
 <!ELEMENT Name (#PCDATA)>
 <!ELEMENT partIndicators (PartIndicator)*>
