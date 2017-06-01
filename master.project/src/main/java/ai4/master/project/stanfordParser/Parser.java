@@ -111,6 +111,10 @@ public class Parser {
 		
 		for(Sentence s : sentences) {
 			for(SentencePart sP : s.getParts()) {
+				for(Word word : sP.getWords()) {
+					System.out.println(word);
+				}
+				
 				if(sP.getCookingAction() == null) {
 //					System.err.println("Can't convert to Step:");
 //					System.err.println(sP.getText());

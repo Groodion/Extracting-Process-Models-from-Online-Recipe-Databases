@@ -403,23 +403,40 @@ public class Word extends PartialObject<Word> {
 
 	public void deepBlockGeneration(KeyWordDatabase kwdb) {
 		if(getPos() == STTSTag.KON) {
-			if(getNext() != null && getPrev() != null && getNext().getRole() == Role.INGREDIENT && getPrev().getRole() == Role.INGREDIENT) {
-				Block enumerationBlock = new Block(sentencePart);
+			
+			if(getNext() != null && getPrev() != null && ((getNext().getRole() == Role.INGREDIENT || getNext().getRole() == Role.UNDECIDABLE_OBJECT) && (getPrev().getRole() == Role.INGREDIENT || getPrev().getRole() == Role.UNDECIDABLE_OBJECT))) {
+				Block collectionBlock = new Block(sentencePart);
+				collectionBlock.setRole(BlockRole.INGREDIENT_TOOL_COLLECTION);
 				
 				Word lastIngredient = getNext().getConnections().size() == 0 ? getNext() : getNext().getConnections().get(0);
 				
-				enumerationBlock.setRole(BlockRole.INGREDIENT_TOOL_COLLECTION);
+				System.err.println(lastIngredient);
+				
 				Word sWord = null;
-				for(Word word = getPrev(); word != null && (word.getRole() == Role.INGREDIENT || word.getRole() == Role.UNDECIDABLE_OBJECT); word = word.getPrev()) {
+				for(Word word = getPrev(); word != null && (word instanceof PunctuationMark || word.getPos() == STTSTag.KON || word.getRole() == Role.INGREDIENT || word.getRole() == Role.UNDECIDABLE_OBJECT); word = word.getPrev()) {
 					sWord = word;
 				}
 				for(Word word = sWord; word != lastIngredient.getNext(); word = word.getNext()) {
-					word.setBlock(enumerationBlock);
+					if(word.getRole() == Role.INGREDIENT) {
+						collectionBlock.setRole(BlockRole.INGREDIENT_COLLECTION);
+					}
+					word.setBlock(collectionBlock);
+				}
+				
+				for(Word word : collectionBlock.getWords()) {
+					word.select(Role.INGREDIENT, kwdb);
 				}
 			}
 		}
 	}
 	
+	private void select(Role role, KeyWordDatabase kwdb) {
+		if(this.role == Role.UNDECIDABLE_OBJECT) {
+			this.role = role;
+			
+			ingredients.add(kwdb.findIngredient(getText()));
+		}
+	}
 	public List<Word> getLastSubjectWords() {
 		List<Word> subjectWords = new ArrayList<Word>();
 		

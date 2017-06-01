@@ -267,8 +267,23 @@
 			</Transformation>
 		</transformations>
 	</CookingAction>
-	<CookingAction name="schneiden" />
-	<CookingAction name="drehen" />
+	<CookingAction name="schneiden">
+		<regs>
+			<Regex result="all">.*</Regex>
+		</regs>
+		<transformations>
+			<Transformation>
+				<AddIngredientTag>geschnitten</AddIngredientTag>
+			</Transformation>
+		</transformations>
+	</CookingAction>
+	<CookingAction name="drehen">
+		<transformations>
+			<Transformation>
+				<AddIngredientTag>gedreht</AddIngredientTag>
+			</Transformation>
+		</transformations>
+	</CookingAction>
 	<CookingAction name="legen" />
 	<CookingAction name="backen" />
 	<CookingAction name="verteilen">
@@ -278,12 +293,42 @@
 			</Transformation>
 		</transformations>
 	</CookingAction>
-	<CookingAction name="verrühren" />
-	<CookingAction name="einkochen" />
-	<CookingAction name="abschmecken" />
+	<CookingAction name="verrühren">
+		<transformations>
+			<Transformation>
+				<AddIngredientTag>verrührt</AddIngredientTag>
+			</Transformation>
+		</transformations>
+	</CookingAction>
+	<CookingAction name="einkochen">
+		<transformations>
+			<Transformation>
+				<AddIngredientTag>eingekocht</AddIngredientTag>
+			</Transformation>
+		</transformations>
+	</CookingAction>
+	<CookingAction name="abschmecken">
+		<transformations>
+			<Transformation>
+				<AddIngredientTag>mit INGREDIENT abgeschmeckt</AddIngredientTag>
+			</Transformation>
+		</transformations>
+	</CookingAction>
 	<CookingAction name="herstellen" />
-	<CookingAction name="hochziehen" />
-	<CookingAction name="untermischen" />
+	<CookingAction name="hochziehen">
+		<transformations>
+			<Transformation>
+				<AddIngredientTag>hochgezogen</AddIngredientTag>
+			</Transformation>
+		</transformations>
+	</CookingAction>
+	<CookingAction name="untermischen">
+		<transformations>
+			<Transformation>
+				<AddIngredientTag>mit INGREDIENT</AddIngredientTag>
+			</Transformation>
+		</transformations>
+	</CookingAction>
 </cookingActions>
 <partIndicators>
 	<PartIndicator>Teil</PartIndicator>
