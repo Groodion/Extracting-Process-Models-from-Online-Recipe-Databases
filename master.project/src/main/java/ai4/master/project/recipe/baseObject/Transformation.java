@@ -20,15 +20,12 @@ public class Transformation {
 	public Ingredient getProduct() {
 		return product;
 	}
-
 	public void setProduct(Ingredient product) {
 		this.product = product;
 	}
-
 	public IngredientTag getTag() {
 		return tag;
 	}
-
 	public void setTag(IngredientTag tag) {
 		this.tag = tag;
 	}
@@ -37,6 +34,13 @@ public class Transformation {
 		return mandatoryIngredients;
 	}
 	
+	/**
+	 * Testet ob die Vorraussetzungen an die gegebenen Zutaten für diese Transformation
+	 * erfüllt sind
+	 * @param ingredient Die zu transformierende Zutat
+	 * @param list Liste mit restlichen Zutaten des Step-Objekts
+	 * @return Testresultat
+	 */
 	public boolean matches(Ingredient ingredient, List<Ingredient> list) {
 		if(mandatoryIngredients.isEmpty()) {
 			return true;
@@ -51,6 +55,18 @@ public class Transformation {
 		
 		return checkList.isEmpty();
 	}
+	
+	/**
+	 * führt eine von vier Transformationen durch:<br />
+	 * 1. wenn das produkt gesetzt ist wird dieses als ergebnis der Transformation
+	 * zurückgegeben<br />
+	 * 2. wenn eine IngredientTag gesetzt ist wird die Hauptzutat damit getagged<br />
+	 * 3. wenn eine QuantifierTag gesetzt ist wird die Hauptzutat damit getagged<br />
+	 * 4. wenn nichts gesetzt ist wird die Zutat unverändert zurückgegeben
+	 * @param ingredient Hauptzutat
+	 * @param list Zutatsliste
+	 * @return transformierte Zutat
+	 */
 	public Ingredient transform(Ingredient ingredient, List<Ingredient> list) {
 		if(product != null) {
 			return product;

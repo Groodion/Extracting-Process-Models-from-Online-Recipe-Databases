@@ -54,6 +54,10 @@ public class SentencePart extends PartialObject<SentencePart> {
 		return sentence;
 	}
 
+	/**
+	 * Gibt zurück ob der Satzteil ein Verb beinhaltet
+	 * @return
+	 */
 	public boolean containsVerb() {
 		for (Word word : words) {
 			if (!(word instanceof PunctuationMark)) {
@@ -86,9 +90,12 @@ public class SentencePart extends PartialObject<SentencePart> {
 		for (Word word : words) {
 			word.deepBlockGeneration(kwdb);
 		}
-
 	}
 
+	/**
+	 * Fügt zwei Satzteile zu einem zusammen
+	 * @return
+	 */
 	public void mergeWith(SentencePart sentencePart) {
 		words.get(words.size() - 1).setNext(sentencePart.words.get(0));
 		for (; !sentencePart.words.isEmpty();)
@@ -96,13 +103,8 @@ public class SentencePart extends PartialObject<SentencePart> {
 		getSentence().getParts().remove(sentencePart);
 	}
 
-	/**
-	 * string * _KON ~INGREDIENT #TYPE
-	 * @param reg
-	 * @return
-	 */
-	private String[] combinations;
 	
+	private String[] combinations;
 	private String[] textComb(boolean ignorePunctuationMarks) {
 		if(combinations == null) {
 			List<StringBuilder> combinations = new ArrayList<StringBuilder>();
@@ -143,7 +145,10 @@ public class SentencePart extends PartialObject<SentencePart> {
 		return combinations;
 	}
 	
-	
+	/**
+	 * Testet ob der Satzteil einem regulären Ausdruck entspricht.
+	 * @return
+	 */
 	public boolean matches(String reg, boolean ignorePunctuationMarks) {
 		String[] combinations = textComb(ignorePunctuationMarks);
 		
@@ -155,10 +160,18 @@ public class SentencePart extends PartialObject<SentencePart> {
 		
 		return false;
 	}
+	/**
+	 * Löscht die gespeicherten Textcombinationen des Ausdruckstesters, um Arbeitsspeicher frei zu machen.
+	 * @return
+	 */
 	public void clearMemory() {
 		this.combinations = null;
 	}
 	
+	/**
+	 * Identifiziert bestimmte Wörter anhand eines regulären Ausdrucks. <b>FUNKTIONIERT NOCH NICHT</b>
+	 * @return
+	 */
 	public List<Object> identify(String reg) {
 		for(String combination : combinations) {
 			if(combination.matches(reg)) {

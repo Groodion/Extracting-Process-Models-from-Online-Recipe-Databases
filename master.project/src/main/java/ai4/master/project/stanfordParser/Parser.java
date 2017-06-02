@@ -37,6 +37,7 @@ public class Parser {
 	
 	private List<Sentence> analyzeText(String text) {
 		List<Sentence> sentences = new ArrayList<Sentence>();
+		//Text wird in sätze zerlegt
 		List<List<TaggedWord>> taggedList = tagger.process(getSplittedSentencesFromString(text));
 		Sentence sentence = null;
 		
@@ -48,6 +49,7 @@ public class Parser {
 			
 			for(TaggedWord taggedWord : taggedSentence) {
 				if(taggedWord.tag().equals(STTSTag.KON.name())) {
+					//Wenn ein UND oder ODER gefunden wird, wird ein neuer Satzteil erzeugt
 					word = null;
 					part = new SentencePart(part, sentence);
 				}
@@ -56,15 +58,23 @@ public class Parser {
 					STTSTag tag = STTSTag.valueOf(taggedWord.tag());
 					word = new Word(taggedWord.word(), tag, word, part);
 				} catch(Exception e) {
+					//Satzzeichen erzeugen neuen Satzteil
 					new PunctuationMark(taggedWord.word(), part);
+					word = null;
+					part = new SentencePart(part, sentence);
 				}
 			}
 			
+			//Satzteile ohne eigenes Verb werden mit dem nächsten Satzteil verschmolzen
 			for(int j = 0; j < sentence.getParts().size() - 1; j++) {
 				if(!sentence.getParts().get(j).containsVerb()) {
 					sentence.getParts().get(j).mergeWith(sentence.getParts().get(j + 1));
 					j--;
 				}
+			}
+			
+			if(sentence.getParts().get(sentence.getParts().size() - 1).getWords().isEmpty()) {
+				sentence.getParts().remove(sentence.getParts().size() - 1);
 			}
 			
 			
@@ -111,13 +121,9 @@ public class Parser {
 		
 		for(Sentence s : sentences) {
 			for(SentencePart sP : s.getParts()) {
-				for(Word word : sP.getWords()) {
-					System.out.println(word);
-				}
-				
 				if(sP.getCookingAction() == null) {
-//					System.err.println("Can't convert to Step:");
-//					System.err.println(sP.getText());
+					System.err.println("Can't convert to Step:");
+					System.err.println(sP.getText());
 				} else {
 					Step step = new Step();
 					BaseCookingAction action = sP.getCookingAction();

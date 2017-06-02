@@ -26,6 +26,10 @@ public class Step {
 		tools = new ArrayList<Tool>();
 	}
 	
+	/**
+	 * Liste mit im Arbeitsschritt verwendeten Werkzeugen. Sowohl implizite als auch explizite.
+	 * @return Werkzeugliste
+	 */
 	public List<Tool> getTools() {
 		return tools;
 	}
@@ -45,6 +49,11 @@ public class Step {
 	public void setText(String text) {
 		this.text = text;
 	}
+	/**
+	 * Liste mit Zutaten die im aktuellen Arbeitsschritt benötigt werden. Enthällt auch implizierte 
+	 * und referenzierte Objekte.
+	 * @return Zutatenliste
+	 */
 	public List<Ingredient> getIngredients() {
 		return ingredients;
 	}

@@ -16,7 +16,7 @@
 	name CDATA #REQUIRED
 >
 <!ELEMENT transformations (Transformation*)>
-<!ELEMENT Transformation (ingredients?, (AddIngredientTag | AddQuantifierTag | Ingredient))>
+<!ELEMENT Transformation (ingredients?, (AddIngredientTag | AddQuantifierTag | Ingredient)?)>
 <!ELEMENT AddIngredientTag (#PCDATA)>
 <!ELEMENT AddQuantifierTag (#PCDATA)>
 <!ELEMENT Result (#PCDATA)>

@@ -49,6 +49,11 @@ public class Block extends PartialObject<Block> {
 		return role;
 	}
 
+	/**
+	 * Wenn der Block eine Beschreibung ist, dann ist in diesem Feld das Beschreibungsziel gespeichert. 
+	 * Ansonsten null
+	 * @return
+	 */
 	public Word getDescriptionTarget() {
 		return descriptionTarget;
 	}
@@ -56,6 +61,10 @@ public class Block extends PartialObject<Block> {
 		this.descriptionTarget = descriptionTarget;
 	}
 
+	/**
+	 * Gibt an ob der Block das Subjekt des Satzes ist
+	 * @return
+	 */
 	public boolean isSubject() {
 		return subject;
 	}
@@ -63,6 +72,10 @@ public class Block extends PartialObject<Block> {
 		this.subject = subject;
 	}
 
+	/**
+	 * Gibt an ob der Block das Objekt des Satzes ist
+	 * @return
+	 */
 	public boolean isObject() {
 		return object;
 	}
@@ -70,16 +83,32 @@ public class Block extends PartialObject<Block> {
 		this.object = object;
 	}
 
+	/**
+	 * Gibt das erste Wort des Blocks zurück
+	 * @return
+	 */
 	public Word getFirstWord() {
 		return words.get(0);
 	}
+	/**
+	 * Gibt das letzte Wort des Blocks zurück
+	 * @return
+	 */
 	public Word getLastWord() {
 		return words.get(words.size() - 1);
 	}
 	
+	/**
+	 * Gibt das erste Wort vor dem Block zurück
+	 * @return
+	 */
 	public Word getPrevWord() {
 		return getFirstWord().getPrev();
 	}
+	/**
+	 * Gibt das erste Wort nach dem Block zurück
+	 * @return
+	 */
 	public Word getNextWord() {
 		return getLastWord().getNext();
 	}

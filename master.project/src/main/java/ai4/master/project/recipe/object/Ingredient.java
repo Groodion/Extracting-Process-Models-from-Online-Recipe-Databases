@@ -21,6 +21,11 @@ public class Ingredient extends NamedObject<BaseIngredient> {
 		return tags;
 	}
 
+	/**
+	 * Erzeugt eine Kopie des Objektes und fügt den gegeben tag an diese an.
+	 * @param tag hizuzufügender Tag
+	 * @return getaggede Kopie der Zutat
+	 */
 	public Ingredient tag(IngredientTag tag) {
 		Ingredient taggedIngredient = new Ingredient(getName(), getBaseObject());
 		

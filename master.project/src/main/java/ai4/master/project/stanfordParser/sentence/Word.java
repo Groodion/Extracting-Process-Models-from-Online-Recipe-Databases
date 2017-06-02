@@ -409,9 +409,7 @@ public class Word extends PartialObject<Word> {
 				collectionBlock.setRole(BlockRole.INGREDIENT_TOOL_COLLECTION);
 				
 				Word lastIngredient = getNext().getConnections().size() == 0 ? getNext() : getNext().getConnections().get(0);
-				
-				System.err.println(lastIngredient);
-				
+								
 				Word sWord = null;
 				for(Word word = getPrev(); word != null && (word instanceof PunctuationMark || word.getPos() == STTSTag.KON || word.getRole() == Role.INGREDIENT || word.getRole() == Role.UNDECIDABLE_OBJECT); word = word.getPrev()) {
 					sWord = word;
