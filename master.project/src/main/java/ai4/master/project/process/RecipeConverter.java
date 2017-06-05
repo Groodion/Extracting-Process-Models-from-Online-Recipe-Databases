@@ -28,7 +28,6 @@ public class RecipeConverter {
         StartEventBuilder startEventBuilder = currentBuilder.startEvent("Start");
         UserTaskBuilder userTaskBuilder = null;
         int i = 0;
-        String lastId = "";
         for(Step step : recipe.getSteps()) {
         if(i == 0) {
             userTaskBuilder = startEventBuilder.userTask("id" + i).name(step.getText());
