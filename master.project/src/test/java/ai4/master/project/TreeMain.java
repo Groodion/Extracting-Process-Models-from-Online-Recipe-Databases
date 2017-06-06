@@ -1,6 +1,7 @@
 package ai4.master.project;
 
 import ai4.master.project.tree.Node;
+import ai4.master.project.tree.Tree;
 import ai4.master.project.tree.TreeTraverser;
 
 /**
@@ -10,8 +11,9 @@ import ai4.master.project.tree.TreeTraverser;
  */
 public class TreeMain {
 
-    public static void main(String [] args){
+    public static void main(String [] args)throws Exception{
 
+        Tree<String> tree = new Tree<String>();
         Node<String> root = new Node<String>("Root");
 
         Node<String> child1 = new Node<String>("Child1");
@@ -25,7 +27,8 @@ public class TreeMain {
 
         child2.addChild("Child21");
 
-        TreeTraverser<String> treeTraverser = new TreeTraverser<String>(root);
+        tree.setRoot(root);
+        TreeTraverser<String> treeTraverser = new TreeTraverser<String>(tree);
         for (Node node:
                 treeTraverser.preOrder()) {
             System.out.println(node.getData().toString());

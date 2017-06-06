@@ -4,6 +4,8 @@ import ai4.master.project.output.XMLWriter;
 import ai4.master.project.recipe.Step;
 import ai4.master.project.recipe.baseObject.BaseRecipe;
 import ai4.master.project.recipe.object.Ingredient;
+import ai4.master.project.tree.Node;
+import ai4.master.project.tree.Tree;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
@@ -52,16 +54,61 @@ public class RecipeConverter {
 
 
 
-    private void sortProducts(BaseRecipe baseRecipe){
-        List<Step> orderdSteps = new ArrayList<Step>();
-
-        for (Step s :
-                baseRecipe.getSteps()) {
-            for(Ingredient i: s.getProducts()){
-                System.out.println(i.getIngredientName());
-            }
-
+    // Creates the recipe tree Starting with the steplist
+    private Node<Step> createRecipeTree(List<Step> stepList) throws Exception{
+        List<Step> inversedStepList = reverse(stepList);
+        if(inversedStepList.size() == 0){
+            throw new Exception("Somethings wrong with the stepList in createRecipeTree. The inversedList is empty.");
         }
+        List<Tree<Step>> treeList = new ArrayList<Tree<Step>>();
+
+        Tree<Step> tree = new Tree<Step>();
+        Node<Step> root = new Node<Step>();
+        root.setData(inversedStepList.get(0)); //This is the last element of the recipe.
+        tree.setRoot(root);
+        treeList.add(tree);
+
+        inversedStepList.remove(0);
+        List<Integer> toRemove = new ArrayList<Integer>();
+
+        /*
+        Basic Algorithmn Idea:
+        Beginning from root:
+            Check all other steps: If at least one ingredient of root
+            is a product of currStep: add it as a child. This means it depends
+            on it and has to be done before.
+            Otherwise it is not dependent and should build another tree.
+            The used nodes have to be removed from the list.
+            Do until no Tree changes anymore probably. Have to think through this.
+
+         */
+        for (int i = 0; i < inversedStepList.size(); i++) {
+            List<Ingredient> currIng = root.getData().getIngredients();
+            Step currStep = inversedStepList.get(i);
+
+            if(isDependent(currIng, currStep.getIngredients())){
+                root.addChild(currStep);
+            }else{
+                // Create a new tree.
+            }
+        }
+
+
+        return root;
+    }
+
+    private boolean isDependent(List<Ingredient> parent, List<Ingredient> maybeChild){
+        // TODO Implement me
+
+        return false;
+    }
+
+    private List<Step> reverse(List<Step> list){
+        List<Step> reversedList = new ArrayList<Step>();
+
+        // TODO
+
+        return reversedList;
     }
     /**
      * Adds ingredients from the step to the usertask

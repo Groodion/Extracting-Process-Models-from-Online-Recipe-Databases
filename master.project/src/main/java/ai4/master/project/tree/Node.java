@@ -8,6 +8,7 @@ public class Node<T> {
     private List<Node<T>> children = new ArrayList<Node<T>>();
     private Node<T> parent = null;
 
+    public Node(){}
     public Node(T data) {
         this.data = data;
     }
