@@ -12,9 +12,9 @@ public class TreeTraverser<T> {
 
     private Node<T> root;
 
-    public TreeTraverser(Tree<T> tree) throws Exception{
+    public TreeTraverser(Tree<T> tree){
         if(tree.getRoot() == null){
-            throw new Exception("You tried to create a treetraverser without a root node.");
+            System.err.print("Root equals null");
         }
         this.root = tree.getRoot();
     }

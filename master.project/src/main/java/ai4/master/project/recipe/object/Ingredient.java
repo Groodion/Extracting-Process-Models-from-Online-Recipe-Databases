@@ -29,4 +29,13 @@ public class Ingredient extends NamedObject<BaseIngredient> {
 	public String getIngredientName(){
 	    return this.getName();
     }
+
+    @Override
+	public boolean equals(Object o){
+		Ingredient i = (Ingredient)o;
+		if(this.getIngredientName().equals(i.getIngredientName())){
+			return true;
+		}
+		return false;
+	}
 }
