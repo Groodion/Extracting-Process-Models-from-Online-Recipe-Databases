@@ -63,6 +63,48 @@ public class TestRecipeFactory {
 		blaetterteig.getTags().add(new IngredientTag("aus dem Kuehlregal"));
 		blaetterteig.getTags().add(new IngredientTag("rechteckig"));
 		
+		Ingredient aufgerollterBlaetterteig = bI_blaetterTeig.toObject();
+		aufgerollterBlaetterteig.getTags().addAll(blaetterteig.getTags());
+		aufgerollterBlaetterteig.getTags().add(new IngredientTag("aufgerollt"));
+
+		Ingredient blaetterteigMitSchmand = bI_blaetterTeig.toObject();
+		blaetterteigMitSchmand.getTags().addAll(aufgerollterBlaetterteig.getTags());
+		blaetterteigMitSchmand.getTags().add(new IngredientTag("mit Schmand bestrichen"));
+
+		Ingredient blaetterteigMitSchmandMitSchinkenwuerfelMitKaese = bI_blaetterTeig.toObject();
+		blaetterteigMitSchmandMitSchinkenwuerfelMitKaese.getTags().addAll(blaetterteigMitSchmand.getTags());
+		blaetterteigMitSchmandMitSchinkenwuerfelMitKaese.getTags().add(new IngredientTag("mit Schinkenwuerfel"));
+		blaetterteigMitSchmandMitSchinkenwuerfelMitKaese.getTags().add(new IngredientTag("mit Kaese"));
+		
+		Ingredient blaetterteigGeklappt = bI_blaetterTeig.toObject();
+		blaetterteigGeklappt.getTags().addAll(blaetterteigMitSchmandMitSchinkenwuerfelMitKaese.getTags());
+		blaetterteigGeklappt.getTags().add(new IngredientTag("geklappt"));
+		
+		Ingredient blaetterteigBestrichen = bI_blaetterTeig.toObject();
+		blaetterteigBestrichen.getTags().addAll(blaetterteigGeklappt.getTags());
+		blaetterteigBestrichen.getTags().add(new IngredientTag("mit Schmand bestrichen"));
+		
+		Ingredient blaetterteigBestrichenMitSchinkenUndKaese = bI_blaetterTeig.toObject();
+		blaetterteigBestrichenMitSchinkenUndKaese.getTags().addAll(blaetterteigBestrichen.getTags());
+		blaetterteigBestrichenMitSchinkenUndKaese.getTags().add(new IngredientTag("mit Schinkenwuerfel"));
+		blaetterteigBestrichenMitSchinkenUndKaese.getTags().add(new IngredientTag("mit Kaese"));		
+		
+		Ingredient blaetterteigBestrichenMitSchinkenUndKaeseGeklappt = bI_blaetterTeig.toObject();
+		blaetterteigBestrichenMitSchinkenUndKaeseGeklappt.getTags().addAll(blaetterteigBestrichenMitSchinkenUndKaese.getTags());
+		blaetterteigBestrichenMitSchinkenUndKaeseGeklappt.getTags().add(new IngredientTag("geklappt"));
+		
+		Ingredient blaetterteigGeschnitten = bI_blaetterTeig.toObject();
+		blaetterteigGeschnitten.getTags().addAll(blaetterteigBestrichenMitSchinkenUndKaeseGeklappt.getTags());
+		blaetterteigGeschnitten.getTags().add(new IngredientTag("geschnitten"));
+		
+		Ingredient blaetterteigGedreht = bI_blaetterTeig.toObject();
+		blaetterteigGedreht.getTags().addAll(blaetterteigGeschnitten.getTags());
+		blaetterteigGedreht.getTags().add(new IngredientTag("gedreht"));
+		
+		Ingredient blaetterteigGebacken = bI_blaetterTeig.toObject();
+		blaetterteigGebacken.getTags().addAll(blaetterteigGedreht.getTags());
+		blaetterteigGebacken.getTags().add(new IngredientTag("gebacken"));
+		
 		BaseIngredient bI_teigHaelfte1 = new BaseIngredient();
 		bI_teigHaelfte1.getNames().add("Teighaelfte1");
 		Ingredient blaetterteigHaelfte1 = bI_teigHaelfte1.toObject();
@@ -171,65 +213,75 @@ public class TestRecipeFactory {
 		bA_backen.getNames().add("backen");
 		bA_backen.setResult("gebackene Stangen");
 		BaseIngredient bI_gebackeneStangen = bA_backen.transform(bI_gelegteStangen, null);
-	Ingredient i_gebackeneStangen = bI_gebackeneStangen.toObject();
+		Ingredient i_gebackeneStangen = bI_gebackeneStangen.toObject();
 		i_gebackeneStangen.getTags().add(new IngredientTag("gebacken"));
 		CookingAction cA_backen = bA_backen.toObject();
-		
+				
 		//Creating Steps
 		Step step1 = new Step();
 		step1.getIngredients().add(blaetterteig);
 		step1.setCookingAction(cA_aufrollen);
 		step1.setText("Den Blaetterteig aufrollen");
-		
-		
+		step1.getProducts().add(aufgerollterBlaetterteig);
+				
 		Step step2 = new Step();
 		step2.setText("und eine Teighaelfte mit gut der Haelfte des Schmands bestreichen");
 		step2.setCookingAction(cA_bestreichen);
 		step2.getTools().add(messer);
+		step2.getProducts().add(blaetterteigMitSchmand);
 		
 		//Evtl. Steps hierarchisch anordnen
 		Step step3 = new Step();
 		step3.setText("Die Haelfte der Schinkenwuerfel und des Kaeses darauf verteilen");
 		step3.setCookingAction(cA_verteilen);
+		step3.getProducts().add(blaetterteigMitSchmandMitSchinkenwuerfelMitKaese);
 		
 		Step step4 = new Step();
 		step4.setText("Die Seite des Blaetterteiges, die nicht belegt ist auf die andere Seite klappen");
 		step4.setCookingAction(cA_klappen);
+		step4.getProducts().add(blaetterteigGeklappt);
 		
 		Step step5 = new Step();
 		step5.setText("Wiederum die Haelfte des Teiges mit dem restlichen Schmand bestreichen");
 		step5.setCookingAction(cA_bestreichen2);
 		step5.getTools().add(messer);
+		step5.getProducts().add(blaetterteigBestrichen);
 		
 		Step step6 = new Step();
 		step6.setText("und die Schinkenwuerfel und Kaeseraspel darauf geben");
 		step6.setCookingAction(cA_belegen2);
+		step6.getProducts().add(blaetterteigBestrichenMitSchinkenUndKaese);
 		
 		Step step7 = new Step();
 		step7.setText("Die unbestrichene Teighaelfte darueber klappen");
 		step7.setCookingAction(cA_klappen2);
+		step7.getProducts().add(blaetterteigBestrichenMitSchinkenUndKaeseGeklappt);
 		
 		Step step8 = new Step();
 		step8.setText("Den Blaetterteig in Streifen schneiden");
 		step8.setCookingAction(cA_schneiden);
 		step8.getTools().add(messer);
+		step8.getProducts().add(blaetterteigGeschnitten);
 		
 		Step step9 = new Step();
 		step9.setText("Vorsichtig spiralfoermig drehen");
 		step9.setCookingAction(cA_drehen);
+		step5.getProducts().add(blaetterteigGedreht);
 		
 		Step step10 = new Step();
 		step10.setText("und auf ein mit Backpapier belegtes Blech legen");
 		step10.setCookingAction(cA_legen);
 		step10.getTools().add(backblech);
 		step10.getTools().add(backpapier);
+		step5.getProducts().add(blaetterteigGedreht);
 		
 		Step step11 = new Step();
 		step11.setText("Bei 180Grad ca. 25 Minuten backen");
 		step11.setCookingAction(cA_backen);
 		step11.getTools().add(backofen);
-		CookingEvent ev = new CookingEvent("backen", EventType.TIMER);
+		CookingEvent ev = new CookingEvent("25 Minuten backen", EventType.TIMER);
 		step11.setEvent(ev);
+		step11.getProducts().add(blaetterteigGebacken);
 
 		recipe.getSteps().add(step1);
 		recipe.getSteps().add(step2);
