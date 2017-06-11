@@ -122,14 +122,17 @@ public class RecipeGetterChefkoch implements RecipeGetter {
 
         while (ingredigentsIterator.hasNext()) {
             JSONObject ingredigent = ingredigentsIterator.next();
-            stringBuilder.append(ingredigent.get("name"));
-            stringBuilder.append(" ");
-            stringBuilder.append(ingredigent.get("menge"));
-            stringBuilder.append(" ");
-            stringBuilder.append(ingredigent.get("einheit"));
+            String ingredient = null;
+            StringBuilder ingredientBuilder = new StringBuilder();
+            ingredientBuilder.append(ingredient = ingredigent.get("name").toString());
+            ingredientBuilder.append(" ");
+            ingredientBuilder.append(ingredigent.get("menge"));
+            ingredientBuilder.append(" ");
+            ingredientBuilder.append(ingredigent.get("einheit"));
+            recipe.getIngredients().add(ingredient);
+            
+            stringBuilder.append(ingredientBuilder);
             stringBuilder.append("\n");
-            recipe.getIngredients().add(new Ingredient(stringBuilder.toString(), null));
-
         }
 
         return stringBuilder.toString();

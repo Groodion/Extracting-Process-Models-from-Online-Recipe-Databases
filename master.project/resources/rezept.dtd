@@ -1,12 +1,17 @@
-<!ELEMENT root (tools, ingredients, cookingActions, partIndicators, lastSentenceReferences)>
+<!ELEMENT root (tools, groups, ingredients, cookingActions, partIndicators, lastSentenceReferences)>
 <!ELEMENT tools (Tool)*>
 <!ELEMENT Tool (Name)*>
 <!ATTLIST Tool
 	name CDATA #REQUIRED
 >
 <!ELEMENT ingredients (Ingredient)*>
-<!ELEMENT Ingredient (Name | Property)*>
+<!ELEMENT Ingredient (Name | Property)*, groups?>
 <!ATTLIST Ingredient
+	name CDATA #REQUIRED
+>
+<!ELEMENT groups (Group)*>
+<!ELEMENT Group (Name)*>
+<!ATTLIST Group
 	name CDATA #REQUIRED
 >
 <!ELEMENT Property (#PCDATA)>
@@ -23,7 +28,8 @@
 <!ELEMENT regs (Regex+)>
 <!ELEMENT Regex (#PCDATA)>
 <!ATTLIST Regex
-	result (first|last|all) "first"
+	result (first|last|all|prev|no_result) "first"
+	ingredientsNeeded (true|false) "true"
 >
 <!ELEMENT Name (#PCDATA)>
 <!ELEMENT partIndicators (PartIndicator)*>

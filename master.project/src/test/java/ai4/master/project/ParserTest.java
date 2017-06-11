@@ -17,7 +17,7 @@ public class ParserTest {
 
 		//997991205154456,185511079703831,150681066371674,1726761281857676,2397571379105119,982031203667502,914011196708021,1033741208508759,965881202287446,43611014899035,
 
-		Recipe recipe = RecipeGetterChefkoch.recipeGetterFactory().getRecipe("997991205154456");
+		Recipe recipe = RecipeGetterChefkoch.recipeGetterFactory().getRecipe("2397571379105119");
 		
 		parser.parseRecipe(recipe);
 		

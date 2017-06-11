@@ -196,17 +196,28 @@
 	<Tool name="Tarteform">
 		<Name>Tarte-Form</Name>
 	</Tool>
+	<Tool name="Deckel"></Tool>
 </tools>
-<ingredients>
-	<Ingredient name="Blätterteig">
-		<Name>Teig</Name>
-		<Name>Teighälfte</Name>
-	</Ingredient>
-	<Ingredient name="Schmand" />
-	<Ingredient name="Käse">
+<groups>
+	<Group name="Gemüse" />
+	<Group name="Käse">
 		<Name>Käsewürfel</Name>
 		<Name>Käseraspel</Name>
+	</Group>
+	<Group name="Öl" />
+	<Group name="Flüssigkeit" />
+	<Group name="Teig" />
+	<Group name="Fisch" />
+	<Group name="Fleisch" />
+	<Group name="Wurst" />
+</groups>
+<ingredients>
+	<Ingredient name="Blätterteig">
+		<groups>
+			<Group name="Teig"/>
+		</groups>
 	</Ingredient>
+	<Ingredient name="Schmand" />
 	<Ingredient name="Fett"></Ingredient>
 	<Ingredient name="Paniermehl"></Ingredient>
 	<Ingredient name="Schinkenwürfel" />
@@ -227,7 +238,40 @@
 	<Ingredient name="Zwieback"><Name>Zwiebackbrösel</Name></Ingredient>
 	<Ingredient name="Ei"><Name>Eier</Name></Ingredient>
 	<Ingredient name="Zimt"></Ingredient>
-	<Ingredient name="Öl"></Ingredient>
+	<Ingredient name="Erdnussöl">
+		<groups>
+			<Group name="Öl"/>
+		</groups>
+	</Ingredient>
+	<Ingredient name="Olivenöl">
+		<groups>
+			<Group name="Öl"/>
+		</groups>
+	</Ingredient>
+	<Ingredient name="Lachs">
+		<Name>Lachsfilet</Name>
+	</Ingredient>
+	<Ingredient name="Bacon">
+		<Name>Speck</Name>
+	</Ingredient>
+	<Ingredient name="Brokkoli"></Ingredient>
+	<Ingredient name="Champignon">
+		<Name>Champignons</Name>
+	</Ingredient>
+	<Ingredient name="Zwiebel"></Ingredient>
+	<Ingredient name="Zucchini"></Ingredient>
+	<Ingredient name="Chili">
+		<Name>Chili-Flocken</Name>
+		<Name>Chiliflocken</Name>
+		<Name>Chilipulver</Name>
+	</Ingredient>
+	<Ingredient name="Paprika">
+		<Name>Paprikapulver</Name>
+	</Ingredient>
+	<Ingredient name="Feta">
+		<Name>Feta-Käse</Name>
+	</Ingredient>
+	<Ingredient name="Parmesan"></Ingredient>
 </ingredients>
 <cookingActions>
 	<CookingAction name="rollen">
@@ -261,6 +305,14 @@
 		</transformations>
 	</CookingAction>
 	<CookingAction name="geben">
+		<Name>zugeben</Name>
+		<Name>hinzugeben</Name>
+		
+		<regs>
+			<Regex result="last">.*~INGREDIENT.*zu(r|m)?.*~INGREDIENT.*~ACTION</Regex>
+			<Regex result="prev">.*~INGREDIENT.*~ACTION</Regex>
+		</regs>
+		
 		<transformations>
 			<Transformation>
 				<AddIngredientTag>mit INGREDIENT</AddIngredientTag>
@@ -284,7 +336,9 @@
 			</Transformation>
 		</transformations>
 	</CookingAction>
-	<CookingAction name="legen" />
+	<CookingAction name="legen">
+		<Name>auflegen</Name>
+	</CookingAction>
 	<CookingAction name="backen" />
 	<CookingAction name="verteilen">
 		<transformations>
@@ -328,6 +382,52 @@
 				<AddIngredientTag>mit INGREDIENT</AddIngredientTag>
 			</Transformation>
 		</transformations>
+	</CookingAction>
+	<CookingAction name="abwaschen">
+		<Name>säubern</Name>
+		<regs>
+			<Regex result="all">.*</Regex>
+		</regs>
+		<transformations>
+			<Transformation>
+				<AddIngredientTag>sauber</AddIngredientTag>
+			</Transformation>
+		</transformations>
+	</CookingAction>
+	<CookingAction name="tupfen">
+		<transformations>
+			<Transformation>
+				<AddIngredientTag>trocken</AddIngredientTag>
+			</Transformation>
+		</transformations>
+	</CookingAction>
+	<CookingAction name="umwickeln">
+		<Name>wickeln</Name>
+		<Name>einwickeln</Name>
+		<regs>
+			<Regex result="first">~INGREDIENT.*mit.*~INGREDIENT.*umwickeln</Regex>
+			<Regex result="last">~INGREDIENT.*um.*~INGREDIENT.*wickeln</Regex>
+		</regs>
+		<transformations>
+			<Transformation>
+				<AddIngredientTag>umwickelt mit INGREDIENT</AddIngredientTag>
+			</Transformation>
+		</transformations>
+	</CookingAction>
+	<CookingAction name="stellen">
+		<regs>
+			<Regex ingredientsNeeded="false" result="no_result">^(?!.*~INGREDIENT).*</Regex>
+		</regs>
+	</CookingAction>
+	<CookingAction name="würzen">
+		<regs>
+			<Regex result="first">.*~INGREDIENT.*mit.*(~INGREDIENT.*)+~ACTION</Regex>
+		</regs>
+	</CookingAction>
+	<CookingAction name="garnieren">
+		<regs>
+			<Regex result="first">.*~INGREDIENT.*mit.*(~INGREDIENT.*)+~ACTION</Regex>
+		</regs>
 	</CookingAction>
 </cookingActions>
 <partIndicators>

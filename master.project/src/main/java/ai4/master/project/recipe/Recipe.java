@@ -11,7 +11,7 @@ import ai4.master.project.recipe.object.Ingredient;
  */
 public class Recipe {
 
-	private List<Ingredient> ingredients;
+	private List<String> ingredients;
 	private List<Step> steps;
 
 	private String preparation;
@@ -20,7 +20,7 @@ public class Recipe {
 	
 
 	public Recipe(LANG_FLAG language) {
-		ingredients = new ArrayList<Ingredient>();
+		ingredients = new ArrayList<String>();
 		steps = new ArrayList<Step>();
 		this.language = language;
 		preparation = "";
@@ -33,7 +33,7 @@ public class Recipe {
 		this.preparation = preparation;
 	}
 
-	public List<Ingredient> getIngredients() {
+	public List<String> getIngredients() {
 		return ingredients;
 	}
 	public List<Step> getSteps() {

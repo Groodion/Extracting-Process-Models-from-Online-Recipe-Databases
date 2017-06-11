@@ -2,13 +2,16 @@ package ai4.master.project.stanfordParser;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
+import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.Regex;
 import ai4.master.project.recipe.object.CookingAction;
 import ai4.master.project.recipe.object.Ingredient;
@@ -54,6 +57,15 @@ public class Parser {
 					part = new SentencePart(part, sentence);
 				}
 				
+				if(taggedWord.word().equals("-LRB-")) {
+					taggedWord.setWord("(");
+					taggedWord.setTag("$(");
+				}
+				if(taggedWord.word().equals("-RRB-")) {
+					taggedWord.setWord(")");
+					taggedWord.setTag("$(");
+				}
+
 				try {
 					STTSTag tag = STTSTag.valueOf(taggedWord.tag());
 					word = new Word(taggedWord.word(), tag, word, part);
@@ -116,7 +128,20 @@ public class Parser {
 		for(Sentence sentence : sentences) {
 			sentence.init(kwdb);
 		}
+
+		Map<BaseIngredient, Ingredient> activeIngredients = new HashMap<BaseIngredient, Ingredient>();
 		
+		for(String s : recipe.getIngredients()) {
+			String name = s.split("\\(")[0];
+			BaseIngredient ingredient = kwdb.findIngredient(name);
+			
+			if(ingredient != null) {
+				activeIngredients.put(ingredient, ingredient.toObject());
+			} else {
+				System.err.println("Unknown Ingredient: " + name);
+			}
+		}
+				
 		Step lastStep = null;
 		
 		for(Sentence s : sentences) {
@@ -150,9 +175,14 @@ public class Parser {
 								}
 							}
 						}
-					}					
+					}
+					boolean noResult = false;
+					boolean ingredientsNeeded = true;
+					
 					for(Regex regex : action.getRegexList()) {
 						if(sP.matches(regex.getExpression(), false)) {
+							ingredientsNeeded = regex.isIngredientsNeeded();
+							
 							switch(regex.getResult()) {
 							case ALL:
 								for(Ingredient ingredient : step.getIngredients()) {
@@ -165,6 +195,15 @@ public class Parser {
 							case LAST:
 								step.getProducts().add(action.transform(step.getIngredients().get(step.getIngredients().size() - 1), step.getIngredients()));
 								break;
+							case PREV:
+								step.getIngredients().addAll(lastStep.getProducts());
+								for(Ingredient ingredient : lastStep.getProducts()) {
+									step.getProducts().add(action.transform(ingredient, step.getIngredients()));
+								}
+								break;
+							case NO_RESULT:
+								noResult = true;
+								break;
 							default:
 								break;
 							}
@@ -173,17 +212,36 @@ public class Parser {
 					}
 					
 					sP.clearMemory();
-					if(step.getIngredients().isEmpty()) {
-						step.getIngredients().addAll(lastStep.getProducts());
-					}
-					if(step.getProducts().isEmpty()) {
-						for(Ingredient ingredient : lastStep.getProducts()) {
-							if(ingredient != null)
-								step.getProducts().add(action.transform(ingredient, step.getIngredients()));
+					if(lastStep != null && ingredientsNeeded) {
+						if(step.getIngredients().isEmpty()) {
+							step.getIngredients().addAll(lastStep.getProducts());
+						}
+						if(step.getProducts().isEmpty() && !noResult) {
+							for(Ingredient ingredient : lastStep.getProducts()) {
+								if(ingredient != null) {
+									step.getIngredients().add(ingredient);
+									step.getProducts().add(action.transform(ingredient, step.getIngredients()));
+								}
+							}
 						}
 					}
-										
+					
+					while(step.getIngredients().remove(null));
+					while(step.getProducts().remove(null));
+					
+					for(int i = 0; i < step.getIngredients().size(); i++) {
+						Ingredient ingredient = step.getIngredients().get(i);
+						if(activeIngredients.containsKey(ingredient.getBaseObject())) {
+							step.getIngredients().set(i, activeIngredients.get(ingredient.getBaseObject()));
+							activeIngredients.remove(ingredient.getBaseObject());
+						}
+					}
+					
+					step.getProducts().forEach(product -> activeIngredients.put(product.getBaseObject(), product));
+					
+					
 					recipe.getSteps().add(step);
+					
 					
 					lastStep = step;
 				}

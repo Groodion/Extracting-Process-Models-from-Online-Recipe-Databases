@@ -5,14 +5,17 @@ import java.util.List;
 
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
+import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
 import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.stanfordParser.sentence.Role;
+
 
 public class KeyWordDatabase {
 	
 	private List<BaseTool> tools;
 	private List<BaseIngredient> ingredients;
 	private List<BaseCookingAction> cookingActions;
+	private List<BaseIngredientGroup> ingredientGroups;
 	private List<String> partIndicators;
 	private List<String> lastSentenceReferences;
 	
@@ -117,6 +120,15 @@ public class KeyWordDatabase {
 		}
 		return bestMatch;
 	}
+	public BaseIngredientGroup findIngredientGroup(String text) {
+		for(BaseIngredientGroup group : ingredientGroups) {
+			if(group.getStemmedNames().contains(text)) {
+				return group;
+			}
+		}
+		
+		return null;
+	}
 
 	public boolean isUnknown(String text, double error) {
 		return findTool(text, error) == null
@@ -163,4 +175,9 @@ public class KeyWordDatabase {
 			return null;
 		}
 	}
+
+	public List<BaseIngredientGroup> getIngredientGroups() {
+		return ingredientGroups;
+	}
+
 }

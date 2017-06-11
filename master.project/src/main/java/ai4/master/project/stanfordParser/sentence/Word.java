@@ -74,6 +74,7 @@ public class Word extends PartialObject<Word> {
 		return connections;
 	}
 	public Role getRole() {
+		while(connections.remove(null));
 		if(!referenceTargets.isEmpty()) {
 			Role role = referenceTargets.get(0).getRole();
 			
@@ -368,6 +369,9 @@ public class Word extends PartialObject<Word> {
 		case TRUNC:
 			break;
 		case VVINF:
+		case VVFIN:
+		case VVIMP:
+		case VVIZU:
 			role = Role.ACTION;
 			cookingAction = kwdb.findCookingAction(stem(getText()));
 		case VAFIN:
@@ -377,11 +381,9 @@ public class Word extends PartialObject<Word> {
 		case VMFIN:
 		case VMINF:
 		case VMPP:
-		case VVFIN:
-		case VVIMP:
-		case VVIZU:
 		case VVPP:
 			isVerb = true;
+			//System.out.println(getText() + " " + getPos());
 			break;
 		case XY:
 			break;

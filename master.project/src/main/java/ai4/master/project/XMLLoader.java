@@ -12,6 +12,7 @@ import org.jdom2.input.sax.XMLReaders;
 
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
+import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
 import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.recipe.baseObject.Regex;
 import ai4.master.project.recipe.baseObject.Transformation;
@@ -34,13 +35,17 @@ public class XMLLoader {
 	public static final String ELEMENT_NAME = "Name";
 	public static final String ELEMENT_REGS = "regs";
 	public static final String ELEMENT_REGEX = "Regex";
+	public static final String ELEMENT_GROUPS = "groups";
+	public static final String ELEMENT_GROUP = "Group";
 	public static final String ATTRIBUTE_NAME = "name";
 	public static final String ATTRIBUTE_RESULT_FINDER = "resultFinder";
 	public static final String ATTRIBUTE_RESULT = "result";
+	public static final String ATTRIBUTE_INGREDIENTS_NEEDED = "ingredientsNeeded";
 	public static final String ELEMENT_TRANSFORMATIONS = "transformations";
 	public static final String ELEMENT_TRANSFORMATION = "Transformation";
 	public static final String ELEMENT_ADD_INGREDIENT_TAG = "AddIngredientTag";
 	public static final String ELEMENT_ADD_QUANTIFIER_TAG = "AddQuantifierTag";
+
 	
 	/**
 	 * Loads XML-File from URL and puts the elements into lists
@@ -60,6 +65,8 @@ public class XMLLoader {
 		for(Element child : root.getChildren()) {
 			if(child.getName().equals(ELEMENT_TOOLS)) {
 				readTools(child, kwdb);
+			} else if(child.getName().equals(ELEMENT_GROUPS)) {
+				readGroups(child, kwdb);
 			} else if(child.getName().equals(ELEMENT_INGREDIENTS)) {
 				readIngredients(child, kwdb);
 			} else if(child.getName().equals(ELEMENT_COOKING_ACTIONS)) {
@@ -106,6 +113,38 @@ public class XMLLoader {
 		
 		kwdb.getTools().add(tool);
 	}
+
+	private void readGroups(Element element, KeyWordDatabase kwdb) {
+		for(Element child : element.getChildren()) {
+			if(child.getName().equals(ELEMENT_GROUPS)) {
+				readGroup(child, kwdb);
+			} else {
+				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
+			}
+		}
+	}
+	private void readGroup(Element element, KeyWordDatabase kwdb) {
+		BaseIngredientGroup group = new BaseIngredientGroup();
+		
+		for(Attribute att : element.getAttributes()) {
+			if(att.getName().equals(ATTRIBUTE_NAME)) {
+				group.addName(att.getValue());
+			} else {
+				System.err.println("Unknown Attribute");
+			}
+		}		
+
+		for(Element child : element.getChildren()) {
+			if(child.getName().equals(ELEMENT_NAME)) {
+				group.addName(child.getText());
+			} else {
+				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
+			}
+		}
+		
+		kwdb.getIngredientGroups().add(group);
+	}
+
 	private void readIngredients(Element element, KeyWordDatabase kwdb) {
 		for(Element child : element.getChildren()) {
 			if(child.getName().equals(ELEMENT_INGREDIENT)) {
@@ -113,7 +152,7 @@ public class XMLLoader {
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}
-		}		
+		}
 	}
 	private void readIngredient(Element element, KeyWordDatabase kwdb) {
 		BaseIngredient ingredient = new BaseIngredient();
@@ -129,6 +168,8 @@ public class XMLLoader {
 		for(Element child : element.getChildren()) {
 			if(child.getName().equals(ELEMENT_NAME)) {
 				ingredient.addName(child.getText());
+			} else if(child.getName().equals(ELEMENT_GROUPS)) {
+				readGroups(child, kwdb, ingredient);
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}
@@ -136,6 +177,25 @@ public class XMLLoader {
 		
 		kwdb.getIngredients().add(ingredient);
 	}
+	private void readGroups(Element element, KeyWordDatabase kwdb, BaseIngredient ingredient) {
+		for(Element child : element.getChildren()) {
+			if(child.getName().equals(ELEMENT_GROUPS)) {
+				readGroup(child, kwdb, ingredient);
+			} else {
+				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
+			}
+		}
+	}
+	private void readGroup(Element element, KeyWordDatabase kwdb, BaseIngredient ingredient) {
+		for(Attribute att : element.getAttributes()) {
+			if(att.getName().equals(ATTRIBUTE_NAME)) {
+				ingredient.getIngredientGroups().add(kwdb.findIngredientGroup(att.getValue()));
+			} else {
+				System.err.println("Unknown Attribute");
+			}
+		}
+	}
+	
 	private void readCookingActions(Element element, KeyWordDatabase kwdb) {
 		for(Element child : element.getChildren()) {
 			if(child.getName().equals(ELEMENT_COOKING_ACTION)) {
@@ -198,21 +258,17 @@ public class XMLLoader {
 		
 		cookingAction.getTransformations().add(transformation);
 	}
-
 	private void readAddIngredientTag(Element element, KeyWordDatabase kwdb, Transformation transformation) {
 		transformation.setTag(new IngredientTag(element.getText()));
 	}
-	
 	private void readAddQuantifierTag(Element element, KeyWordDatabase kwdb, Transformation transformation) {
 		transformation.setTag(new QuantifierTag(element.getText()));
 	}
-
 	private void readTransformationProduct(Element element, KeyWordDatabase kwdb, Transformation transformation) {
 		String name = element.getAttributeValue(ATTRIBUTE_NAME);
 		
 		transformation.setProduct(kwdb.findIngredient(name).toObject());
 	}
-
 	private void readTransformationIngredientes(Element element, KeyWordDatabase kwdb, Transformation transformation) {
 		for(Element child : element.getChildren()) {
 			if(child.getName().equals(ELEMENT_INGREDIENT)) {
@@ -222,13 +278,11 @@ public class XMLLoader {
 			}
 		}
 	}
-
 	private void readTransformationIngredient(Element element, KeyWordDatabase kwdb, Transformation transformation) {
 		String name = element.getAttributeValue(ATTRIBUTE_NAME);
 		
 		transformation.getMandatoryIngredients().add(kwdb.findIngredient(name).toObject());
 	}
-
 	private void readRegs(Element element, KeyWordDatabase kwdb, BaseCookingAction cA) {
 		for(Element child : element.getChildren()) {
 			if(child.getName().equals(ELEMENT_REGEX)) {
@@ -246,7 +300,13 @@ public class XMLLoader {
 			result = Regex.Result.valueOf(element.getAttributeValue(ATTRIBUTE_RESULT).toUpperCase());
 		}
 		
-		cA.getRegexList().add(new Regex(expression, result));
+		boolean iN = true;
+		
+		try {
+			iN = element.getAttribute(ATTRIBUTE_INGREDIENTS_NEEDED).getBooleanValue();
+		} catch(Exception e) { }
+		
+		cA.getRegexList().add(new Regex(expression, result, iN));
 	}
 
 	private void readPartIndicators(Element element, KeyWordDatabase kwdb) {
