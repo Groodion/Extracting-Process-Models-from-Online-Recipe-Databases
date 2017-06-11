@@ -28,7 +28,6 @@ public class TreeTraverser<T> {
     public List<Node<T>> preOrder(){
       List<Node<T>> preOrder = new ArrayList<Node<T>>();
       actuallyPreOrder(root, preOrder);
-      System.out.println(preOrder.size());
       return  preOrder;
     }
 

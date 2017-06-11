@@ -18,6 +18,7 @@ import java.util.List;
 /**
  * Created by René Bärnreuther on 24.05.2017.
  */
+@Deprecated
 public class RecipeConverter {
 
 
@@ -82,15 +83,22 @@ public class RecipeConverter {
             Do until no Tree changes anymore probably. Have to think through this.
 
          */
-        for (int i = 0; i < inversedStepList.size(); i++) {
-            List<Ingredient> currIng = root.getData().getIngredients();
-            Step currStep = inversedStepList.get(i);
+        for (Tree<Step> t :
+                treeList) {
 
-            if(isDependent(currIng, currStep.getIngredients())){
-                root.addChild(currStep);
-            }else{
-                // Create a new tree.
+            List<Ingredient> ingredientsOfRoot =t.getRoot().getData().getIngredients();
+            for (Step s:
+                 inversedStepList) {
+                if(isDependent(ingredientsOfRoot, s.getProducts())){
+                    t.getRoot().addChild(s);
+                }else{
+                    Tree newTree = new Tree();
+                    newTree.setRoot(new Node<Step>(s));
+                    treeList.add(newTree);
+                }
+
             }
+
         }
 
 
