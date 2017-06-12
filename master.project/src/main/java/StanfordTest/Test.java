@@ -1,27 +1,19 @@
 package StanfordTest;
 
+import ai4.master.project.recipe.Recipe;
+import ai4.master.project.recipe.Step;
+import ai4.master.project.recipe.TestRecipeFactory;
+import ai4.master.project.recipe.object.Ingredient;
 
 public class Test {
-	
-	
 	public static void main(String args[]) {
-		Parser p = new Parser("lib/models/german-fast.tagger");
+		Recipe recipe = TestRecipeFactory.getInstance().createRecipe();
 		
-		System.out.println(p.getSentencesFromFile("test.txt"));
-		System.out.println(p.getSentencesFromString("Das ist ein Satz. Dies ist ein weiterer Satz. Und noch einer hintendran!?"));
-		System.out.println("---------------------------");
-		
-		System.out.println(p.getSplittedSentencesFromUrl("test.txt"));
-		System.out.println("---------------------------");
-		
-		p.analyzeText("test.txt");
-		System.out.println("---------------------------");
-		System.out.println(p.getNouns());
-		System.out.println(p.getVerbs());
-		System.out.println(p.getAdjectives());
-		
+		for(Step step : recipe.getSteps()) {
+			System.out.println(step.toString());
+			for(Ingredient product : step.getProducts()) {
+				System.out.println(product.getCompleteName());
+			}
+		}
 	}
-
-
-	
 }

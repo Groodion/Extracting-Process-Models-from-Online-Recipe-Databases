@@ -15,6 +15,17 @@ import java.util.List;
 
 public class TestRecipeFactory {
 	
+	private static TestRecipeFactory INSTANCE = new TestRecipeFactory();
+	
+	public static TestRecipeFactory getInstance() {
+		return INSTANCE;
+	}
+	
+	
+	private TestRecipeFactory() {
+		
+	}
+	
 	public Recipe createRecipe() {
 		Recipe recipe = new Recipe(LANG_FLAG.DE);
 		
@@ -22,6 +33,7 @@ public class TestRecipeFactory {
 		bI_schmand.getNames().add("Schmand");
 		Ingredient schmand = bI_schmand.toObject();
 		schmand.getTags().add(new QuantifierTag("200g"));
+		
 		
 		BaseIngredient bI_schinkenwuerfel = new BaseIngredient();
 		bI_schinkenwuerfel.getNames().add("Schinkenwuerfel");
@@ -42,7 +54,7 @@ public class TestRecipeFactory {
 		backpapier.setImplicit(false);
 		
 		BaseTool bT_blech = new BaseTool();
-		bT_backpapier.getNames().add("Backblech");
+		bT_blech.getNames().add("Backblech");
 		Tool backblech = bT_blech.toObject();
 		backpapier.setImplicit(false);
 		
@@ -266,14 +278,14 @@ public class TestRecipeFactory {
 		Step step9 = new Step();
 		step9.setText("Vorsichtig spiralfoermig drehen");
 		step9.setCookingAction(cA_drehen);
-		step5.getProducts().add(blaetterteigGedreht);
+		step9.getProducts().add(blaetterteigGedreht);
 		
 		Step step10 = new Step();
 		step10.setText("und auf ein mit Backpapier belegtes Blech legen");
 		step10.setCookingAction(cA_legen);
 		step10.getTools().add(backblech);
 		step10.getTools().add(backpapier);
-		step5.getProducts().add(blaetterteigGedreht);
+		step10.getProducts().add(blaetterteigGedreht);
 		
 		Step step11 = new Step();
 		step11.setText("Bei 180Grad ca. 25 Minuten backen");

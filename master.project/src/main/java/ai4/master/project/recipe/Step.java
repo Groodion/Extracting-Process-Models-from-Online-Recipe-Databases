@@ -23,6 +23,7 @@ public class Step {
 	public Step() {
 		ingredients = new ArrayList<Ingredient>();
 		tools = new ArrayList<Tool>();
+		products = new ArrayList<Ingredient>();
 	}
 	
 	public List<Tool> getTools() {
