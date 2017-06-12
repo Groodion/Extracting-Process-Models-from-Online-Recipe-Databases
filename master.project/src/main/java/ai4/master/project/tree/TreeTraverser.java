@@ -12,6 +12,7 @@ public class TreeTraverser<T> {
 
     private Node<T> root;
 
+    private boolean print = false;
     public TreeTraverser(Tree<T> tree){
         if(tree.getRoot() == null){
             System.err.print("Root equals null");
@@ -20,6 +21,8 @@ public class TreeTraverser<T> {
     }
 
 
+    public void activatePrint(){ print = true;}
+    public void deactivatePrint() {print = false;}
     // TODO as far as I think we need a levelwise traversing. This needs to be implemented probably. But we still need to check for this ..
     /**
      * Traverses the tree starting from root in preOrder direction
@@ -34,7 +37,8 @@ public class TreeTraverser<T> {
     // Called by the public method to realize recursion with list.
     private void actuallyPreOrder(Node<T> root, List<Node<T>> list){
         if(root != null){
-            System.out.println(root.getData().toString());
+            if(print)
+                System.out.println(root.getData().toString());
             list.add(root);
         }
 

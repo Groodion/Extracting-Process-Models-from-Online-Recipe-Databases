@@ -1,11 +1,11 @@
 package ai4.master.project.recipe;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ai4.master.project.recipe.object.CookingAction;
 import ai4.master.project.recipe.object.Ingredient;
 import ai4.master.project.recipe.object.Tool;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Step {
 	
@@ -23,6 +23,7 @@ public class Step {
 	public Step() {
 		ingredients = new ArrayList<Ingredient>();
 		tools = new ArrayList<Tool>();
+		products = new ArrayList<>();
 	}
 	
 	public List<Tool> getTools() {
@@ -59,5 +60,35 @@ public class Step {
 	public String toString() {
 		return "Step [ingredients=" + ingredients + ", tools=" + tools + ", cookingAction=" + cookingAction + ", products="
 				+ products + ", \'" + text + "']";
+	}
+
+	public String printIngredients(){
+		StringBuilder stringBuilder = new StringBuilder();
+		for (Ingredient i : ingredients){
+			stringBuilder.append(i);
+			stringBuilder.append(",");
+		}
+		return stringBuilder.toString();
+	}
+
+	public String printProducts(){
+		StringBuilder stringBuilder = new StringBuilder();
+		for(Ingredient i: products){
+			stringBuilder.append(i);
+			stringBuilder.append(",");
+
+		}
+		return stringBuilder.toString();
+	}
+	@Override
+	public boolean equals(Object o){
+		Step step = (Step)o ;
+		if(this.text == null || ((Step) o).getText() == null){
+			return false;
+		}
+		if(this.text.equals(step.getText())){
+			return true;
+		}
+		return false;
 	}
 }

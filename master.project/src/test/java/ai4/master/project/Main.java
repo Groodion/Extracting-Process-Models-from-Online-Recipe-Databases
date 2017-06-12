@@ -16,7 +16,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        RecipeGetterChefkoch recipeGetter = RecipeGetterChefkoch.recipeGetterFactory();
+        RecipeGetterChefkoch recipeGetter = new RecipeGetterChefkoch();
         String ids = recipeGetter.getRecipeIDs("Käse",1);
 
         String[] id = ids.split(",");

@@ -1,8 +1,8 @@
 package ai4.master.project.process;
 
 import ai4.master.project.output.XMLWriter;
+import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
-import ai4.master.project.recipe.baseObject.BaseRecipe;
 import ai4.master.project.recipe.object.Ingredient;
 import ai4.master.project.tree.Node;
 import ai4.master.project.tree.Tree;
@@ -22,9 +22,9 @@ import java.util.List;
 public class RecipeConverter {
 
 
-    private BaseRecipe recipe;
+    private Recipe recipe;
 
-    public BpmnModelInstance convertToBpmn(BaseRecipe recipe){
+    public BpmnModelInstance convertToBpmn(Recipe recipe){
         //sortProducts(recipe);
         BpmnModelInstance currentModel = Bpmn.createEmptyModel();
         ProcessBuilder currentBuilder = Bpmn.createProcess("Recipe");
