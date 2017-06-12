@@ -1,10 +1,10 @@
 package ai4.master.project.recipe.baseObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ai4.master.project.recipe.ResultType;
 import ai4.master.project.recipe.object.CookingAction;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookingAction> {
 
@@ -42,7 +42,7 @@ public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookin
 		if(result == null) {
 			return mainIngredient;
 		}
-		return null;
+		return mainIngredient;
 	}
 
 	@Override
