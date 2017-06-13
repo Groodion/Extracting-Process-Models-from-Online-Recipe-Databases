@@ -17,7 +17,7 @@ public class RecipeToTreeConverter {
 
 
     // Test Rezept ist in der TestRecipeFactory mit implementiert von mir. Ich denke, da sollten alle Fälle abgedeckt sein, nur der in Facebook beschriebene funktioniert noch nicht, der Rest schon. (vgl. MainConverter Ausgabe).
-    public List<Tree> createTree(Recipe recipe) {
+    public Tree createTree(Recipe recipe) {
         List<Tree> treeList = new ArrayList<Tree>();
         Tree<Step> tree = new Tree();
         treeList.add(tree);
@@ -68,7 +68,13 @@ public class RecipeToTreeConverter {
         }
 
 
-        return treeList;
+        Tree<Step> finalTree = new Tree<>(new Node<>(new Step()));
+        for (Tree t :
+                treeList) {
+            finalTree.getRoot().addChild(t.getRoot());
+        }
+
+        return finalTree;
 
 
     }

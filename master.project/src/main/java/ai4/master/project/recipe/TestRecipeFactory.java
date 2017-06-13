@@ -327,44 +327,51 @@ Brötchen + Schinken/Zwiebeln	Brötchen mit Schinken/Marmelade
 		Recipe recipe = new Recipe(LANG_FLAG.DE);
 
 		Step step1 = new Step();
+		step1.setText("Schinken aufs Broetchen legen");
 		step1.getIngredients().add(new Ingredient("Brötchen",new BaseIngredient()));
 		step1.getIngredients().add(new Ingredient("Schinken", new BaseIngredient()));
 		step1.getProducts().add(new Ingredient("Brötchen mit Schinken", new BaseIngredient()));
 		recipe.getSteps().add(step1);
 
 		Step step2 = new Step();
+		step2.setText("Zwiebeln drauf legen");
 		step2.getIngredients().add(new Ingredient("Brötchen mit Schinken", new BaseIngredient()));
 		step2.getIngredients().add(new Ingredient("Zwiebeln", new BaseIngredient()));
 		step2.getProducts().add(new Ingredient("Brötchen mit Schinken und Zwiebeln", new BaseIngredient()));
 		recipe.getSteps().add(step2);
 
 		Step step7 = new Step();
+		step7.setText("Marmelade aufs Brötchen tun");
 		step7.getIngredients().add(new Ingredient("Brötchen mit Schinken", new BaseIngredient()));
 		step7.getIngredients().add(new Ingredient("Marmelade",new BaseIngredient()));
 		step7.getProducts().add(new Ingredient("Ekliges Brötchen", new BaseIngredient()));
 		recipe.getSteps().add(step7);
 
 		Step step3 = new Step();
+		step3.setText("Ketchup drauf");
 		step3.getIngredients().add(new Ingredient("Brötchen mit Schinken und Zwiebeln", new BaseIngredient()));
 		step3.getIngredients().add(new Ingredient("Ketchup", new BaseIngredient()));
 		step3.getProducts().add(new Ingredient("Brötchen mit Schinken und Zwiebeln und Ketchup",new BaseIngredient()));
 		recipe.getSteps().add(step3);
 
-		Step step4 = new Step();
+	/*	Step step4 = new Step();
+		step4.setText("Käse zu Milch machen");
 		step4.getIngredients().add(new Ingredient("Milch", new BaseIngredient()));
 		step4.getProducts().add(new Ingredient("Käse",new BaseIngredient()));
 		recipe.getSteps().add(step4);
 
 		Step step5 = new Step();
+		step5.setText("Käse schmelzen");
 		step5.getIngredients().add(new Ingredient("Käse", new BaseIngredient()));
 		step5.getProducts().add(new Ingredient("Geschmolzenzer Käse", new BaseIngredient()));
 		recipe.getSteps().add(step5);
 
 		Step step6 = new Step();
+		step6.setText("Geschmolzen Käse aufs Brötchen");
 		step6.getIngredients().add(new Ingredient("Geschmolzener Käse", new BaseIngredient()));
 		step6.getIngredients().add(new Ingredient("Brötchen mit Schinken und Zwiebeln und Ketchup", new BaseIngredient()));
 		step6.getProducts().add(new Ingredient("Lecker Lecker Brötchen", new BaseIngredient()));
-		recipe.getSteps().add(step6);
+		recipe.getSteps().add(step6);*/
 
 
 		return recipe;
