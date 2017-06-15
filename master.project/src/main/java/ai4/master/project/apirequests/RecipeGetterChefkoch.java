@@ -142,6 +142,8 @@ public class RecipeGetterChefkoch implements RecipeGetter {
         return null;
     }
 
+
+
     /*
     Returns the HTML Body to the given URL, expected in JSON Format usually.
     Returns null, if nothing was given back.
