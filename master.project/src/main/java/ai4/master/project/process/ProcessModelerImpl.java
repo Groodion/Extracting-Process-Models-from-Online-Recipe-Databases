@@ -1,6 +1,10 @@
 package ai4.master.project.process;
 
 import ai4.master.project.recipe.Recipe;
+import ai4.master.project.recipe.Step;
+import ai4.master.project.tree.Node;
+import ai4.master.project.tree.Tree;
+import ai4.master.project.tree.TreeTraverser;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.*;
@@ -8,6 +12,10 @@ import org.camunda.bpm.model.bpmn.instance.Process;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.*;
 import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
 import org.camunda.bpm.model.bpmn.instance.di.Waypoint;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -24,9 +32,14 @@ public class ProcessModelerImpl implements ProcessModeler {
     private String lastUseNodeID = null;
 
     BpmnModelInstance modelInstance;
+    List<UserTask> createdUserTasks = new ArrayList<>();
+    List<SequenceFlow> createdFlows = new ArrayList<>();
     public BpmnModelInstance convertToProcess(Recipe recipe){
+
+        Tree<Step> t = new RecipeToTreeConverter().createTree(recipe);
+        List<Node<Step>>  nodes = new TreeTraverser<Step>(t).preOrder();
         // create an empty model
-        modelInstance = Bpmn.createEmptyModel();
+        modelInstance =  Bpmn.createEmptyModel();
         Definitions definitions = modelInstance.newInstance(Definitions.class);
         definitions.setTargetNamespace("http://camunda.org/examples");
         modelInstance.setDefinitions(definitions);
@@ -43,20 +56,71 @@ public class ProcessModelerImpl implements ProcessModeler {
         definitions.addChildElement(diagram);
 
 
-        // WE NEED TO DO IT LIKE STHIS
-        // create start event, user task and end event
-        StartEvent startEvent = createElement(process, "start", "Di generation wanted",
-                StartEvent.class, plane, 15, 15, 50, 50, true);
+        StartEvent startEvent = createElement(process, "start", "Start", StartEvent.class, plane, 15, 15, 50, 50, true);
 
-        UserTask userTask = createElement(process, "userTask", "Generate Model with DI",
-                UserTask.class, plane, 100, 0, 80, 100, false);
+        //First we create the user tasks for all nodes.
+        for(Node<Step> node: nodes){
+            if(node.getData().getText() == null){
+                continue;
+            }
+                if(!idExists(createIdOf(node.getData().getText()))) {
+                    UserTask userTask = createElement(process, createIdOf(node.getData().getText()), node.getData().getText(), UserTask.class, plane, 100, 0, 80, 100, false);
+                    createdUserTasks.add(userTask);
+                    System.out.println("Creating " + node.getData().getText() + "with id " + createIdOf(node.getData().getText()));
 
-        createSequenceFlow(process, startEvent, userTask, plane, 65, 40, 100, 40);
+                }
 
-        EndEvent endEvent = createElement(process, "end", "DI generation completed",
-                EndEvent.class, plane, 250, 15, 50, 50, true);
+        }
 
-        createSequenceFlow(process, userTask, endEvent, plane, 200, 40, 250, 40);
+        // We connect every node to every child node.
+        // In case there are more than 1 children, we put a parallel gateway in between.
+        int i = 0;
+        for (Node<Step> node :
+                nodes) {
+
+            if(node.getData().getText() == null){
+                continue;
+            }
+            boolean useGateway = false;
+            UserTask from = getUserTaskTo(node);
+            System.out.println(from.getAttributeValue("id"));
+
+
+            // TODO we need to think about how to add parallel gateways
+
+            for (Node<Step> childNode :
+                    node.getChildren()) {
+
+                UserTask to = getUserTaskTo(childNode);
+                System.out.println("From: " + from.getAttributeValue("name") + " to: " + to.getAttributeValue("name"));
+
+                if(!sequenceExists(createId(from, to))){
+
+                        createdFlows.add( createSequenceFlow(process, from, to,  plane, 65, 40, 100, 40));
+
+                }
+
+            }
+            i++;
+        }
+
+        // The first node is an empty root node. Every children from there has to be connected to the start node.
+        for(Node<Step> node : t.getRoot().getChildren()){
+            createdFlows.add(createSequenceFlow(process, startEvent, getUserTaskTo(node), plane, 65,40,100,40));
+        }
+
+        EndEvent endEvent = createElement(process, "end", "Ende", EndEvent.class, plane, 150, 150, 50, 50, true);
+
+        //Every node without children belongs to the endEvent
+        for(Node<Step> node : nodes){
+            if(node.getChildren().size() == 0){
+                if(node.getData().getText() != null){
+                    if(!sequenceExists(createId(getUserTaskTo(node),endEvent))){
+                    createdFlows.add(createSequenceFlow(process, getUserTaskTo(node),endEvent, plane, 65,40,100,40));
+                    }
+                }
+            }
+        }
 
         // validate and write model to file
         Bpmn.validateModel(modelInstance);
@@ -70,6 +134,46 @@ public class ProcessModelerImpl implements ProcessModeler {
 
     }
 
+
+    @NotNull
+    private String createId(FlowNode from, FlowNode to){
+        return from.getId() + "-" + to.getId();
+    }
+
+    private boolean idExists(String id){
+        for(UserTask u: createdUserTasks){
+            if(u.getAttributeValue("id").equals(id)){
+                return true;
+            }
+        }
+        return false;
+    }
+    private UserTask getUserTaskTo(Node<Step> node){
+        for(UserTask u : createdUserTasks){
+            String result = "";
+            result = u.getAttributeValue("id");
+
+            if(result.equals(createIdOf(node.getData().getText()))){
+                return u;
+            }
+        }
+        return null;
+    }
+
+    //        // WE NEED TO DO IT LIKE STHIS
+//        // create start event, user task and end event
+//        StartEvent startEvent = createElement(process, "start", "Di generation wanted",
+//                StartEvent.class, plane, 15, 15, 50, 50, true);
+//
+//        UserTask userTask = createElement(process, "userTask", "Generate Model with DI",
+//                UserTask.class, plane, 100, 0, 80, 100, false);
+//
+//        createSequenceFlow(process, startEvent, userTask, plane, 65, 40, 100, 40);
+//
+//        EndEvent endEvent = createElement(process, "end", "DI generation completed",
+//                EndEvent.class, plane, 250, 15, 50, 50, true);
+//
+//        createSequenceFlow(process, userTask, endEvent, plane, 200, 40, 250, 40);
     protected <T extends BpmnModelElementInstance> T createElement(BpmnModelElementInstance parentElement,
                                                                    String id, String name, Class<T> elementClass, BpmnPlane plane,
                                                                    double x, double y, double heigth, double width, boolean withLabel) {
@@ -106,6 +210,7 @@ public class ProcessModelerImpl implements ProcessModeler {
     public SequenceFlow createSequenceFlow(org.camunda.bpm.model.bpmn.instance.Process process, FlowNode from, FlowNode to, BpmnPlane plane,
                                            int... waypoints) {
         String identifier = from.getId() + "-" + to.getId();
+
         SequenceFlow sequenceFlow = modelInstance.newInstance(SequenceFlow.class);
         sequenceFlow.setAttributeValue("id", identifier, true);
         process.addChildElement(sequenceFlow);
@@ -127,6 +232,17 @@ public class ProcessModelerImpl implements ProcessModeler {
         plane.addChildElement(bpmnEdge);
 
         return sequenceFlow;
+    }
+
+
+    private boolean sequenceExists(String id){
+        for (SequenceFlow s :
+                createdFlows) {
+            if(s.getAttributeValue("id").equals(id)){
+                return true;
+            }
+        }
+        return false;
     }
     private String createIdOf(String input){
         return input.replace(" ", "_");

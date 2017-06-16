@@ -354,7 +354,7 @@ Brötchen + Schinken/Zwiebeln	Brötchen mit Schinken/Marmelade
 		step3.getProducts().add(new Ingredient("Brötchen mit Schinken und Zwiebeln und Ketchup",new BaseIngredient()));
 		recipe.getSteps().add(step3);
 
-	/*	Step step4 = new Step();
+		Step step4 = new Step();
 		step4.setText("Käse zu Milch machen");
 		step4.getIngredients().add(new Ingredient("Milch", new BaseIngredient()));
 		step4.getProducts().add(new Ingredient("Käse",new BaseIngredient()));
@@ -368,11 +368,60 @@ Brötchen + Schinken/Zwiebeln	Brötchen mit Schinken/Marmelade
 
 		Step step6 = new Step();
 		step6.setText("Geschmolzen Käse aufs Brötchen");
-		step6.getIngredients().add(new Ingredient("Geschmolzener Käse", new BaseIngredient()));
+		step6.getIngredients().add(new Ingredient("Geschmolzenzer Käse", new BaseIngredient()));
 		step6.getIngredients().add(new Ingredient("Brötchen mit Schinken und Zwiebeln und Ketchup", new BaseIngredient()));
 		step6.getProducts().add(new Ingredient("Lecker Lecker Brötchen", new BaseIngredient()));
-		recipe.getSteps().add(step6);*/
+		recipe.getSteps().add(step6);
 
+
+		return recipe;
+	}
+
+
+	public Recipe create(){
+		Recipe recipe = new Recipe(LANG_FLAG.DE);
+
+		// One line
+		Step a1 = new Step();
+		a1.setText("A1");
+		a1.getIngredients().add(new Ingredient("A",new BaseIngredient()));
+		a1.getProducts().add(new Ingredient("A_Out",new BaseIngredient()));
+		recipe.getSteps().add(a1);
+
+		Step a2 = new Step();
+		a2.setText("A2");
+		a2.getIngredients().add(new Ingredient("A_Out",new BaseIngredient()));
+		a2.getProducts().add(new Ingredient("A2_Out",new BaseIngredient()));
+		recipe.getSteps().add(a2);
+
+
+		//Another line
+		Step b1 = new Step();
+		b1.setText("B1");
+		b1.getIngredients().add(new Ingredient("B", new BaseIngredient()));
+		b1.getProducts().add(new Ingredient("B_Out", new BaseIngredient()));
+		recipe.getSteps().add(b1);
+
+		Step b2 = new Step();
+		b2.setText("B2");
+		b2.getIngredients().add(new Ingredient("B_Out", new BaseIngredient()));
+		b2.getProducts().add(new Ingredient("B2_Out",new BaseIngredient()));
+		recipe.getSteps().add(b2);
+
+		//Connect
+
+		Step c1 = new Step();
+		c1.setText("C1");
+		c1.getIngredients().add(new Ingredient("B2_Out", new BaseIngredient()));
+		c1.getIngredients().add(new Ingredient("A2_Out",new BaseIngredient()));
+		c1.getProducts().add(new Ingredient("Asd", new BaseIngredient()));
+		recipe.getSteps().add(c1);
+
+		Step c2 = new Step();
+		c2.setText("C2");
+		c2.getIngredients().add(new Ingredient("Asd", new BaseIngredient()));
+
+		recipe.getSteps().add(c2);
 
 		return recipe;
 	}

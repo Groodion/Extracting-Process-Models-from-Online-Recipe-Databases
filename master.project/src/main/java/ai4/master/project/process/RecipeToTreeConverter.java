@@ -49,10 +49,16 @@ public class RecipeToTreeConverter {
             for (int k = 0; k < usedNodes.size(); k++) {
                 if (compare(usedNodes.get(k).getData().getProducts(), currentStep.getIngredients())) {
                     foundOne = true;
-//                    System.out.println("Match");
-//                    System.out.println(usedNodes.get(k).getData().printProducts());
-//                    System.out.println("DEPENDING ON");
-//                    System.out.println(currentStep.getIngredients());
+
+
+
+                    System.out.println("Match");
+                    System.out.println(usedNodes.get(k).getData().getText());
+                    //System.out.println("product : " + usedNodes.get(k).getData().printProducts());
+                    System.out.println("DEPENDING ON");
+                    //System.out.println(currentStep.getIngredients());
+                    System.out.println(currentStep.getText());
+                    System.out.println();
 
                     //Now we know: Current step needs usedNodes.get(k) as a child (this means it has to be done before!
                     usedNodes.get(k).addChild(currentStep);
@@ -74,6 +80,10 @@ public class RecipeToTreeConverter {
             finalTree.getRoot().addChild(t.getRoot());
         }
 
+        TreeTraverser t = new TreeTraverser(finalTree);
+       // t.activatePrint();
+        t.preOrder();
+        System.out.println("FINISHED TRAVERSING FINAL TREE");
         return finalTree;
 
 
