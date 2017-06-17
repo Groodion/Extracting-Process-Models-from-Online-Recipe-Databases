@@ -16,7 +16,7 @@ import java.util.List;
 public class RecipeToTreeConverter {
 
 
-    // Test Rezept ist in der TestRecipeFactory mit implementiert von mir. Ich denke, da sollten alle Fälle abgedeckt sein, nur der in Facebook beschriebene funktioniert noch nicht, der Rest schon. (vgl. MainConverter Ausgabe).
+    // Test Rezept ist in der TestRecipeFactory mit implementiert von mir. Ich denke, da sollten alle Fälle abgedeckt sein.
     public Tree createTree(Recipe recipe) {
         List<Tree> treeList = new ArrayList<Tree>();
         Tree<Step> tree = new Tree();

@@ -17,7 +17,7 @@ public class MainConverter {
 
         RecipeToTreeConverter recipeToTreeConverter = new RecipeToTreeConverter();
         TestRecipeFactory testRecipeFactory = new TestRecipeFactory();
-        Recipe recipe = testRecipeFactory.createSimpleRecipe();
+        Recipe recipe = testRecipeFactory.create();
       /*  for(Step ingredient : recipe.getSteps()){
             System.out.println("Pro: " + ingredient.printProducts());
             System.out.println("Ing: " + ingredient.printIngredients());
@@ -27,6 +27,7 @@ public class MainConverter {
 
         ProcessModeler processModeler = new ProcessModelerImpl();
         processModeler.convertToProcess(recipe);
+
 
     }
 }
