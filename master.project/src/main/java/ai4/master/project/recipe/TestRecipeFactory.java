@@ -420,8 +420,14 @@ Brötchen + Schinken/Zwiebeln	Brötchen mit Schinken/Marmelade
 		Step c2 = new Step();
 		c2.setText("C2");
 		c2.getIngredients().add(new Ingredient("Asd", new BaseIngredient()));
-
 		recipe.getSteps().add(c2);
+
+		Step d1 = new Step();
+		d1.setText("D1");
+		d1.getIngredients().add(new Ingredient("A2_Out", new BaseIngredient()));
+		d1.getProducts().add(new Ingredient("D1_Out",new BaseIngredient()));
+		recipe.getSteps().add(d1);
+
 
 		return recipe;
 	}

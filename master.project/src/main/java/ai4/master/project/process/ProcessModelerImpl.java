@@ -133,21 +133,33 @@ public class ProcessModelerImpl implements ProcessModeler {
             System.out.println(from.getAttributeValue("id"));
 
 
+            if(node.getChildren().size() == 1){
+                UserTask to = getUserTaskTo(node.getChildren().get(0));
+                if(!sequenceExists(createId(from,to))){
+                    flows.add(createSequenceFlow(process, from, to, plane, 65, 40, 100, 40));
+                }
+            }else if(node.getChildren().size() > 1){
             // TODO we need to think about how to add parallel gateways
+                System.out.println("Creating a parallel gateway");
+                ParallelGateway  parallelGateway = createElement(process,"parallel_gateway_"+i, "parallel_gateway_"+i, ParallelGateway.class, plane, 50,50,30,30,false);
+                // First we need to connect the parent to the parallel gateway.
+                if(!sequenceExists(createId(from, parallelGateway))){
+                    flows.add(createSequenceFlow(process, from, parallelGateway, plane, 65, 40, 100, 40));
+                }
 
-            for (Node<Step> childNode :
+                //Now we create a connection from the gateway to every child
+                for (Node<Step> childNode :
                     node.getChildren()) {
 
                 UserTask to = getUserTaskTo(childNode);
                 System.out.println("From: " + from.getAttributeValue("name") + " to: " + to.getAttributeValue("name"));
 
                 if (!sequenceExists(createId(from, to))) {
-
-                    flows.add(createSequenceFlow(process, from, to, plane, 65, 40, 100, 40));
+                    flows.add(createSequenceFlow(process, parallelGateway, to, plane, 65, 40, 100, 40));
 
                 }
 
-            }
+            }}
             i++;
         }
     }
