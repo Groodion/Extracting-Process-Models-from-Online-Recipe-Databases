@@ -26,8 +26,8 @@ import java.util.List;
 public class ProcessModelerImpl implements ProcessModeler {
 
 
-    // TODO Add Input/Output-Parameter
     // TODO Add Tools
+    // TODO Maybe a simple algorithm to design layout to be at least a bit visible..
 
     /*
     If a node has more than one children we need a parallel gate. So maybe we could call a method that creates everything starting from there (the gate) on?
