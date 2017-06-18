@@ -3,6 +3,7 @@ package ai4.master.project.process;
 import ai4.master.project.output.XMLWriter;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
+import ai4.master.project.recipe.object.Ingredient;
 import ai4.master.project.tree.Node;
 import ai4.master.project.tree.Tree;
 import ai4.master.project.tree.TreeTraverser;
@@ -181,6 +182,18 @@ public class ProcessModelerImpl implements ProcessModeler {
             }
             if (!idExists(createIdOf(node.getData().getText()))) {
                 UserTask userTask = createElement(process, createIdOf(node.getData().getText()), node.getData().getText(), UserTask.class, plane, 100, 0, 80, 100, false);
+
+                /* Iterate over the Input parameter ( = ingredients) and output parameter ( = products) and add them */
+                for(Ingredient ingredient : node.getData().getIngredients()){
+                    userTask.builder().camundaInputParameter("Ingredient",ingredient.getIngredientName());
+                }
+
+                for(Ingredient product : node.getData().getProducts()){
+                    userTask.builder().camundaOutputParameter("Product", product.getIngredientName());
+                }
+
+
+
                 userTasks.add(userTask);
                 System.out.println("Creating " + node.getData().getText() + "with id " + createIdOf(node.getData().getText()));
 
