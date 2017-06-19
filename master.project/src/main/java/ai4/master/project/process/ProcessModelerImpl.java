@@ -28,13 +28,18 @@ public class ProcessModelerImpl implements ProcessModeler {
 
     // TODO Add Tools
     // TODO Maybe a simple algorithm to design layout to be at least a bit visible..
+    // TODO Add a possibility to use a parallel or a XOR gateway using nodes isXor
 
+
+    private int taskX = 100;
+    private int taskY = 50;
+
+    private int userTaskHeight = 80;
+    private int userTaskWidth = 100;
     /*
     If a node has more than one children we need a parallel gate. So maybe we could call a method that creates everything starting from there (the gate) on?
     We give the method the "subtree" and create the BPMN Model from there on and return and append it maybe.
      */
-
-    private String lastUseNodeID = null;
 
     BpmnModelInstance modelInstance;
     List<UserTask> userTasks = new ArrayList<>();
@@ -118,7 +123,7 @@ public class ProcessModelerImpl implements ProcessModeler {
             for (Node<Step> node : t.getRoot().getChildren()) {
                 flows.add(createSequenceFlow(process, startParallel, getUserTaskTo(node), plane, 65, 40, 100, 40));
             }
-        }else{
+        } else {
             flows.add(createSequenceFlow(process, startEvent, getUserTaskTo(t.getRoot().getChildren().get(0)), plane, 65, 40, 100, 40));
 
         }
@@ -140,36 +145,73 @@ public class ProcessModelerImpl implements ProcessModeler {
             UserTask from = getUserTaskTo(node);
             System.out.println(from.getAttributeValue("id"));
 
+            // TODO refactoring this part.
+            if (!node.isXor()) {
 
-            if (node.getChildren().size() == 1) {
-                UserTask to = getUserTaskTo(node.getChildren().get(0));
-                if (!sequenceExists(createId(from, to))) {
-                    flows.add(createSequenceFlow(process, from, to, plane, 65, 40, 100, 40));
-                }
-            } else if (node.getChildren().size() > 1) {
-                System.out.println("Creating a parallel gateway");
-                ParallelGateway parallelGateway = createElement(process, "parallel_gateway_" + i, "parallel_gateway_" + i, ParallelGateway.class, plane, 50, 50, 30, 30, false);
-                // First we need to connect the parent to the parallel gateway.
-                if (!sequenceExists(createId(from, parallelGateway))) {
-                    flows.add(createSequenceFlow(process, from, parallelGateway, plane, 65, 40, 100, 40));
-                }
-
-                //Now we create a connection from the gateway to every child
-                for (Node<Step> childNode :
-                        node.getChildren()) {
-
-                    UserTask to = getUserTaskTo(childNode);
-                    System.out.println("From: " + from.getAttributeValue("name") + " to: " + to.getAttributeValue("name"));
-
+                if (node.getChildren().size() == 1) {
+                    UserTask to = getUserTaskTo(node.getChildren().get(0));
                     if (!sequenceExists(createId(from, to))) {
-                        flows.add(createSequenceFlow(process, parallelGateway, to, plane, 65, 40, 100, 40));
-
+                        flows.add(createSequenceFlow(process, from, to, plane, 65, 40, 100, 40));
+                    }
+                } else if (node.getChildren().size() > 1) {
+                    System.out.println("Creating a parallel gateway");
+                    ParallelGateway parallelGateway = createElement(process, "parallel_gateway_" + i, "parallel_gateway_" + i, ParallelGateway.class, plane, 50, 50, 30, 30, false);
+                    // First we need to connect the parent to the parallel gateway.
+                    if (!sequenceExists(createId(from, parallelGateway))) {
+                        flows.add(createSequenceFlow(process, from, parallelGateway, plane, 65, 40, 100, 40));
                     }
 
+                    //Now we create a connection from the gateway to every child
+                    for (Node<Step> childNode :
+                            node.getChildren()) {
+
+                        UserTask to = getUserTaskTo(childNode);
+                        System.out.println("From: " + from.getAttributeValue("name") + " to: " + to.getAttributeValue("name"));
+
+                        if (!sequenceExists(createId(from, to))) {
+                            flows.add(createSequenceFlow(process, parallelGateway, to, plane, 65, 40, 100, 40));
+
+                        }
+
+                    }
+                } else {
+                    if (node.getChildren().size() == 1) {
+                        UserTask to = getUserTaskTo(node.getChildren().get(0));
+                        if (!sequenceExists(createId(from, to))) {
+                            flows.add(createSequenceFlow(process, from, to, plane, 65, 40, 100, 40));
+                        }
+                    } else if (node.getChildren().size() > 1) {
+                        System.out.println("Creating a exclusive gateway");
+                        ExclusiveGateway exclusiveGateway = createElement(process, "exclusive_gateway_" + i, "exclusive_gateway_" + i, ExclusiveGateway.class, plane, 50, 50, 30, 30, false);
+                        // First we need to connect the parent to the parallel gateway.
+                        if (!sequenceExists(createId(from, exclusiveGateway))) {
+                            flows.add(createSequenceFlow(process, from, exclusiveGateway, plane, 65, 40, 100, 40));
+                        }
+
+                        //Now we create a connection from the gateway to every child
+                        for (Node<Step> childNode :
+                                node.getChildren()) {
+
+                            UserTask to = getUserTaskTo(childNode);
+                            System.out.println("From: " + from.getAttributeValue("name") + " to: " + to.getAttributeValue("name"));
+
+                            if (!sequenceExists(createId(from, to))) {
+                                flows.add(createSequenceFlow(process, exclusiveGateway, to, plane, 65, 40, 100, 40));
+
+                            }
+
+                        }
+                    }
                 }
+                i++;
+
             }
-            i++;
         }
+    }
+
+
+    private void connectTo() {
+
     }
 
     /*
@@ -181,17 +223,16 @@ public class ProcessModelerImpl implements ProcessModeler {
                 continue;
             }
             if (!idExists(createIdOf(node.getData().getText()))) {
-                UserTask userTask = createElement(process, createIdOf(node.getData().getText()), node.getData().getText(), UserTask.class, plane, 100, 0, 80, 100, false);
-
+                UserTask userTask = createElement(process, createIdOf(node.getData().getText()), node.getData().getText(), UserTask.class, plane, taskX, taskY, userTaskHeight, userTaskWidth, false);
+                taskX += 150;
                 /* Iterate over the Input parameter ( = ingredients) and output parameter ( = products) and add them */
-                for(Ingredient ingredient : node.getData().getIngredients()){
-                    userTask.builder().camundaInputParameter("Ingredient",ingredient.getIngredientName());
+                for (Ingredient ingredient : node.getData().getIngredients()) {
+                    userTask.builder().camundaInputParameter("Ingredient", ingredient.getIngredientName());
                 }
 
-                for(Ingredient product : node.getData().getProducts()){
+                for (Ingredient product : node.getData().getProducts()) {
                     userTask.builder().camundaOutputParameter("Product", product.getIngredientName());
                 }
-
 
 
                 userTasks.add(userTask);

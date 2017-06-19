@@ -12,6 +12,7 @@ import java.util.List;
 
 /**
  * Created by Michael, René on 08.06.2017.
+ * // TODO Implement a method to determine whether we need "XOR" or "AND" Gateway using isXor() / setIsXor(true|false)
  */
 public class RecipeToTreeConverter {
 
@@ -36,7 +37,7 @@ public class RecipeToTreeConverter {
             // We need a traversal of every tree we have to look for dependencys.
 
             List<Node<Step>> usedNodes = new ArrayList<>();
-            for(Tree t: treeList){
+            for (Tree t : treeList) {
                 TreeTraverser<Step> treeTraverser = new TreeTraverser<>(t);
                 usedNodes.addAll(treeTraverser.preOrder());
             }
@@ -49,7 +50,6 @@ public class RecipeToTreeConverter {
             for (int k = 0; k < usedNodes.size(); k++) {
                 if (compare(usedNodes.get(k).getData().getProducts(), currentStep.getIngredients())) {
                     foundOne = true;
-
 
 
                     System.out.println("Match");
@@ -65,7 +65,7 @@ public class RecipeToTreeConverter {
                 }
             }
 
-            if(!foundOne){
+            if (!foundOne) {
                 // Create a new tree with the node and add it to the list.
                 Tree<Step> tree1 = new Tree<>(new Node<Step>(currentStep));
                 treeList.add(tree1);
@@ -81,7 +81,7 @@ public class RecipeToTreeConverter {
         }
 
         TreeTraverser t = new TreeTraverser(finalTree);
-       // t.activatePrint();
+        // t.activatePrint();
         t.preOrder();
         System.out.println("FINISHED TRAVERSING FINAL TREE");
         return finalTree;
@@ -89,62 +89,7 @@ public class RecipeToTreeConverter {
 
     }
 
-    /*
-    Returns a list with all steps starting at k
-     */
-    private List<Step> createRemainingSteps(int k, List<Step> steps) {
-        List<Step> remaining = new ArrayList<>();
-        for (int i = k; i < steps.size(); i++) {
-            remaining.add(steps.get(i));
-        }
-        return remaining;
-    }
 
-    @Deprecated
-    public Tree convertTree(Recipe recipe) {
-        Tree<Step> tree = new Tree();
-        List<Step> steps = recipe.getSteps();
-        Node<Step> root = new Node<Step>();
-        root.setData(new Step()); // start node
-        tree.setRoot(new Node<Step>(steps.get(0)));
-
-        for (int i = 0; i < steps.size(); i++) {
-
-            Node<Step> currentNode = new Node();
-            Step currentStep = steps.get(i);
-            currentNode.setData(currentStep);
-
-            boolean isDependent = false;
-            for (int j = 0; j < steps.size(); j++) {
-                Step jStep = steps.get(j);
-                if (compare(currentNode.getData().getIngredients(), jStep.getProducts())) {
-                    addChildToNode(tree, steps.get(j), currentStep);
-                    currentNode.addChild(steps.get(j));
-                    isDependent = true;
-                }
-            }
-            if (!isDependent) {
-                tree.getRoot().addChild(currentNode);
-            }
-        }
-
-        return tree;
-    }
-
-    @Deprecated
-    private void addChildToNode(Tree<Step> tree, Step father, Step child) {
-        TreeTraverser<Step> treeTraverser = new TreeTraverser<Step>(tree);
-
-        List<Node<Step>> allNodes = treeTraverser.preOrder();
-
-        // Is it really THAT simple? We will see
-        for (Node node : allNodes) {
-            if (node.getData().equals(father)) { //This equals doesnt work
-                node.getChildren().add(child);
-            }
-        }
-        // TODO traverse list and set children
-    }
 
 
     /*
