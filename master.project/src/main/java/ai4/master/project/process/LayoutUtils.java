@@ -5,7 +5,9 @@ import org.camunda.bpm.model.bpmn.instance.Gateway;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 
 /**
- * Created by René Bärnreuther on 20.06.2017.
+ * Created by René Bärnreuther, Michi Bösch on 20.06.2017.
+    This class delievers values for the layout design of the bpmn model.
+
  */
 public class LayoutUtils {
 
