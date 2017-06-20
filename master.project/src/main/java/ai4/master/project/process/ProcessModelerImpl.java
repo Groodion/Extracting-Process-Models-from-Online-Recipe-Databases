@@ -45,6 +45,7 @@ public class ProcessModelerImpl implements ProcessModeler {
     List<UserTask> userTasks = new ArrayList<>();
     List<SequenceFlow> flows = new ArrayList<>();
 
+    private int tempX = 0;
     public BpmnModelInstance convertToProcess(Recipe recipe) {
 
         Tree<Step> t = new RecipeToTreeConverter().createTree(recipe);
@@ -67,9 +68,9 @@ public class ProcessModelerImpl implements ProcessModeler {
         definitions.addChildElement(diagram);
 
 
-        StartEvent startEvent = createElement(process, "start", "Start", StartEvent.class, plane, 15, 15, 50, 50, true);
-        EndEvent endEvent = createElement(process, "end", "Ende", EndEvent.class, plane, 150, 150, 50, 50, false);
-
+        StartEvent startEvent = createElement(process, "start", "Start", StartEvent.class, plane, taskX, taskY, 50, 50, true);
+        tempX = taskX+150;
+        taskX+=300;
         //First we create the user tasks for all nodes.
         createUserTasks(nodes, process, plane);
 
@@ -80,6 +81,7 @@ public class ProcessModelerImpl implements ProcessModeler {
         // The first node is an empty root node. Every children from there has to be connected to the start node.
         createStartEventToConnections(t, startEvent, process, plane);
 
+        EndEvent endEvent = createElement(process, "end", "Ende", EndEvent.class, plane, taskX, taskY, 50, 50, false);
 
         //Every node without children belongs to the endEvent
         createNodeToEndEventConnection(nodes, endEvent, process, plane);
@@ -105,30 +107,50 @@ public class ProcessModelerImpl implements ProcessModeler {
                 System.out.println("Connection to end-event");
                 if (node.getData().getText() != null) {
                     if (!sequenceExists(createId(getUserTaskTo(node), endEvent))) {
-                        flows.add(createSequenceFlow(process, getUserTaskTo(node), endEvent, plane, 65, 40, 100, 40));
+                        flows.add(createSequenceFlow(process, getUserTaskTo(node), endEvent, plane,
+                                LayoutUtils.getCenterCoordinates(getUserTaskTo(node))[0],
+                                LayoutUtils.getCenterCoordinates(getUserTaskTo(node))[1],
+                                LayoutUtils.getCenterCoordinates(endEvent)[0],
+                                LayoutUtils.getCenterCoordinates(endEvent)[1]));
                     }
                 }
             }
         }
     }
 
+
     /*
     Creates connection from startevent to starting nodes.
      */
     private void createStartEventToConnections(Tree<Step> t, StartEvent startEvent, Process process, BpmnPlane plane) {
         if (t.getRoot().getChildren().size() > 1) {
-            ParallelGateway startParallel = createElement(process, "parallel_gateway_start", "parallel_gateway_start", ParallelGateway.class, plane, 50, 50, 30, 30, false);
-            flows.add(createSequenceFlow(process, startEvent, startParallel, plane, 65, 40, 100, 40));
+            ParallelGateway startParallel = createElement(process, "parallel_gateway_start", "parallel_gateway_start", ParallelGateway.class, plane, tempX, taskY, 30, 30, false);
+            taskX += 150;
+            flows.add(createSequenceFlow(process, startEvent, startParallel, plane,
+                    LayoutUtils.getCenterCoordinates(startEvent)[0],
+                    LayoutUtils.getCenterCoordinates(startEvent)[1],
+                    LayoutUtils.getCenterCoordinates(startParallel)[0],
+                    LayoutUtils.getCenterCoordinates(startParallel)[1]));
 
             for (Node<Step> node : t.getRoot().getChildren()) {
-                flows.add(createSequenceFlow(process, startParallel, getUserTaskTo(node), plane, 65, 40, 100, 40));
+                System.out.println("Creating connection from ParallelGateway to " + node.getData().getText());
+                flows.add(createSequenceFlow(process, startParallel, getUserTaskTo(node), plane,
+                        LayoutUtils.getCenterCoordinates(startParallel)[0],
+                        LayoutUtils.getCenterCoordinates(startParallel)[1],
+                        LayoutUtils.getCenterCoordinates(getUserTaskTo(node))[0],
+                        LayoutUtils.getCenterCoordinates(getUserTaskTo(node))[1]));
             }
         } else {
-            flows.add(createSequenceFlow(process, startEvent, getUserTaskTo(t.getRoot().getChildren().get(0)), plane, 65, 40, 100, 40));
+            flows.add(createSequenceFlow(process, startEvent, getUserTaskTo(t.getRoot().getChildren().get(0)), plane,
+                    LayoutUtils.getCenterCoordinates(startEvent)[0], //start x
+                    LayoutUtils.getCenterCoordinates(startEvent)[1], //start y
+                    LayoutUtils.getCenterCoordinates(getUserTaskTo(t.getRoot().getChildren().get(0)))[0], //end x
+                    LayoutUtils.getCenterCoordinates(getUserTaskTo(t.getRoot().getChildren().get(0)))[1])); //end y
 
         }
 
     }
+
 
     /*
     Creates connection to children. Every parent is connected to every children. If there are more than one children we need a gateway in between.
@@ -151,14 +173,18 @@ public class ProcessModelerImpl implements ProcessModeler {
                 if (node.getChildren().size() == 1) {
                     UserTask to = getUserTaskTo(node.getChildren().get(0));
                     if (!sequenceExists(createId(from, to))) {
-                        flows.add(createSequenceFlow(process, from, to, plane, 65, 40, 100, 40));
+                        flows.add(createSequenceFlow(process, from, to, plane,
+                                LayoutUtils.getCenterCoordinates(from)[0], LayoutUtils.getCenterCoordinates(from)[1],
+                                LayoutUtils.getCenterCoordinates(to)[0], LayoutUtils.getCenterCoordinates(to)[1]));
                     }
                 } else if (node.getChildren().size() > 1) {
                     System.out.println("Creating a parallel gateway");
-                    ParallelGateway parallelGateway = createElement(process, "parallel_gateway_" + i, "parallel_gateway_" + i, ParallelGateway.class, plane, 50, 50, 30, 30, false);
+                    ParallelGateway parallelGateway = createElement(process, "parallel_gateway_" + i, "parallel_gateway_" + i, ParallelGateway.class, plane, taskX, taskY, 30, 30, false);
+                    taskX += 150;
                     // First we need to connect the parent to the parallel gateway.
                     if (!sequenceExists(createId(from, parallelGateway))) {
-                        flows.add(createSequenceFlow(process, from, parallelGateway, plane, 65, 40, 100, 40));
+                        flows.add(createSequenceFlow(process, from, parallelGateway, plane,    LayoutUtils.getCenterCoordinates(from)[0], LayoutUtils.getCenterCoordinates(from)[1],
+                                LayoutUtils.getCenterCoordinates(parallelGateway)[0], LayoutUtils.getCenterCoordinates(parallelGateway)[1]));
                     }
 
                     //Now we create a connection from the gateway to every child
@@ -169,12 +195,15 @@ public class ProcessModelerImpl implements ProcessModeler {
                         System.out.println("From: " + from.getAttributeValue("name") + " to: " + to.getAttributeValue("name"));
 
                         if (!sequenceExists(createId(from, to))) {
-                            flows.add(createSequenceFlow(process, parallelGateway, to, plane, 65, 40, 100, 40));
+                            flows.add(createSequenceFlow(process, parallelGateway, to, plane, LayoutUtils.getCenterCoordinates(from)[0], LayoutUtils.getCenterCoordinates(from)[1],
+                                    LayoutUtils.getCenterCoordinates(to)[0], LayoutUtils.getCenterCoordinates(to)[1]));
 
                         }
 
                     }
-                } else {
+                }
+                // XOR PART
+                else {
                     if (node.getChildren().size() == 1) {
                         UserTask to = getUserTaskTo(node.getChildren().get(0));
                         if (!sequenceExists(createId(from, to))) {
@@ -209,10 +238,6 @@ public class ProcessModelerImpl implements ProcessModeler {
         }
     }
 
-
-    private void connectTo() {
-
-    }
 
     /*
     Create all user tasks.
