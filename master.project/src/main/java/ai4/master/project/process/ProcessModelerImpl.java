@@ -266,11 +266,11 @@ public class ProcessModelerImpl implements ProcessModeler {
                 }
                 /* Iterate over the Input parameter ( = ingredients) and output parameter ( = products) and add them */
                 for (Ingredient ingredient : node.getData().getIngredients()) {
-                    userTask.builder().camundaInputParameter("Ingredient", ingredient.getIngredientName());
+                    userTask.builder().camundaInputParameter("Ingredient", ingredient.getName());
                 }
 
                 for (Ingredient product : node.getData().getProducts()) {
-                    userTask.builder().camundaOutputParameter("Product", product.getIngredientName());
+                    userTask.builder().camundaOutputParameter("Product", product.getName());
                 }
 
 
