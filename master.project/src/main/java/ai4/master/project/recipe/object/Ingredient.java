@@ -32,10 +32,19 @@ public class Ingredient extends NamedObject<BaseIngredient> {
 
     @Override
 	public boolean equals(Object o){
+		boolean isEqual = true;
 		Ingredient i = (Ingredient)o;
-		if(this.getIngredientName().equals(i.getIngredientName())){
-			return true;
+		if(!this.getIngredientName().equals(i.getIngredientName())){
+			isEqual = false;
 		}
-		return false;
+
+		for(IngredientTag ingredientTag : tags){
+			for(IngredientTag iTag : i.getTags()){
+				if(!ingredientTag.equals(iTag)){
+					isEqual = false;
+				}
+			}
+		}
+		return isEqual;
 	}
 }
