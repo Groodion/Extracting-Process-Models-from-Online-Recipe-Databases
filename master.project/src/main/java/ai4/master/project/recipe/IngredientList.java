@@ -1,39 +1,47 @@
 package ai4.master.project.recipe;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ai4.master.project.recipe.baseObject.BaseIngredient;
+import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
 import ai4.master.project.recipe.object.Ingredient;
-import ai4.master.project.recipe.object.IngredientGroup;
 
 public class IngredientList extends ArrayList<Ingredient> {
 
 	private static final long serialVersionUID = 1L;
 
-	
-	public void group(IngredientGroup group) {
-		for(Ingredient ingredient : this) {
-			if(ingredient.getBaseObject().getIngredientGroups().contains(group.getBaseObject())) {
-				group.getIngredients().add(ingredient);
+	public List<Ingredient> get(BaseIngredient baseIngredient) {
+		List<Ingredient> ingredients = new ArrayList<Ingredient>();
+		
+		if(baseIngredient instanceof BaseIngredientGroup) {
+			for(Ingredient ingredient : this) {
+				if(ingredient.getBaseObject().getIngredientGroups().contains(baseIngredient)) {
+					ingredients.add(ingredient);
+				}
+			}
+		} else {
+			for(Ingredient ingredient : this) {
+				if(ingredient.getBaseObject() == baseIngredient) {
+					ingredients.add(ingredient);
+				}
 			}
 		}
 		
-		removeAll(group.getIngredients());
-		add(group);
+		return ingredients;
 	}
-	public void split(IngredientGroup group) {
-		addAll(group.getIngredients());
+	public void remove(BaseIngredient baseIngredient) {
+		ArrayList<Ingredient> ri = new ArrayList<Ingredient>();
 		
-		remove(group);
-	}
-	
-	public Ingredient get(BaseIngredient baseIngredient) {
-		for(Ingredient ingredient : this) {
-			if(ingredient.getBaseObject() == baseIngredient) {
-				return ingredient;
+		for(Ingredient i : this) {
+			if(i.getBaseObject().equals(baseIngredient)) {
+				ri.add(i);
 			}
 		}
 		
-		return null;
+		removeAll(ri);
+	}
+	public boolean contains(BaseIngredient bi) {
+		return !get(bi).isEmpty();
 	}
 }

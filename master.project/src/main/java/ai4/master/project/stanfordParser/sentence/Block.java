@@ -18,6 +18,8 @@ public class Block extends PartialObject<Block> {
 	public Block(SentencePart sentencePart) {
 		this.sentencePart = sentencePart;
 		
+		this.sentencePart.getBlocks().add(this);
+		
 		words = new ArrayList<Word>();
 	}
 	

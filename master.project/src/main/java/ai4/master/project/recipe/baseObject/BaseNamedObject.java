@@ -34,4 +34,6 @@ public abstract class BaseNamedObject<N extends NamedObject<B>, B extends BaseNa
 	}
 
 	public abstract N toObject();
+
+	public abstract String toXML();
 }

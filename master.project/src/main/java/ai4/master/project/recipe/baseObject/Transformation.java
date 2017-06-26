@@ -5,6 +5,7 @@ import java.util.List;
 
 import ai4.master.project.recipe.object.Ingredient;
 import ai4.master.project.recipe.object.ingredientTag.IngredientTag;
+import ai4.master.project.recipe.object.ingredientTag.QuantifierTag;
 
 public class Transformation {
 
@@ -85,5 +86,34 @@ public class Transformation {
 		}
 		
 		return ingredient;
+	}
+
+	public String toXML() {
+		StringBuilder sB = new StringBuilder();
+		
+		sB.append("<Transformation>");
+		sB.append("<ingredients>");
+		for(Ingredient ingredient : mandatoryIngredients) {
+			sB.append("<Ingredient name=\"");
+			sB.append(ingredient.getName());
+			sB.append("\"/>");
+		}
+		sB.append("</ingredients>");
+		if(product != null) {
+			sB.append("<Ingredient name=\"");
+			sB.append(product.getName());
+			sB.append("\"/>");			
+		} else if(tag instanceof QuantifierTag) {
+			sB.append("<AddQuantifierTag>");
+			sB.append(tag.getName());
+			sB.append("</AddQuantifierTag>");
+		} else {
+			sB.append("<AddIngredientTag>");
+			sB.append(tag.getName());
+			sB.append("</AddIngredientTag>");
+		}
+		sB.append("</Transformation>");
+		
+		return sB.toString();
 	}	
 }

@@ -3,8 +3,6 @@ package ai4.master.project.recipe;
 import java.util.ArrayList;
 import java.util.List;
 
-import ai4.master.project.recipe.object.Ingredient;
-
 /**
  * Created by René Bärnreuther on 04.05.2017.
  * .

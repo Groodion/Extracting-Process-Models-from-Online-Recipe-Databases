@@ -17,13 +17,14 @@ public class Step {
 	
 	private String text;
 	
-	private CookingEvent event;
+	private List<CookingEvent> events;
 	
 	
 	public Step() {
 		ingredients = new ArrayList<Ingredient>();
 		products = new ArrayList<Ingredient>();
 		tools = new ArrayList<Tool>();
+		events = new ArrayList<CookingEvent>();
 	}
 	
 	/**
@@ -58,11 +59,8 @@ public class Step {
 		return ingredients;
 	}
 
-	public CookingEvent getEvent() {
-		return event;
-	}
-	public void setEvent(CookingEvent event) {
-		this.event = event;
+	public List<CookingEvent> getEvents() {
+		return events;
 	}
 	
 	@Override

@@ -20,4 +20,9 @@ public class IngredientGroup extends Ingredient {
 	public List<Ingredient> getIngredients() {
 		return ingredients;
 	}
+
+	@Override
+	public String toString() {
+		return "IngredientGroup [name=" + getName() + ", ingredients=" + ingredients + "]";
+	}
 }

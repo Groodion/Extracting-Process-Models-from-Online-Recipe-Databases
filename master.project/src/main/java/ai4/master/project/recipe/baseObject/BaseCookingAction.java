@@ -5,6 +5,7 @@ import java.util.List;
 
 import ai4.master.project.recipe.object.CookingAction;
 import ai4.master.project.recipe.object.Ingredient;
+import ai4.master.project.recipe.object.IngredientGroup;
 
 
 public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookingAction> {
@@ -53,14 +54,23 @@ public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookin
 	 * @param list Liste mit restlichen Zutaten des Step-Objekts
 	 * @return transformaierte Zutat
 	 */
-	public Ingredient transform(Ingredient ingredient, List<Ingredient> list) {
+	public List<Ingredient> transform(Ingredient ingredient, List<Ingredient> list) {
+		List<Ingredient> transformedIngredients = new ArrayList<Ingredient>();
 		for(Transformation transformation : transformations) {
 			if(transformation.matches(ingredient, list)) {
-				return transformation.transform(ingredient, list);
+				if(ingredient instanceof IngredientGroup) {
+					for(Ingredient i : ((IngredientGroup) ingredient).getIngredients()) {
+						transformedIngredients.add(transformation.transform(i, list));
+					}
+				} else {
+					transformedIngredients.add(transformation.transform(ingredient, list));
+				}
+				
+				break;
 			}
 		}
 		
-		return null;
+		return transformedIngredients;
 	}
 
 	@Override
@@ -71,5 +81,31 @@ public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookin
 			name = getNames().iterator().next();
 		}
 		return new CookingAction(name, this);
+	}
+	
+	@Override
+	public String toXML() {
+		StringBuilder sB = new StringBuilder();
+		
+		sB.append("<CookingAction>");
+		for(String name : getNames()) {
+			sB.append("<Name>");
+			sB.append(name);
+			sB.append("</Name>");			
+		}
+		sB.append("<regs>");
+		for(Regex regex : regexList) {
+			sB.append(regex.toXML());		
+		}
+		sB.append("</regs>");
+		sB.append("<transformations>");
+		for(Transformation transformation : transformations) {
+			sB.append(transformation.toXML());		
+		}
+		sB.append("</transformations>");
+
+		sB.append("</CookingAction>");
+		
+		return sB.toString();
 	}
 }

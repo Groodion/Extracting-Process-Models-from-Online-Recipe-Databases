@@ -80,6 +80,8 @@ public class XMLLoader {
 			}
 		}
 		
+		System.out.println(kwdb.toXML());
+		
 		return kwdb;
 	}
 	
@@ -116,7 +118,7 @@ public class XMLLoader {
 
 	private void readGroups(Element element, KeyWordDatabase kwdb) {
 		for(Element child : element.getChildren()) {
-			if(child.getName().equals(ELEMENT_GROUPS)) {
+			if(child.getName().equals(ELEMENT_GROUP)) {
 				readGroup(child, kwdb);
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
@@ -141,7 +143,7 @@ public class XMLLoader {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}
 		}
-		
+
 		kwdb.getIngredientGroups().add(group);
 	}
 
@@ -179,7 +181,7 @@ public class XMLLoader {
 	}
 	private void readGroups(Element element, KeyWordDatabase kwdb, BaseIngredient ingredient) {
 		for(Element child : element.getChildren()) {
-			if(child.getName().equals(ELEMENT_GROUPS)) {
+			if(child.getName().equals(ELEMENT_GROUP)) {
 				readGroup(child, kwdb, ingredient);
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
@@ -189,7 +191,8 @@ public class XMLLoader {
 	private void readGroup(Element element, KeyWordDatabase kwdb, BaseIngredient ingredient) {
 		for(Attribute att : element.getAttributes()) {
 			if(att.getName().equals(ATTRIBUTE_NAME)) {
-				ingredient.getIngredientGroups().add(kwdb.findIngredientGroup(att.getValue()));
+				BaseIngredientGroup g = kwdb.findIngredientGroup(att.getValue());
+				ingredient.getIngredientGroups().add(g);
 			} else {
 				System.err.println("Unknown Attribute");
 			}
@@ -223,12 +226,26 @@ public class XMLLoader {
 				readRegs(child, kwdb, cookingAction);
 			} else if(child.getName().equals(ELEMENT_TRANSFORMATIONS)) {
 				readTransformations(child, kwdb, cookingAction);
+			} else if(child.getName().equals(ELEMENT_TOOLS)) {
+				readTools(child, kwdb, cookingAction);
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}
 		}
 		
 		kwdb.getCookingActions().add(cookingAction);
+	}
+	private void readTools(Element element, KeyWordDatabase kwdb, BaseCookingAction cookingAction) {
+		for(Element child : element.getChildren()) {
+			if(child.getName().equals(ELEMENT_TOOL)) {
+				readTool(element, kwdb, cookingAction);
+			} else {
+				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
+			}
+		}
+	}
+	private void readTool(Element element, KeyWordDatabase kwdb, BaseCookingAction cookingAction) {
+		cookingAction.getImplicitTools().add(kwdb.findTool(element.getAttributeValue("name")));
 	}
 	private void readTransformations(Element element, KeyWordDatabase kwdb, BaseCookingAction cookingAction) {
 		for(Element child : element.getChildren()) {

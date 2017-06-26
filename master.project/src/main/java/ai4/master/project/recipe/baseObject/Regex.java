@@ -28,4 +28,17 @@ public class Regex {
 	public boolean isIngredientsNeeded() {
 		return ingredientsNeeded;
 	}
+	public String toXML() {
+		StringBuilder sB = new StringBuilder();
+		
+		sB.append("<Regex result=\"");
+		sB.append(result.toString().toLowerCase());
+		sB.append("\" ingredientsNeeded=\"");
+		sB.append(ingredientsNeeded);
+		sB.append("\">");
+		sB.append(expression);
+		sB.append("</Regex>");
+		
+		return sB.toString();
+	}
 }

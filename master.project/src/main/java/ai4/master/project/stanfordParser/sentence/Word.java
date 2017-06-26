@@ -36,6 +36,7 @@ public class Word extends PartialObject<Word> {
 	
 	private boolean isVerb = false;
 	private boolean lastProductReference = false;
+	private boolean conditionIndicator = false;
 	
 	private BaseCookingAction cookingAction;
 	private List<BaseTool> tools;
@@ -75,6 +76,7 @@ public class Word extends PartialObject<Word> {
 	}
 	public Role getRole() {
 		while(connections.remove(null));
+		while(referenceTargets.remove(null));
 		if(!referenceTargets.isEmpty()) {
 			Role role = referenceTargets.get(0).getRole();
 			
@@ -234,6 +236,9 @@ public class Word extends PartialObject<Word> {
 	public boolean isLastProductReference() {
 		return lastProductReference;
 	}
+	public boolean isConditionIndicator() {
+		return conditionIndicator;
+	}
 	
 	public SentencePart getSentencePart() {
 		return sentencePart;
@@ -251,6 +256,8 @@ public class Word extends PartialObject<Word> {
 	}
 
 	public void init(KeyWordDatabase kwdb) {
+		conditionIndicator = kwdb.isConditionIndicator(getText());
+		
 		if(kwdb.isLastSentenceRefernece(getText())) {
 			lastProductReference = true;
 		}
@@ -318,7 +325,10 @@ public class Word extends PartialObject<Word> {
 			break;
 		case PPER:
 			getReferenceTargets().add(getLastIngredient());
-			getIngredients().addAll(getLastIngredient().getIngredients());
+			if(getLastIngredient() == null) {
+			} else {
+				getIngredients().addAll(getLastIngredient().getIngredients());
+			}
 			break;
 		case PPOSAT:
 			break;
@@ -405,7 +415,6 @@ public class Word extends PartialObject<Word> {
 
 	public void deepBlockGeneration(KeyWordDatabase kwdb) {
 		if(getPos() == STTSTag.KON) {
-			
 			if(getNext() != null && getPrev() != null && ((getNext().getRole() == Role.INGREDIENT || getNext().getRole() == Role.UNDECIDABLE_OBJECT) && (getPrev().getRole() == Role.INGREDIENT || getPrev().getRole() == Role.UNDECIDABLE_OBJECT))) {
 				Block collectionBlock = new Block(sentencePart);
 				collectionBlock.setRole(BlockRole.INGREDIENT_TOOL_COLLECTION);
@@ -427,6 +436,20 @@ public class Word extends PartialObject<Word> {
 					word.select(Role.INGREDIENT, kwdb);
 				}
 			}
+		} else if(block == null && conditionIndicator) {			
+			Word start = this;
+			Word end = this;
+						
+			for(; start.getPrev() != null && start.getPrev().getRole() == null && start.getPrev().getBlock() == null; start = start.getPrev());
+			for(; end.getNext() != null && end.getNext().getRole() == null && end.getNext().getBlock() == null; end = end.getNext());
+			
+			Block conditionBlock = new Block(sentencePart);
+			
+			for(Word word = start; word != end.getNext(); word = word.getNext()) {
+				word.setBlock(conditionBlock);
+			}
+			
+			conditionBlock.setRole(BlockRole.CONDITION);
 		}
 	}
 	
