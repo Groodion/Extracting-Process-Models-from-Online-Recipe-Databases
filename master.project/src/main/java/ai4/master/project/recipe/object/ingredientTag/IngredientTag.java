@@ -12,14 +12,9 @@ public class IngredientTag {
 	public String getName() {
 		return name;
 	}
-
-
+	
 	@Override
-	public boolean equals(Object o){
-		IngredientTag i = (IngredientTag) o;
-		if(i.getName().equals(this.getName())){
-			return true;
-		}
-		return false;
+	public String toString() {
+		return name;
 	}
 }
