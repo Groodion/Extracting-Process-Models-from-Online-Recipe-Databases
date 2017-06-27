@@ -17,15 +17,20 @@ public class Step {
 	
 	private String text;
 	
-	private CookingEvent event;
+	private List<CookingEvent> events;
 	
 	
 	public Step() {
 		ingredients = new ArrayList<Ingredient>();
 		tools = new ArrayList<Tool>();
 		products = new ArrayList<>();
+		events = new ArrayList<CookingEvent>();
 	}
 	
+	/**
+	 * Liste mit im Arbeitsschritt verwendeten Werkzeugen. Sowohl implizite als auch explizite.
+	 * @return Werkzeugliste
+	 */
 	public List<Tool> getTools() {
 		return tools;
 	}
@@ -45,15 +50,17 @@ public class Step {
 	public void setText(String text) {
 		this.text = text;
 	}
+	/**
+	 * Liste mit Zutaten die im aktuellen Arbeitsschritt benötigt werden. Enthällt auch implizierte 
+	 * und referenzierte Objekte.
+	 * @return Zutatenliste
+	 */
 	public List<Ingredient> getIngredients() {
 		return ingredients;
 	}
 
-	public CookingEvent getEvent() {
-		return event;
-	}
-	public void setEvent(CookingEvent event) {
-		this.event = event;
+	public List<CookingEvent> getEvents() {
+		return events;
 	}
 	
 	@Override

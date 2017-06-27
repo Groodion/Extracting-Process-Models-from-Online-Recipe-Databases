@@ -1,31 +1,30 @@
 package ai4.master.project.recipe.baseObject;
 
-import ai4.master.project.recipe.object.Tool;
+import ai4.master.project.recipe.object.IngredientGroup;
 
-
-public class BaseTool extends BaseNamedObject<Tool, BaseTool> {
-
+public class BaseIngredientGroup extends BaseIngredient {
 	@Override
-	public Tool toObject() {
+	public IngredientGroup toObject() {
 		String name = "UNNAMED";
 		
 		if(getNames().size() != 0) {
 			name = getNames().iterator().next();
 		}
-		return new Tool(name, this);
+		
+		return new IngredientGroup(name, this);
 	}
-
+	
 	@Override
 	public String toXML() {
 		StringBuilder sB = new StringBuilder();
 		
-		sB.append("<Tool>");
+		sB.append("<Group>");
 		for(String name : getNames()) {
 			sB.append("<Name>");
 			sB.append(name);
 			sB.append("</Name>");			
 		}
-		sB.append("</Tool>");
+		sB.append("</Group>");
 		
 		return sB.toString();
 	}

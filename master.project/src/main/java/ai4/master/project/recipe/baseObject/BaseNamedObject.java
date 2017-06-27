@@ -22,14 +22,9 @@ public abstract class BaseNamedObject<N extends NamedObject<B>, B extends BaseNa
 	public Set<String> getStemmedNames() {
 		return stemmedNames;
 	}
-
-	public void setName(String name){
-		names.add(name);
-	}
 	
 	public void addName(String name) {
 		names.add(name);
-				
 		stemmedNames.add(Word.stem(name));
 	}
 	
@@ -39,4 +34,6 @@ public abstract class BaseNamedObject<N extends NamedObject<B>, B extends BaseNa
 	}
 
 	public abstract N toObject();
+
+	public abstract String toXML();
 }

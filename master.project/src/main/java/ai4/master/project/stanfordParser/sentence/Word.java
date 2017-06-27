@@ -35,6 +35,8 @@ public class Word extends PartialObject<Word> {
 	private Block block;
 	
 	private boolean isVerb = false;
+	private boolean lastProductReference = false;
+	private boolean conditionIndicator = false;
 	
 	private BaseCookingAction cookingAction;
 	private List<BaseTool> tools;
@@ -73,6 +75,8 @@ public class Word extends PartialObject<Word> {
 		return connections;
 	}
 	public Role getRole() {
+		while(connections.remove(null));
+		while(referenceTargets.remove(null));
 		if(!referenceTargets.isEmpty()) {
 			Role role = referenceTargets.get(0).getRole();
 			
@@ -229,6 +233,12 @@ public class Word extends PartialObject<Word> {
 	public boolean isVerb() {
 		return isVerb;
 	}
+	public boolean isLastProductReference() {
+		return lastProductReference;
+	}
+	public boolean isConditionIndicator() {
+		return conditionIndicator;
+	}
 	
 	public SentencePart getSentencePart() {
 		return sentencePart;
@@ -246,6 +256,12 @@ public class Word extends PartialObject<Word> {
 	}
 
 	public void init(KeyWordDatabase kwdb) {
+		conditionIndicator = kwdb.isConditionIndicator(getText());
+		
+		if(kwdb.isLastSentenceRefernece(getText())) {
+			lastProductReference = true;
+		}
+		
 		switch(pos) {
 		case ADJA:
 			connections.add(getNextNoun());
@@ -309,7 +325,10 @@ public class Word extends PartialObject<Word> {
 			break;
 		case PPER:
 			getReferenceTargets().add(getLastIngredient());
-			getIngredients().addAll(getLastIngredient().getIngredients());
+			if(getLastIngredient() == null) {
+			} else {
+				getIngredients().addAll(getLastIngredient().getIngredients());
+			}
 			break;
 		case PPOSAT:
 			break;
@@ -360,6 +379,9 @@ public class Word extends PartialObject<Word> {
 		case TRUNC:
 			break;
 		case VVINF:
+		case VVFIN:
+		case VVIMP:
+		case VVIZU:
 			role = Role.ACTION;
 			cookingAction = kwdb.findCookingAction(stem(getText()));
 		case VAFIN:
@@ -369,11 +391,9 @@ public class Word extends PartialObject<Word> {
 		case VMFIN:
 		case VMINF:
 		case VMPP:
-		case VVFIN:
-		case VVIMP:
-		case VVIZU:
 		case VVPP:
 			isVerb = true;
+			//System.out.println(getText() + " " + getPos());
 			break;
 		case XY:
 			break;
@@ -395,23 +415,51 @@ public class Word extends PartialObject<Word> {
 
 	public void deepBlockGeneration(KeyWordDatabase kwdb) {
 		if(getPos() == STTSTag.KON) {
-			if(getNext() != null && getPrev() != null && getNext().getRole() == Role.INGREDIENT && getPrev().getRole() == Role.INGREDIENT) {
-				Block enumerationBlock = new Block(sentencePart);
+			if(getNext() != null && getPrev() != null && ((getNext().getRole() == Role.INGREDIENT || getNext().getRole() == Role.UNDECIDABLE_OBJECT) && (getPrev().getRole() == Role.INGREDIENT || getPrev().getRole() == Role.UNDECIDABLE_OBJECT))) {
+				Block collectionBlock = new Block(sentencePart);
+				collectionBlock.setRole(BlockRole.INGREDIENT_TOOL_COLLECTION);
 				
 				Word lastIngredient = getNext().getConnections().size() == 0 ? getNext() : getNext().getConnections().get(0);
-				
-				enumerationBlock.setRole(BlockRole.INGREDIENT_TOOL_COLLECTION);
+								
 				Word sWord = null;
-				for(Word word = getPrev(); word != null && (word.getRole() == Role.INGREDIENT || word.getRole() == Role.UNDECIDABLE_OBJECT); word = word.getPrev()) {
+				for(Word word = getPrev(); word != null && (word instanceof PunctuationMark || word.getPos() == STTSTag.KON || word.getRole() == Role.INGREDIENT || word.getRole() == Role.UNDECIDABLE_OBJECT); word = word.getPrev()) {
 					sWord = word;
 				}
 				for(Word word = sWord; word != lastIngredient.getNext(); word = word.getNext()) {
-					word.setBlock(enumerationBlock);
+					if(word.getRole() == Role.INGREDIENT) {
+						collectionBlock.setRole(BlockRole.INGREDIENT_COLLECTION);
+					}
+					word.setBlock(collectionBlock);
+				}
+				
+				for(Word word : collectionBlock.getWords()) {
+					word.select(Role.INGREDIENT, kwdb);
 				}
 			}
+		} else if(block == null && conditionIndicator) {			
+			Word start = this;
+			Word end = this;
+						
+			for(; start.getPrev() != null && start.getPrev().getRole() == null && start.getPrev().getBlock() == null; start = start.getPrev());
+			for(; end.getNext() != null && end.getNext().getRole() == null && end.getNext().getBlock() == null; end = end.getNext());
+			
+			Block conditionBlock = new Block(sentencePart);
+			
+			for(Word word = start; word != end.getNext(); word = word.getNext()) {
+				word.setBlock(conditionBlock);
+			}
+			
+			conditionBlock.setRole(BlockRole.CONDITION);
 		}
 	}
 	
+	private void select(Role role, KeyWordDatabase kwdb) {
+		if(this.role == Role.UNDECIDABLE_OBJECT) {
+			this.role = role;
+			
+			ingredients.add(kwdb.findIngredient(getText()));
+		}
+	}
 	public List<Word> getLastSubjectWords() {
 		List<Word> subjectWords = new ArrayList<Word>();
 		
