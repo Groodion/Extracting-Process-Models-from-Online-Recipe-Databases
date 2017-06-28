@@ -1,9 +1,9 @@
 package ai4.master.project.recipe.object;
 
+import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
 
 
 public class IngredientGroup extends Ingredient {

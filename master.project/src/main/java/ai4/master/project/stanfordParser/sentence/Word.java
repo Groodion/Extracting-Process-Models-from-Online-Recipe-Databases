@@ -1,15 +1,14 @@
 package ai4.master.project.stanfordParser.sentence;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.tartarus.snowball.ext.German2Stemmer;
-
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.stanfordParser.STTSTag;
+import org.tartarus.snowball.ext.German2Stemmer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Word extends PartialObject<Word> {

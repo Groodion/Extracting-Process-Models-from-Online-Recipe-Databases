@@ -1,8 +1,5 @@
 package ai4.master.project.stanfordParser.sentence;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.CookingEvent;
 import ai4.master.project.recipe.EventType;
@@ -15,6 +12,9 @@ import ai4.master.project.recipe.object.Ingredient;
 import ai4.master.project.recipe.object.IngredientGroup;
 import ai4.master.project.recipe.object.Tool;
 import ai4.master.project.stanfordParser.STTSTag;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SentencePart extends PartialObject<SentencePart> {
 
@@ -60,7 +60,7 @@ public class SentencePart extends PartialObject<SentencePart> {
 	}
 
 	/**
-	 * Gibt zurück ob der Satzteil ein Verb beinhaltet
+	 * Gibt zurï¿½ck ob der Satzteil ein Verb beinhaltet
 	 * @return
 	 */
 	public boolean containsVerb() {
@@ -98,7 +98,7 @@ public class SentencePart extends PartialObject<SentencePart> {
 	}
 
 	/**
-	 * Fügt zwei Satzteile zu einem zusammen
+	 * Fï¿½gt zwei Satzteile zu einem zusammen
 	 * @return
 	 */
 	public void mergeWith(SentencePart sentencePart) {
@@ -159,7 +159,7 @@ public class SentencePart extends PartialObject<SentencePart> {
 	}
 	
 	/**
-	 * Testet ob der Satzteil einem regulären Ausdruck entspricht.
+	 * Testet ob der Satzteil einem regulï¿½ren Ausdruck entspricht.
 	 * @return
 	 */
 	public boolean matches(String reg, boolean ignorePunctuationMarks) {
@@ -175,7 +175,7 @@ public class SentencePart extends PartialObject<SentencePart> {
 		return false;
 	}
 	/**
-	 * Löscht die gespeicherten Textcombinationen des Ausdruckstesters, um Arbeitsspeicher frei zu machen.
+	 * Lï¿½scht die gespeicherten Textcombinationen des Ausdruckstesters, um Arbeitsspeicher frei zu machen.
 	 * @return
 	 */
 	public void clearMemory() {
@@ -183,7 +183,7 @@ public class SentencePart extends PartialObject<SentencePart> {
 	}
 	
 	/**
-	 * Identifiziert bestimmte Wörter anhand eines regulären Ausdrucks. <b>FUNKTIONIERT NOCH NICHT</b>
+	 * Identifiziert bestimmte Wï¿½rter anhand eines regulï¿½ren Ausdrucks. <b>FUNKTIONIERT NOCH NICHT</b>
 	 * @return
 	 */
 	public List<Object> identify(String reg) {

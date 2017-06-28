@@ -1,8 +1,8 @@
 package ai4.master.project;
 
-import java.io.IOException;
-import java.net.URL;
-
+import ai4.master.project.recipe.baseObject.*;
+import ai4.master.project.recipe.object.ingredientTag.IngredientTag;
+import ai4.master.project.recipe.object.ingredientTag.QuantifierTag;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -10,14 +10,8 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.input.sax.XMLReaders;
 
-import ai4.master.project.recipe.baseObject.BaseCookingAction;
-import ai4.master.project.recipe.baseObject.BaseIngredient;
-import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
-import ai4.master.project.recipe.baseObject.BaseTool;
-import ai4.master.project.recipe.baseObject.Regex;
-import ai4.master.project.recipe.baseObject.Transformation;
-import ai4.master.project.recipe.object.ingredientTag.IngredientTag;
-import ai4.master.project.recipe.object.ingredientTag.QuantifierTag;
+import java.io.IOException;
+import java.net.URL;
 
 
 public class XMLLoader {	

@@ -1,10 +1,10 @@
 package ai4.master.project.recipe.baseObject;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import ai4.master.project.recipe.object.NamedObject;
 import ai4.master.project.stanfordParser.sentence.Word;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public abstract class BaseNamedObject<N extends NamedObject<B>, B extends BaseNamedObject<N, B>> {
 	

@@ -1,11 +1,11 @@
 package ai4.master.project.recipe.baseObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ai4.master.project.recipe.object.Ingredient;
 import ai4.master.project.recipe.object.ingredientTag.IngredientTag;
 import ai4.master.project.recipe.object.ingredientTag.QuantifierTag;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Transformation {
 
@@ -36,8 +36,8 @@ public class Transformation {
 	}
 	
 	/**
-	 * Testet ob die Vorraussetzungen an die gegebenen Zutaten für diese Transformation
-	 * erfüllt sind
+	 * Testet ob die Vorraussetzungen an die gegebenen Zutaten fï¿½r diese Transformation
+	 * erfï¿½llt sind
 	 * @param ingredient Die zu transformierende Zutat
 	 * @param list Liste mit restlichen Zutaten des Step-Objekts
 	 * @return Testresultat
@@ -58,12 +58,12 @@ public class Transformation {
 	}
 	
 	/**
-	 * führt eine von vier Transformationen durch:<br />
+	 * fï¿½hrt eine von vier Transformationen durch:<br />
 	 * 1. wenn das produkt gesetzt ist wird dieses als ergebnis der Transformation
-	 * zurückgegeben<br />
+	 * zurï¿½ckgegeben<br />
 	 * 2. wenn eine IngredientTag gesetzt ist wird die Hauptzutat damit getagged<br />
 	 * 3. wenn eine QuantifierTag gesetzt ist wird die Hauptzutat damit getagged<br />
-	 * 4. wenn nichts gesetzt ist wird die Zutat unverändert zurückgegeben
+	 * 4. wenn nichts gesetzt ist wird die Zutat unverï¿½ndert zurï¿½ckgegeben
 	 * @param ingredient Hauptzutat
 	 * @param list Zutatsliste
 	 * @return transformierte Zutat

@@ -1,14 +1,14 @@
 package ai4.master.project;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
 import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.stanfordParser.sentence.Role;
 import ai4.master.project.stanfordParser.sentence.Word;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class KeyWordDatabase {

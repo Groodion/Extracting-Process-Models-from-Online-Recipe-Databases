@@ -1,11 +1,11 @@
 package ai4.master.project.recipe.object;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.object.ingredientTag.IngredientTag;
 import ai4.master.project.recipe.object.ingredientTag.QuantifierTag;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Ingredient extends NamedObject<BaseIngredient> {
 
@@ -23,8 +23,8 @@ public class Ingredient extends NamedObject<BaseIngredient> {
 	}
 
 	/**
-	 * Erzeugt eine Kopie des Objektes und fügt den gegeben tag an diese an.
-	 * @param tag hizuzufügender Tag
+	 * Erzeugt eine Kopie des Objektes und fï¿½gt den gegeben tag an diese an.
+	 * @param tag hizuzufï¿½gender Tag
 	 * @return getaggede Kopie der Zutat
 	 */
 	public Ingredient tag(IngredientTag tag) {

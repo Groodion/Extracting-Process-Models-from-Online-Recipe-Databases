@@ -1,10 +1,5 @@
 package ai4.master.project.stanfordParser;
 
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.IngredientList;
 import ai4.master.project.recipe.Recipe;
@@ -24,6 +19,11 @@ import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.process.DocumentPreprocessor;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 
 public class Parser {
 
@@ -40,7 +40,7 @@ public class Parser {
 	
 	private List<Sentence> analyzeText(String text) {
 		List<Sentence> sentences = new ArrayList<Sentence>();
-		//Text wird in sätze zerlegt
+		//Text wird in sï¿½tze zerlegt
 		List<List<TaggedWord>> taggedList = tagger.process(getSplittedSentencesFromString(text));
 		Sentence sentence = null;
 		
@@ -77,7 +77,7 @@ public class Parser {
 				}
 			}
 			
-			//Satzteile ohne eigenes Verb werden mit dem nächsten Satzteil verschmolzen
+			//Satzteile ohne eigenes Verb werden mit dem nï¿½chsten Satzteil verschmolzen
 			for(int j = 0; j < sentence.getParts().size() - 1; j++) {
 				if(!sentence.getParts().get(j).containsVerb()) {
 					if(sentence.getParts().get(j).containsWord("ebenfalls") || sentence.getParts().get(j).containsWord(")")) {

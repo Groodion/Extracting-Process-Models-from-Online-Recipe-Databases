@@ -1,11 +1,11 @@
 package ai4.master.project.recipe.baseObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ai4.master.project.recipe.object.CookingAction;
 import ai4.master.project.recipe.object.Ingredient;
 import ai4.master.project.recipe.object.IngredientGroup;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookingAction> {
@@ -23,32 +23,32 @@ public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookin
 
 	/**
 	 * Liste mit allen Werkzeugen die von der Aktion Impliziert werden 
-	 * und bei der automatischen Step-Erzeugung dem Objekt hinzugefügt 
-	 * werden wenn kein anderes Werkzeug im Text erwähnt wird.
+	 * und bei der automatischen Step-Erzeugung dem Objekt hinzugefï¿½gt 
+	 * werden wenn kein anderes Werkzeug im Text erwï¿½hnt wird.
 	 * @return Implizite Werkzeugliste
 	 */
 	public List<BaseTool> getImplicitTools() {
 		return implicitTools;
 	}
 	/**
-	 * Liste mit allen regulären Ausdrücken die zur automatischen 
+	 * Liste mit allen regulï¿½ren Ausdrï¿½cken die zur automatischen 
 	 * Produktidentifikation von einer Aktion gespeichert sind.
-	 * @return Liste mit regulären Ausdrücken
+	 * @return Liste mit regulï¿½ren Ausdrï¿½cken
 	 */
 	public List<Regex> getRegexList() {
 		return regexList;
 	}
 	/**
-	 * Liste mit allen Transformationsmöglichkeiten die von einer Aktion
+	 * Liste mit allen Transformationsmï¿½glichkeiten die von einer Aktion
 	 * ausgehen
-	 * @return Liste mit Transformationsmöglichkeiten
+	 * @return Liste mit Transformationsmï¿½glichkeiten
 	 */
 	public List<Transformation> getTransformations() {
 		return transformations;
 	}
 	
 	/**
-	 * Wählt ausgehend von den zusätzlichen Zutaten das entsprechende Transformations-Objekt
+	 * Wï¿½hlt ausgehend von den zusï¿½tzlichen Zutaten das entsprechende Transformations-Objekt
 	 * aus der Liste aus und wendet diese auf die Hauptzutat an.
 	 * @param ingredient Die zu transformierende Zutat
 	 * @param list Liste mit restlichen Zutaten des Step-Objekts

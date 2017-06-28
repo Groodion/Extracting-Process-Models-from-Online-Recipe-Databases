@@ -1,17 +1,16 @@
 package ai4.master.project;
 
-import java.net.URL;
-
 import ai4.master.project.apirequests.RecipeGetterChefkoch;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
 import ai4.master.project.stanfordParser.Parser;
 
+import java.net.URL;
+
 public class ParserTest {
 	public static void main(String[] args) throws Exception {
 		XMLLoader loader = new XMLLoader();
-		KeyWordDatabase kwdb = loader.load(new URL("file:///D:\\Dropbox\\workspace\\Extracting-Process-Models-from-Online-Recipe-Databases\\master.project\\resources\\Lib.xml"));
-		
+		KeyWordDatabase kwdb = loader.load(new URL("file","","resources/Lib.xml"));
 		Parser parser = new Parser("lib/models/german-fast.tagger");
 		parser.setKwdb(kwdb);
 		//1340271238839144
@@ -25,5 +24,8 @@ public class ParserTest {
 			System.out.println(step);
 			System.out.println(step.getEvents());
 		}
+
+		//ProcessModeler processModeler = new ProcessModelerImpl();
+		//processModeler.convertToProcess(recipe);
 	}
 }
