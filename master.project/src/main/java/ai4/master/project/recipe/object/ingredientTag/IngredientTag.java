@@ -17,7 +17,7 @@ public class IngredientTag {
 
 	/**
 	 * Ersetzt die Zeichenkette "INGREDIENT" im Tag-Name mit dem Namen der gegebenen Zutat 
-	 * und gibt einen neuen Tag mit diesem Namen zurï¿½ck
+	 * und gibt einen neuen Tag mit diesem Namen zurück
 	 * @param ingredient
 	 * @return
 	 */

@@ -1,8 +1,5 @@
 package ai4.master.project.recipe;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ai4.master.project.recipe.object.CookingAction;
 import ai4.master.project.recipe.object.Ingredient;
 import ai4.master.project.recipe.object.Tool;
@@ -25,9 +22,8 @@ public class Step {
 	
 	public Step() {
 		ingredients = new ArrayList<Ingredient>();
-		products = new ArrayList<Ingredient>();
 		tools = new ArrayList<Tool>();
-
+		products = new ArrayList<>();
 		events = new ArrayList<CookingEvent>();
 	}
 	
@@ -55,7 +51,7 @@ public class Step {
 		this.text = text;
 	}
 	/**
-	 * Liste mit Zutaten die im aktuellen Arbeitsschritt benï¿½tigt werden. Enthï¿½llt auch implizierte
+	 * Liste mit Zutaten die im aktuellen Arbeitsschritt benötigt werden. Enthällt auch implizierte 
 	 * und referenzierte Objekte.
 	 * @return Zutatenliste
 	 */

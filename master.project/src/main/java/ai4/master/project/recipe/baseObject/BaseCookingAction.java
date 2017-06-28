@@ -23,32 +23,32 @@ public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookin
 
 	/**
 	 * Liste mit allen Werkzeugen die von der Aktion Impliziert werden 
-	 * und bei der automatischen Step-Erzeugung dem Objekt hinzugefï¿½gt 
-	 * werden wenn kein anderes Werkzeug im Text erwï¿½hnt wird.
+	 * und bei der automatischen Step-Erzeugung dem Objekt hinzugefügt 
+	 * werden wenn kein anderes Werkzeug im Text erwähnt wird.
 	 * @return Implizite Werkzeugliste
 	 */
 	public List<BaseTool> getImplicitTools() {
 		return implicitTools;
 	}
 	/**
-	 * Liste mit allen regulï¿½ren Ausdrï¿½cken die zur automatischen 
+	 * Liste mit allen regulären Ausdrücken die zur automatischen 
 	 * Produktidentifikation von einer Aktion gespeichert sind.
-	 * @return Liste mit regulï¿½ren Ausdrï¿½cken
+	 * @return Liste mit regulären Ausdrücken
 	 */
 	public List<Regex> getRegexList() {
 		return regexList;
 	}
 	/**
-	 * Liste mit allen Transformationsmï¿½glichkeiten die von einer Aktion
+	 * Liste mit allen Transformationsmöglichkeiten die von einer Aktion
 	 * ausgehen
-	 * @return Liste mit Transformationsmï¿½glichkeiten
+	 * @return Liste mit Transformationsmöglichkeiten
 	 */
 	public List<Transformation> getTransformations() {
 		return transformations;
 	}
 	
 	/**
-	 * Wï¿½hlt ausgehend von den zusï¿½tzlichen Zutaten das entsprechende Transformations-Objekt
+	 * Wählt ausgehend von den zusätzlichen Zutaten das entsprechende Transformations-Objekt
 	 * aus der Liste aus und wendet diese auf die Hauptzutat an.
 	 * @param ingredient Die zu transformierende Zutat
 	 * @param list Liste mit restlichen Zutaten des Step-Objekts
@@ -95,7 +95,7 @@ public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookin
 		}
 		sB.append("<regs>");
 		for(Regex regex : regexList) {
-			sB.append(regex.toXML());		
+			sB.append(regex.toXML());
 		}
 		sB.append("</regs>");
 		sB.append("<transformations>");
@@ -103,6 +103,13 @@ public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookin
 			sB.append(transformation.toXML());		
 		}
 		sB.append("</transformations>");
+		sB.append("<tools>");
+		for(BaseTool tool : implicitTools) {
+			sB.append("<Tool name=\"");
+			sB.append(tool.getNames().iterator().next());
+			sB.append("\" />");
+		}
+		sB.append("</tools>");
 
 		sB.append("</CookingAction>");
 		
