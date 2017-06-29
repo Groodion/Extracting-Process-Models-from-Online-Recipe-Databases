@@ -8,17 +8,19 @@ public class Regex {
 	private String expression;
 	private Result result;
 	private boolean ingredientsNeeded;
+	private boolean referencePreviousProducts;
 	
 	
-	public Regex(String expression, Result result, boolean ingredientsNeeded) {
+	public Regex(String expression, Result result, boolean ingredientsNeeded, boolean referencePreviousProducts) {
 		this.expression = expression;
 		this.result = result;
 		this.ingredientsNeeded = ingredientsNeeded;
+		this.referencePreviousProducts = referencePreviousProducts;
 	}
-	public Regex(String expression) {
-		this(expression, Result.FIRST, true);
+	public Regex(String expression, Result result) {
+		this(expression, Result.FIRST, true, false);
 	}
-	
+
 	public String getExpression() {
 		return expression;
 	}
@@ -35,10 +37,15 @@ public class Regex {
 		sB.append(result.toString().toLowerCase());
 		sB.append("\" ingredientsNeeded=\"");
 		sB.append(ingredientsNeeded);
+		sB.append("\" referencePreviousProducts=\"");
+		sB.append(referencePreviousProducts);
 		sB.append("\">");
 		sB.append(expression);
 		sB.append("</Regex>");
 		
 		return sB.toString();
+	}
+	public boolean isReferencePreviousProducts() {
+		return referencePreviousProducts;
 	}
 }

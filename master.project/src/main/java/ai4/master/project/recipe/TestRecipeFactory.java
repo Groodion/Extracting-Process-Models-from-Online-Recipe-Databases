@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TestRecipeFactory {
-
+/*
 	public Recipe createRecipe() {
 		Recipe recipe = new Recipe(LANG_FLAG.DE);
 
@@ -300,7 +300,7 @@ public class TestRecipeFactory {
 		recipe.getIngredients().add(bI_schmand.toObject());
 
 		return recipe;
-	}
+	}*/
 
 	/*
 	 * Bäume sehen so aus: (aufgelistet die Ingredients)

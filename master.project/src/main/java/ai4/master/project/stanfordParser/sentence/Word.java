@@ -1,15 +1,14 @@
 package ai4.master.project.stanfordParser.sentence;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.tartarus.snowball.ext.German2Stemmer;
-
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.stanfordParser.STTSTag;
+import org.tartarus.snowball.ext.German2Stemmer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Word extends PartialObject<Word> {
@@ -37,6 +36,7 @@ public class Word extends PartialObject<Word> {
 	private boolean isVerb = false;
 	private boolean lastProductReference = false;
 	private boolean conditionIndicator = false;
+	private boolean eventIndicator = false;
 	
 	private BaseCookingAction cookingAction;
 	private List<BaseTool> tools;
@@ -239,6 +239,9 @@ public class Word extends PartialObject<Word> {
 	public boolean isConditionIndicator() {
 		return conditionIndicator;
 	}
+	public boolean isEventIndicator() {
+		return eventIndicator;
+	}
 	
 	public SentencePart getSentencePart() {
 		return sentencePart;
@@ -260,6 +263,9 @@ public class Word extends PartialObject<Word> {
 		
 		if(kwdb.isLastSentenceRefernece(getText())) {
 			lastProductReference = true;
+		}
+		if(kwdb.isEventIndicator(getText())) {
+			eventIndicator = true;
 		}
 		
 		switch(pos) {

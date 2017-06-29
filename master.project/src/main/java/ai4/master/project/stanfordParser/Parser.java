@@ -1,12 +1,10 @@
 package ai4.master.project.stanfordParser;
 
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import ai4.master.project.KeyWordDatabase;
+import ai4.master.project.recipe.CookingEvent;
+import ai4.master.project.recipe.EventType;
 import ai4.master.project.recipe.IngredientList;
+import ai4.master.project.recipe.Position;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
@@ -15,6 +13,7 @@ import ai4.master.project.recipe.baseObject.Regex;
 import ai4.master.project.recipe.object.CookingAction;
 import ai4.master.project.recipe.object.Ingredient;
 import ai4.master.project.recipe.object.IngredientGroup;
+import ai4.master.project.recipe.object.Tool;
 import ai4.master.project.stanfordParser.sentence.PunctuationMark;
 import ai4.master.project.stanfordParser.sentence.Sentence;
 import ai4.master.project.stanfordParser.sentence.SentencePart;
@@ -23,6 +22,11 @@ import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.process.DocumentPreprocessor;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
+
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 
 public class Parser {
@@ -40,7 +44,7 @@ public class Parser {
 	
 	private List<Sentence> analyzeText(String text) {
 		List<Sentence> sentences = new ArrayList<Sentence>();
-		//Text wird in sätze zerlegt
+		//Text wird in sï¿½tze zerlegt
 		List<List<TaggedWord>> taggedList = tagger.process(getSplittedSentencesFromString(text));
 		Sentence sentence = null;
 		
@@ -77,7 +81,7 @@ public class Parser {
 				}
 			}
 			
-			//Satzteile ohne eigenes Verb werden mit dem nächsten Satzteil verschmolzen
+			//Satzteile ohne eigenes Verb werden mit dem nï¿½chsten Satzteil verschmolzen
 			for(int j = 0; j < sentence.getParts().size() - 1; j++) {
 				if(!sentence.getParts().get(j).containsVerb()) {
 					if(sentence.getParts().get(j).containsWord("ebenfalls") || sentence.getParts().get(j).containsWord(")")) {
@@ -163,6 +167,22 @@ public class Parser {
 					step.getIngredients().addAll(sP.getIngredients());
 					step.getTools().addAll(sP.getTools());
 					
+					boolean needsImplicitTool = !step.getCookingAction().getBaseObject().getImplicitTools().isEmpty();
+					
+					if(needsImplicitTool) {
+						for(Tool tool : step.getTools()) {
+							if(step.getCookingAction().getBaseObject().getImplicitTools().contains(tool.getBaseObject())) {
+								needsImplicitTool = false;
+								break;
+							}
+						}
+						if(needsImplicitTool) {
+							Tool implicitTool = step.getCookingAction().getBaseObject().getImplicitTools().get(0).toObject();
+							implicitTool.setImplicit(true);
+							step.getTools().add(implicitTool);
+						}
+					}
+					
 					if(sP.containsLastSentenceProductReference()) {
 						if(lastStep == null) {
 							System.err.println("LastSentenceReference in first sentence!");
@@ -170,7 +190,7 @@ public class Parser {
 							step.getIngredients().addAll(lastStep.getProducts());
 						}
 					}
-					
+
 					if(lastStep != null) {
 						for(int i = 0; i < step.getIngredients().size(); i++) {
 							for(Ingredient product : lastStep.getProducts()) {
@@ -180,6 +200,7 @@ public class Parser {
 							}
 						}
 					}
+					
 					boolean noResult = false;
 					boolean ingredientsNeeded = true;
 					
@@ -188,10 +209,14 @@ public class Parser {
 							((IngredientGroup) ingredient).getIngredients().addAll(activeIngredients.get(ingredient.getBaseObject()));
 						}
 					}
-					
+
 					for(Regex regex : action.getRegexList()) {
 						if(sP.matches(regex.getExpression(), false)) {
 							ingredientsNeeded = regex.isIngredientsNeeded();
+							
+							if(regex.isReferencePreviousProducts()) {
+								step.getIngredients().addAll(lastStep.getProducts());
+							}
 							
 							switch(regex.getResult()) {
 							case ALL:
@@ -222,21 +247,23 @@ public class Parser {
 							break;
 						}
 					}
+
 					
 					sP.clearMemory();
 					if(lastStep != null && ingredientsNeeded) {
 						if(step.getIngredients().isEmpty()) {
 							step.getIngredients().addAll(lastStep.getProducts());
-						}
-						if(step.getProducts().isEmpty() && !noResult) {
-							for(Ingredient ingredient : lastStep.getProducts()) {
-								if(ingredient != null) {
-									step.getIngredients().add(ingredient);
-									step.getProducts().addAll(action.transform(ingredient, step.getIngredients()));
+						
+							if(!noResult) {
+								for(Ingredient ingredient : lastStep.getProducts()) {
+									if(ingredient != null) {
+										step.getProducts().addAll(action.transform(ingredient, step.getIngredients()));
+									}
 								}
 							}
 						}
 					}
+
 					
 					while(step.getIngredients().remove(null));
 					while(step.getProducts().remove(null));
@@ -249,10 +276,15 @@ public class Parser {
 							activeIngredients.remove(ingredient.getBaseObject());
 						}
 					}
+
 					
 					step.getProducts().forEach(product -> activeIngredients.add(product));
 					
 					step.getEvents().addAll(sP.getEvents());
+					
+					if(step.getEvents().isEmpty() && sP.containsEventIndicator()) {
+						step.getEvents().add(new CookingEvent(sP.getText(), EventType.TIMER, Position.AFTER));
+					}
 					
 					recipe.getSteps().add(step);
 					

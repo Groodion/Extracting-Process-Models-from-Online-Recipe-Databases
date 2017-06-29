@@ -1,14 +1,16 @@
 package ai4.master.project;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
 import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.stanfordParser.sentence.Role;
 import ai4.master.project.stanfordParser.sentence.Word;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jdom2.Element;
 
 
 public class KeyWordDatabase {
@@ -20,6 +22,7 @@ public class KeyWordDatabase {
 	private List<String> partIndicators;
 	private List<String> lastSentenceReferences;
 	private List<String> conditionIndicators;
+	private List<String> eventIndicators;
 	
 	public KeyWordDatabase() {
 		tools = new ArrayList<BaseTool>();
@@ -29,6 +32,7 @@ public class KeyWordDatabase {
 		partIndicators = new ArrayList<String>();
 		lastSentenceReferences = new ArrayList<String>();
 		conditionIndicators = new ArrayList<String>();
+		eventIndicators = new ArrayList<String>();
 		
 		//TODO import;
 		conditionIndicators.add(Word.stem("Bratzeit"));
@@ -49,6 +53,9 @@ public class KeyWordDatabase {
 	}
 	public List<String> getLastSentenceReferences() {
 		return lastSentenceReferences;
+	}
+	public List<String> getEventIndicators() {
+		return eventIndicators;
 	}
 	
 	public BaseTool findTool(String text) {
@@ -141,6 +148,15 @@ public class KeyWordDatabase {
 	public boolean isLastSentenceRefernece(String text) {
 		return lastSentenceReferences.contains(text.toLowerCase());
 	}
+	public boolean isEventIndicator(String text) {
+		for(String i : eventIndicators) {
+			if(Word.stem(i.toLowerCase()).equals(Word.stem(text.toLowerCase()))) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
 	
 	private static int stringDiff(String a, String b) {
 		int dif = Math.abs(a.length() - b.length());
@@ -222,6 +238,13 @@ public class KeyWordDatabase {
 			sB.append("</LastSentenceReference>");
 		}
 		sB.append("</lastSentenceReferences>");
+		sB.append("<eventIndicators>");
+		for(String eventIndicator : eventIndicators) {
+			sB.append("<EventIndicator>");
+			sB.append(eventIndicator);
+			sB.append("</EventIndicator>");
+		}
+		sB.append("</eventIndicators>");
 		sB.append("</root>");
 
 		return sB.toString();
