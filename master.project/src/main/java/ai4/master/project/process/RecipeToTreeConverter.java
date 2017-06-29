@@ -76,6 +76,12 @@ public class RecipeToTreeConverter {
         Tree<Step> finalTree = new Tree<>(new Node<>(new Step()));
         for (Tree t :
                 treeList) {
+            if(finalTree.getRoot() == null){
+                System.out.println("FinalTree root == null");
+            }
+            if(t.getRoot() == null){
+                System.out.println("Child root == null");
+            }
             finalTree.getRoot().addChild(t.getRoot());
         }
 

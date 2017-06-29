@@ -10,8 +10,6 @@ import ai4.master.project.stanfordParser.sentence.Word;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jdom2.Element;
-
 
 public class KeyWordDatabase {
 	

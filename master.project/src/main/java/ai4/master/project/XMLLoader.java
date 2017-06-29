@@ -78,7 +78,6 @@ public class XMLLoader {
 				System.err.println("Unknown Child " + child.getName() + " in " + root.getName());
 			}
 		}
-				
 		return kwdb;
 	}
 	

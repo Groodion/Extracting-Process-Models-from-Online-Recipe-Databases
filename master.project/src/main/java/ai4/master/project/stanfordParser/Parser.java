@@ -1,4 +1,4 @@
-package ai4.master.project.stanfordParser;
+﻿package ai4.master.project.stanfordParser;
 
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.CookingEvent;

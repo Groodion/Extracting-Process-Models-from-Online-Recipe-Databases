@@ -42,8 +42,9 @@ public class LayoutUtils {
     }
 
     public static int[] getCenterCoordinates(UserTask node) {
-        double x = node.getDiagramElement().getBounds().getX();
-        double y = node.getDiagramElement().getBounds().getY();
+        double x=0,y=0;
+             x = node.getDiagramElement().getBounds().getX();
+             y = node.getDiagramElement().getBounds().getY();
 
         double height = node.getDiagramElement().getBounds().getHeight();
         double width = node.getDiagramElement().getBounds().getWidth();

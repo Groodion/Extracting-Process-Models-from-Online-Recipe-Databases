@@ -118,8 +118,8 @@ public class RecipeGetterChefkoch implements RecipeGetter {
             stringBuilder.append(" ");
             stringBuilder.append(ingredigent.get("einheit"));
             stringBuilder.append("\n");
-            recipe.getIngredients().add(ingredigent.get("name").toString());
 
+            recipe.getIngredients().add(ingredigent.get("name").toString());
         }
 
         return stringBuilder.toString();

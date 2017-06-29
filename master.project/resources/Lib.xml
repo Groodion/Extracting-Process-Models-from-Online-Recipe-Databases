@@ -853,11 +853,6 @@
 			</transformations>
 		</CookingAction>
 		<CookingAction>
-			<tools>
-				<Tool name="Messer" />
-			</tools>
-		</CookingAction>
-		<CookingAction>
 			<Name>schneiden</Name>
 			<regs>
 				<Regex result="all" ingredientsNeeded="true">.*</Regex>
@@ -957,9 +952,7 @@
 		</CookingAction>
 		<CookingAction>
 			<Name>herstellen</Name>
-			<regs>
-			
-			</regs>
+			<regs></regs>
 			<transformations></transformations>
 		</CookingAction>
 		<CookingAction>

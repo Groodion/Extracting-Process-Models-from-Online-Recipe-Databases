@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 //TODO remove überprüfen, da nicht alle bzw falsche objeckte beim parsen entfernt werden 
+
 public class IngredientList extends ArrayList<Ingredient> {
 
 	private static final long serialVersionUID = 1L;
