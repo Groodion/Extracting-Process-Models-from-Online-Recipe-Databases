@@ -432,7 +432,7 @@ public class ProcessModelerImpl implements ProcessModeler {
      */
     public void createXml() {
         Bpmn.validateModel(modelInstance);
-        System.out.println("Writing to " + fileName);
+        System.out.println("Writing to: " + fileName);
         XMLWriter xmlWriter = new XMLWriter(fileName);
         xmlWriter.writeTo(Bpmn.convertToString(modelInstance));
     }

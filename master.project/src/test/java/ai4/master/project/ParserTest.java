@@ -36,7 +36,7 @@ public class ParserTest {
                 ex.printStackTrace();
             }
             System.out.println("FINISHED PARSING RECIPE WITH ID " + currentRecipe);
-            System.out.println("################################################");
+            System.out.println("#################################################");
         }
        /* XMLLoader loader = new XMLLoader();
         KeyWordDatabase kwdb = loader.load(new URL("file", "", "resources/Lib.xml"));

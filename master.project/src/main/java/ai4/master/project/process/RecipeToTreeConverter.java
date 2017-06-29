@@ -108,6 +108,7 @@ public class RecipeToTreeConverter {
                 //System.out.println("Comparing: Input: " + input.getIngredientName() + " with Output: " + output.getIngredientName());
                 if (input.equals(output)) {
                     return true;
+
                 }
             }
         }
