@@ -1,6 +1,8 @@
 package ai4.master.project;
 
 import ai4.master.project.apirequests.RecipeGetterChefkoch;
+import ai4.master.project.process.ProcessModeler;
+import ai4.master.project.process.ProcessModelerImpl;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
 import ai4.master.project.stanfordParser.Parser;
@@ -25,7 +27,7 @@ public class ParserTest {
 			System.out.println(step.getEvents());
 		}
 
-		//ProcessModeler processModeler = new ProcessModelerImpl();
-		//processModeler.convertToProcess(recipe);
+		ProcessModeler processModeler = new ProcessModelerImpl();
+		processModeler.convertToProcess(recipe);
 	}
 }
