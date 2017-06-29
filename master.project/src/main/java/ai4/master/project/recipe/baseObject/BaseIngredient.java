@@ -42,7 +42,6 @@ public class BaseIngredient extends BaseNamedObject<Ingredient, BaseIngredient> 
 		}
 		sB.append("<groups>");
 		for(BaseIngredientGroup group : getIngredientGroups()) {
-			System.out.println(group + " " + this);
 			sB.append("<Group name=\"");
 			sB.append(group.getNames().iterator().next());
 			sB.append("\" />");

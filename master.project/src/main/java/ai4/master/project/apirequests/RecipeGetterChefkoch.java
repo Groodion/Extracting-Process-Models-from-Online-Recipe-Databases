@@ -1,4 +1,4 @@
-package ai4.master.project.apirequests;
+﻿package ai4.master.project.apirequests;
 
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.object.Ingredient;
@@ -118,8 +118,8 @@ public class RecipeGetterChefkoch implements RecipeGetter {
             stringBuilder.append(" ");
             stringBuilder.append(ingredigent.get("einheit"));
             stringBuilder.append("\n");
-            recipe.getIngredients().add(stringBuilder.toString());
 
+            recipe.getIngredients().add(ingredigent.get("name").toString());
         }
 
         return stringBuilder.toString();

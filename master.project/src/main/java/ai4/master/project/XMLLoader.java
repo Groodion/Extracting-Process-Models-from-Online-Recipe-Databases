@@ -26,6 +26,8 @@ public class XMLLoader {
 	public static final String ELEMENT_PART_INDICATOR = "PartIndicator";
 	public static final String ELEMENT_LAST_SENTENCE_REFERENCES = "lastSentenceReferences";
 	public static final String ELEMENT_LAST_SENTENCE_REFERENCE = "LastSentenceReference";
+	public static final String ELEMENT_EVENT_INDICATORS = "eventIndicators";
+	public static final String ELEMENT_EVENT_INDICATOR = "EventIndicator";
 	public static final String ELEMENT_NAME = "Name";
 	public static final String ELEMENT_REGS = "regs";
 	public static final String ELEMENT_REGEX = "Regex";
@@ -35,6 +37,7 @@ public class XMLLoader {
 	public static final String ATTRIBUTE_RESULT_FINDER = "resultFinder";
 	public static final String ATTRIBUTE_RESULT = "result";
 	public static final String ATTRIBUTE_INGREDIENTS_NEEDED = "ingredientsNeeded";
+	public static final String ATTRIBUTE_REFERENCE_PREVIOUS_PRODUCTS = "referencePreviousProducts";
 	public static final String ELEMENT_TRANSFORMATIONS = "transformations";
 	public static final String ELEMENT_TRANSFORMATION = "Transformation";
 	public static final String ELEMENT_ADD_INGREDIENT_TAG = "AddIngredientTag";
@@ -69,13 +72,12 @@ public class XMLLoader {
 				readPartIndicators(child, kwdb);
 			} else if(child.getName().equals(ELEMENT_LAST_SENTENCE_REFERENCES)) {
 				readLastSentenceReferences(child, kwdb);
+			} else if(child.getName().equals(ELEMENT_EVENT_INDICATORS)) {
+				readEventIndicators(child, kwdb);
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + root.getName());
 			}
 		}
-		
-//		System.out.println(kwdb.toXML());
-		
 		return kwdb;
 	}
 	
@@ -232,14 +234,15 @@ public class XMLLoader {
 	private void readTools(Element element, KeyWordDatabase kwdb, BaseCookingAction cookingAction) {
 		for(Element child : element.getChildren()) {
 			if(child.getName().equals(ELEMENT_TOOL)) {
-				readTool(element, kwdb, cookingAction);
+				readTool(child, kwdb, cookingAction);
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}
 		}
 	}
 	private void readTool(Element element, KeyWordDatabase kwdb, BaseCookingAction cookingAction) {
-		cookingAction.getImplicitTools().add(kwdb.findTool(element.getAttributeValue("name")));
+		BaseTool tool = kwdb.findTool(element.getAttributeValue("name"));
+		cookingAction.getImplicitTools().add(tool);
 	}
 	private void readTransformations(Element element, KeyWordDatabase kwdb, BaseCookingAction cookingAction) {
 		for(Element child : element.getChildren()) {
@@ -312,12 +315,16 @@ public class XMLLoader {
 		}
 		
 		boolean iN = true;
+		boolean rPP = false;
 		
 		try {
 			iN = element.getAttribute(ATTRIBUTE_INGREDIENTS_NEEDED).getBooleanValue();
 		} catch(Exception e) { }
+		try {
+			rPP = element.getAttribute(ATTRIBUTE_REFERENCE_PREVIOUS_PRODUCTS).getBooleanValue();
+		} catch(Exception e) { }
 		
-		cA.getRegexList().add(new Regex(expression, result, iN));
+		cA.getRegexList().add(new Regex(expression, result, iN, rPP));
 	}
 
 	private void readPartIndicators(Element element, KeyWordDatabase kwdb) {
@@ -343,5 +350,17 @@ public class XMLLoader {
 	}
 	private void readLastSentenceReference(Element element, KeyWordDatabase kwdb) {
 		kwdb.getLastSentenceReferences().add(element.getValue());
+	}
+	private void readEventIndicators(Element element, KeyWordDatabase kwdb) {
+		for(Element child : element.getChildren()) {
+			if(child.getName().equals(ELEMENT_EVENT_INDICATOR)) {
+				readEventIndicator(child, kwdb);
+			} else {
+				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
+			}
+		}		
+	}
+	private void readEventIndicator(Element element, KeyWordDatabase kwdb) {
+		kwdb.getEventIndicators().add(element.getValue());
 	}
 }

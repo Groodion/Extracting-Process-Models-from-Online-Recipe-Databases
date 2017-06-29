@@ -36,6 +36,7 @@ public class Word extends PartialObject<Word> {
 	private boolean isVerb = false;
 	private boolean lastProductReference = false;
 	private boolean conditionIndicator = false;
+	private boolean eventIndicator = false;
 	
 	private BaseCookingAction cookingAction;
 	private List<BaseTool> tools;
@@ -238,6 +239,9 @@ public class Word extends PartialObject<Word> {
 	public boolean isConditionIndicator() {
 		return conditionIndicator;
 	}
+	public boolean isEventIndicator() {
+		return eventIndicator;
+	}
 	
 	public SentencePart getSentencePart() {
 		return sentencePart;
@@ -259,6 +263,9 @@ public class Word extends PartialObject<Word> {
 		
 		if(kwdb.isLastSentenceRefernece(getText())) {
 			lastProductReference = true;
+		}
+		if(kwdb.isEventIndicator(getText())) {
+			eventIndicator = true;
 		}
 		
 		switch(pos) {

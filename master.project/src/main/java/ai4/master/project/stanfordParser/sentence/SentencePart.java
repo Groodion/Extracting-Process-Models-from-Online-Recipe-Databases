@@ -163,7 +163,6 @@ public class SentencePart extends PartialObject<SentencePart> {
 	 * @return
 	 */
 	public boolean matches(String reg, boolean ignorePunctuationMarks) {
-		System.out.println(getText());
 		String[] combinations = textComb(ignorePunctuationMarks);
 		
 		for(String combination : combinations) {
@@ -265,7 +264,6 @@ public class SentencePart extends PartialObject<SentencePart> {
 		List<CookingEvent> events = new ArrayList<CookingEvent>();
 		
 		for(Block block : blocks) {
-			System.out.println(block);
 			if(block.getRole() == BlockRole.CONDITION) {
 				events.add(new CookingEvent(block.getText(), EventType.TIMER, Position.BEFORE));
 			}
@@ -286,6 +284,14 @@ public class SentencePart extends PartialObject<SentencePart> {
 	public boolean containsWord(String string) {
 		for(Word word : getWords()) {
 			if(Word.stem(word.getText().toLowerCase()).equals(Word.stem(string.toLowerCase()))) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public boolean containsEventIndicator() {
+		for(Word word : words) {
+			if(word.isEventIndicator()) {
 				return true;
 			}
 		}

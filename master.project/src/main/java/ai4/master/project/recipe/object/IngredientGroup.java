@@ -23,6 +23,6 @@ public class IngredientGroup extends Ingredient {
 
 	@Override
 	public String toString() {
-		return "IngredientGroup [name=" + getName() + ", ingredients=" + ingredients + "]";
+		return "IngredientGroup [name=" + getName() + ", ingredients=" + ingredients + ", tags=" + getTags() + "]";
 	}
 }

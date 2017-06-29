@@ -58,7 +58,7 @@ public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookin
 		List<Ingredient> transformedIngredients = new ArrayList<Ingredient>();
 		for(Transformation transformation : transformations) {
 			if(transformation.matches(ingredient, list)) {
-				if(ingredient instanceof IngredientGroup) {
+				if(ingredient instanceof IngredientGroup && !((IngredientGroup) ingredient).getIngredients().isEmpty()) {
 					for(Ingredient i : ((IngredientGroup) ingredient).getIngredients()) {
 						transformedIngredients.add(transformation.transform(i, list));
 					}
@@ -105,7 +105,6 @@ public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookin
 		sB.append("</transformations>");
 		sB.append("<tools>");
 		for(BaseTool tool : implicitTools) {
-			sB.append("<Tool name=\"");
 			sB.append(tool.getNames().iterator().next());
 			sB.append("\" />");
 		}

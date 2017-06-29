@@ -7,6 +7,8 @@ import ai4.master.project.recipe.object.Ingredient;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO remove überprüfen, da nicht alle bzw falsche objeckte beim parsen entfernt werden 
+
 public class IngredientList extends ArrayList<Ingredient> {
 
 	private static final long serialVersionUID = 1L;
@@ -21,11 +23,16 @@ public class IngredientList extends ArrayList<Ingredient> {
 				}
 			}
 		} else {
-			for(Ingredient ingredient : this) {
+			Ingredient best = null;
+			for(Ingredient ingredient : this) { 
 				if(ingredient.getBaseObject() == baseIngredient) {
-					ingredients.add(ingredient);
+					if(best == null || best.getTags().size() < ingredient.getTags().size()) {
+						best = ingredient;
+					}
 				}
 			}
+			if(best != null)
+				ingredients.add(best);
 		}
 		
 		return ingredients;
@@ -38,7 +45,6 @@ public class IngredientList extends ArrayList<Ingredient> {
 				ri.add(i);
 			}
 		}
-		
 		removeAll(ri);
 	}
 	public boolean contains(BaseIngredient bi) {

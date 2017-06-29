@@ -349,9 +349,13 @@
 			<Name>Eierkocher</Name>
 		</Tool>
 		<Tool>
+			<Name>Grill</Name>
+		</Tool>
+		<Tool>
 			<Name>Elektrogrill</Name>
 		</Tool>
 		<Tool>
+			<Name>Herd</Name>
 			<Name>Elektroherd</Name>
 		</Tool>
 		<Tool>
@@ -481,6 +485,14 @@
 		</Group>
 		<Group>
 			<Name>Sahne</Name>
+		</Group>
+		<Group>
+			<Name>Brot</Name>
+		</Group>
+		<Group>
+			<Name>Sauce</Name>
+			<Name>Sosse</Name>
+			<Name>Soße</Name>
 		</Group>
 	</groups>
 	<ingredients>
@@ -669,6 +681,7 @@
 		<Ingredient>
 			<Name>Feta-Käse</Name>
 			<Name>Feta</Name>
+			<Name>Schafskäse</Name>
 			<groups>
 				<Group name="Käsewürfel" />
 			</groups>
@@ -716,6 +729,33 @@
 			<Name>Mischung</Name>
 			<groups></groups>
 		</Ingredient>
+		<Ingredient>
+			<Name>Zitronensaft</Name>
+			<groups>
+				<Group name="Flüssigkeit" />
+			</groups>	
+		</Ingredient>
+		<Ingredient>
+			<Name>Kirschtomate</Name>
+			<groups>
+				<Group name="Gemüse" />
+			</groups>
+		</Ingredient>
+		<Ingredient>
+			<Name>Pitabrot</Name>
+			
+			<groups>
+				<Group name="Brot" />
+			</groups>
+		</Ingredient>
+		<Ingredient>
+			<Name>Tomatensoße</Name>
+			<Name>Tomatensosse</Name>
+			<Name>Tomatensauce</Name>
+			<groups>
+				<Group name="Sauce" />
+			</groups>
+		</Ingredient>
 	</ingredients>
 	<cookingActions>
 		<CookingAction>
@@ -734,8 +774,10 @@
 		<CookingAction>
 			<Name>bestreichen</Name>
 			<Name>streichen</Name>
+			<Name>bepinseln</Name>
 			<regs>
 				<Regex result="first" ingredientsNeeded="true">.*~INGREDIENT.*mit.*~INGREDIENT.*~ACTION.*</Regex>
+				<Regex result="prev" ingredientsNeeded="true">.*mit.*~INGREDIENT.*~ACTION.*</Regex>
 				<Regex result="last" ingredientsNeeded="true">.*~INGREDIENT.*auf.*~INGREDIENT.*~ACTION.*</Regex>
 			</regs>
 			<transformations>
@@ -744,6 +786,9 @@
 					<AddIngredientTag>bestrichen</AddIngredientTag>
 				</Transformation>
 			</transformations>
+			<tools>
+				<Tool name="Pinsel"/>
+			</tools>
 		</CookingAction>
 		<CookingAction>
 			<Name>klappen</Name>
@@ -810,21 +855,6 @@
 		<CookingAction>
 			<Name>schneiden</Name>
 			<regs>
-				<Regex result="all" ingredientsNeeded="true">.*Kern.*heraus.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>entkernt</AddIngredientTag>
-				</Transformation>
-			</transformations>
-			<tools>
-				<Tool name="Messer" />
-			</tools>
-		</CookingAction>
-		<CookingAction>
-			<Name>schneiden</Name>
-			<regs>
 				<Regex result="all" ingredientsNeeded="true">.*</Regex>
 			</regs>
 			<transformations>
@@ -833,6 +863,9 @@
 					<AddIngredientTag>geschnitten</AddIngredientTag>
 				</Transformation>
 			</transformations>
+			<tools>
+				<Tool name="Messer" />
+			</tools>
 		</CookingAction>
 		<CookingAction>
 			<Name>drehen</Name>
@@ -847,8 +880,12 @@
 		<CookingAction>
 			<Name>legen</Name>
 			<Name>auflegen</Name>
-			<regs></regs>
-			<transformations></transformations>
+			<regs>
+				<Regex result="first">.*</Regex>
+			</regs>
+			<transformations>
+				<Transformation></Transformation>
+			</transformations>
 		</CookingAction>
 		<CookingAction>
 			<Name>backen</Name>
@@ -880,11 +917,12 @@
 		</CookingAction>
 		<CookingAction>
 			<Name>verrühren</Name>
-			<regs></regs>
+			<regs>
+				<Regex result="first">.*</Regex>
+			</regs>
 			<transformations>
 				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>verrührt</AddIngredientTag>
+					<AddIngredientTag>verrührt mit INGREDIENT</AddIngredientTag>
 				</Transformation>
 			</transformations>
 			<tools>
@@ -969,8 +1007,9 @@
 			<Name>wickeln</Name>
 			<Name>umwickeln</Name>
 			<regs>
-				<Regex result="first" ingredientsNeeded="true">~INGREDIENT.*mit.*~INGREDIENT.*umwickeln</Regex>
+				<Regex result="first" ingredientsNeeded="true">~INGREDIENT.*mit.*~INGREDIENT.*wickeln</Regex>
 				<Regex result="last" ingredientsNeeded="true">~INGREDIENT.*um.*~INGREDIENT.*wickeln</Regex>
+				<Regex result="first" ingredientsNeeded="true">.*</Regex>
 			</regs>
 			<transformations>
 				<Transformation>
@@ -982,9 +1021,11 @@
 		<CookingAction>
 			<Name>stellen</Name>
 			<regs>
-				<Regex result="no_result" ingredientsNeeded="false">^(?!.*~INGREDIENT).*</Regex>
+				<Regex result="all" ingredientsNeeded="true">.*</Regex>
 			</regs>
-			<transformations></transformations>
+			<transformations>
+				<Transformation></Transformation>
+			</transformations>
 		</CookingAction>
 		<CookingAction>
 			<Name>drücken</Name>
@@ -1114,6 +1155,88 @@
 				<Regex result="no_result">.*</Regex>
 			</regs>
 		</CookingAction>
+		<CookingAction>
+			<Name>kneten</Name>
+			<regs>
+				<Regex result="first">.*</Regex>
+			</regs>
+			<transformations>
+				<Transformation>
+					<AddIngredientTag>gekentet</AddIngredientTag>
+				</Transformation>
+			</transformations>
+		</CookingAction>
+		<CookingAction>
+			<Name>träufeln</Name>
+			<regs>
+				<Regex result="first" referencePreviousProducts="true">(und )?über.*</Regex>
+				<Regex result="last">.*</Regex>
+			</regs>
+			<transformations>
+				<Transformation>
+					<AddIngredientTag>INGREDIENT darauf geträufelt</AddIngredientTag>
+				</Transformation>
+			</transformations>
+		</CookingAction>
+		<CookingAction>
+			<Name>wenden</Name>
+			<regs>
+				<Regex result="all">.*</Regex>
+			</regs>
+			<transformations>
+				<Transformation><AddIngredientTag>gewendet</AddIngredientTag></Transformation>
+			</transformations>
+			<tools>
+				<Tool name="Pfannenwender" />
+				<Tool name="Gabel" />
+			</tools>
+		</CookingAction>
+		<CookingAction>
+			<Name>hobeln</Name>
+			<regs>
+				<Regex result="all">.*</Regex>
+			</regs>
+			<transformations>
+				<Transformation><AddIngredientTag>gehobelt</AddIngredientTag></Transformation>
+			</transformations>
+		</CookingAction>
+		<CookingAction>
+			<Name>stecken</Name>
+			<regs>
+				<Regex result="all">.*Spieß.*</Regex>
+			</regs>
+			<transformations>
+				<Transformation><AddIngredientTag>auf einen Spieß gesteckt</AddIngredientTag></Transformation>
+			</transformations>
+		</CookingAction>
+		<CookingAction>
+			<Name>abschließen</Name>
+			<regs>
+				<Regex result="prev">(und )?mit.*</Regex>
+			</regs>
+			<transformations>
+				<Transformation><AddIngredientTag>abgeschlossen mit INGREDIENT</AddIngredientTag></Transformation>
+			</transformations>
+		</CookingAction>
+		<CookingAction>
+			<Name>grillen</Name>
+			<regs>
+				<Regex result="all">.*</Regex>
+			</regs>
+			<transformations>
+				<Transformation><AddIngredientTag>gegrillt</AddIngredientTag></Transformation>
+			</transformations>
+			<tools>
+				<Tool name="Grill"/>
+			</tools>
+		</CookingAction>
+		<CookingAction>
+			<Name>servieren</Name>
+			<regs>
+				<Regex result="no_result" referencePreviousProducts="true">(und )?(M|m)it.*</Regex>
+				<Regex result="no_result">.*</Regex>
+			</regs>
+		</CookingAction>
 	</cookingActions>
 	<partIndicators>
 		<PartIndicator>Teil</PartIndicator>
@@ -1128,4 +1251,11 @@
 		<LastSentenceReference>dazu</LastSentenceReference>
 		<LastSentenceReference>beides</LastSentenceReference>
 	</lastSentenceReferences>
+	<eventIndicators>
+		<EventIndicator>solange</EventIndicator>
+		<EventIndicator>bis</EventIndicator>
+		<EventIndicator>Stunde</EventIndicator>
+		<EventIndicator>Sekunden</EventIndicator>
+		<EventIndicator>Minuten</EventIndicator>
+	</eventIndicators>
 </root>

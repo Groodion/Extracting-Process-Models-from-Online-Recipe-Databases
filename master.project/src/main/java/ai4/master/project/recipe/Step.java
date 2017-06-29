@@ -68,6 +68,36 @@ public class Step {
 		return "Step [ingredients=" + ingredients + ", tools=" + tools + ", cookingAction=" + cookingAction + ", products="
 				+ products + ", \'" + text + "']";
 	}
+	public String toEasyToReadString() {
+		StringBuilder sB = new StringBuilder();
+		
+		sB.append("Step [\n");
+		sB.append("\tingredients=[\n");
+		for(Ingredient i : ingredients) {
+			sB.append("\t\t" + i + "\n");
+		}
+		sB.append("\t],\n");
+		sB.append("\ttools=[\n");
+		for(Tool t: tools) {
+			sB.append("\t\t" + t + "\n");
+		}
+		sB.append("\t],\n");
+		sB.append("\tcookingAction=" + cookingAction + ",\n");
+		sB.append("\tproducts=[\n");
+		for(Ingredient i : products) {
+			sB.append("\t\t" + i + "\n");
+		}
+		sB.append("\t],\n");
+		sB.append("\tevents=[\n");
+		for(CookingEvent e : events) {
+			sB.append("\t\t" + e + "\n");
+		}
+		sB.append("\t],\n");
+		sB.append("\t'" + text + "'\n");
+		sB.append("]");
+		
+		return sB.toString();
+	}
 
 	public String printIngredients(){
 		StringBuilder stringBuilder = new StringBuilder();

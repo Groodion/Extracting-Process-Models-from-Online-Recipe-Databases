@@ -1,6 +1,7 @@
 package ai4.master.project.recipe.baseObject;
 
 import ai4.master.project.recipe.object.Ingredient;
+import ai4.master.project.recipe.object.IngredientGroup;
 import ai4.master.project.recipe.object.ingredientTag.IngredientTag;
 import ai4.master.project.recipe.object.ingredientTag.QuantifierTag;
 
@@ -75,7 +76,7 @@ public class Transformation {
 			if(tag.getName().contains("INGREDIENT")) {
 				Ingredient product = ingredient;
 				for(Ingredient i : list) {
-					if(ingredient != i) {
+					if(!(ingredient == i || (i instanceof IngredientGroup && ((IngredientGroup)i).getIngredients().contains(ingredient)))) {
 						product = product.tag(tag.replace(i));
 					}
 				}
@@ -103,14 +104,16 @@ public class Transformation {
 			sB.append("<Ingredient name=\"");
 			sB.append(product.getName());
 			sB.append("\"/>");			
-		} else if(tag instanceof QuantifierTag) {
-			sB.append("<AddQuantifierTag>");
-			sB.append(tag.getName());
-			sB.append("</AddQuantifierTag>");
-		} else {
-			sB.append("<AddIngredientTag>");
-			sB.append(tag.getName());
-			sB.append("</AddIngredientTag>");
+		} else if(tag != null) {
+			if(tag instanceof QuantifierTag) {
+				sB.append("<AddQuantifierTag>");
+				sB.append(tag.getName());
+				sB.append("</AddQuantifierTag>");
+			} else {
+				sB.append("<AddIngredientTag>");
+				sB.append(tag.getName());
+				sB.append("</AddIngredientTag>");
+			}
 		}
 		sB.append("</Transformation>");
 		

@@ -1,6 +1,7 @@
 package ai4.master.project.recipe.object;
 
 import ai4.master.project.recipe.baseObject.BaseIngredient;
+import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
 import ai4.master.project.recipe.object.ingredientTag.IngredientTag;
 import ai4.master.project.recipe.object.ingredientTag.QuantifierTag;
 
@@ -28,7 +29,9 @@ public class Ingredient extends NamedObject<BaseIngredient> {
 	 * @return getaggede Kopie der Zutat
 	 */
 	public Ingredient tag(IngredientTag tag) {
-		Ingredient taggedIngredient = new Ingredient(getName(), getBaseObject());
+		Ingredient taggedIngredient;
+		if(this instanceof IngredientGroup) taggedIngredient = new IngredientGroup(getName(), (BaseIngredientGroup) getBaseObject());
+		else 								taggedIngredient = new Ingredient(getName(), getBaseObject());
 		
 		taggedIngredient.getTags().addAll(tags);
 		taggedIngredient.getTags().add(tag);
