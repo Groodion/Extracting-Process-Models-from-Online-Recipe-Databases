@@ -472,6 +472,9 @@
 			<Name>Fleisch</Name>
 		</Group>
 		<Group>
+			<Name>Schinken</Name>
+		</Group>
+		<Group>
 			<Name>Wurst</Name>
 		</Group>
 		<Group>
@@ -490,9 +493,32 @@
 			<Name>Brot</Name>
 		</Group>
 		<Group>
+			<Name>Butter</Name>
+		</Group>
+		<Group>
 			<Name>Sauce</Name>
 			<Name>Sosse</Name>
 			<Name>Soße</Name>
+		</Group>
+		<Group>
+			<Name>Kraut</Name>
+			<Name>Kräuter</Name>
+		</Group>
+		<Group>
+			<Name>Obst</Name>
+			<Name>Frucht</Name>
+		</Group>
+		<Group>
+			<Name>Brühe</Name>
+		</Group>
+		<Group>
+			<Name>Reis</Name>
+		</Group>
+		<Group>
+			<Name>Pilz</Name>
+		</Group>
+		<Group>
+			<Name>Nudel</Name>
 		</Group>
 	</groups>
 	<ingredients>
@@ -524,15 +550,23 @@
 		</Ingredient>
 		<Ingredient>
 			<Name>Paniermehl</Name>
-			<groups></groups>
+			<groups>
+				<Group name="Mehl" />
+			</groups>
 		</Ingredient>
 		<Ingredient>
+			<Name>Vorderschinken</Name>
 			<Name>Schinkenwürfel</Name>
-			<groups></groups>
+			<groups>
+				<Group name="Fleisch" />
+				<Group name="Schinken "/>
+			</groups>
 		</Ingredient>
 		<Ingredient>
 			<Name>Kartoffel</Name>
-			<groups></groups>
+			<groups>
+				<Group name="Gemüse" />
+			</groups>
 		</Ingredient>
 		<Ingredient>
 			<Name>Wasser</Name>
@@ -547,36 +581,36 @@
 			</groups>
 		</Ingredient>
 		<Ingredient>
-			<Name>Butter</Name>
-			<groups></groups>
-		</Ingredient>
-		<Ingredient>
 			<Name>Fleischbrühe</Name>
-			<groups></groups>
+			<groups>
+				<Group name="Brühe" />
+				<Group name="Flüssigkeit" />
+			</groups>
 		</Ingredient>
 		<Ingredient>
 			<Name>Salz</Name>
-			<groups></groups>
+			<groups>
+				<Group name="Gewürz" />
+			</groups>
 		</Ingredient>
 		<Ingredient>
 			<Name>Pfeffer</Name>
-			<groups></groups>
+			<groups>
+				<Group name="Gewürz"/>
+			</groups>
 		</Ingredient>
 		<Ingredient>
 			<Name>Rosmarin</Name>
-			<groups></groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Mehl</Name>
-			<groups></groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Hefe</Name>
-			<groups></groups>
+			<groups>
+				<Group name="Kraut" />
+				<Group name="Gewürz" />
+			</groups>
 		</Ingredient>
 		<Ingredient>
 			<Name>Zucker</Name>
-			<groups></groups>
+			<groups>
+				<Group name="Gewürz" />
+			</groups>
 		</Ingredient>
 		<Ingredient>
 			<Name>Kuhmilch</Name>
@@ -587,6 +621,10 @@
 		</Ingredient>
 		<Ingredient>
 			<Name>Hefemilch</Name>
+			<groups>
+				<Group name="Milch"/>
+				<Group name="Flüssigkeit"/>
+			</groups>
 		</Ingredient>
 		<Ingredient>
 			<Name>Hefeteig</Name>
@@ -599,7 +637,9 @@
 		</Ingredient>
 		<Ingredient>
 			<Name>Pflaumen</Name>
-			<groups></groups>
+			<groups>
+				<Group name="Obst" />
+			</groups>
 		</Ingredient>
 		<Ingredient>
 			<Name>Zwiebackbrösel</Name>
@@ -613,7 +653,9 @@
 		</Ingredient>
 		<Ingredient>
 			<Name>Zimt</Name>
-			<groups></groups>
+			<groups>
+				<Group name="Gewürz" />
+			</groups>
 		</Ingredient>
 		<Ingredient>
 			<Name>Erdnussöl</Name>
@@ -635,9 +677,18 @@
 			</groups>
 		</Ingredient>
 		<Ingredient>
+			<Name>Thunfisch</Name>
+			<groups>
+				<Group name="Fisch" />
+			</groups>
+		</Ingredient>
+		<Ingredient>
 			<Name>Speck</Name>
 			<Name>Bacon</Name>
-			<groups></groups>
+			<groups>
+				<Group name="Schinken" />
+				<Group name="Fleisch" />
+			</groups>
 		</Ingredient>
 		<Ingredient>
 			<Name>Brokkoli</Name>
@@ -648,7 +699,9 @@
 		<Ingredient>
 			<Name>Champignon</Name>
 			<Name>Champignons</Name>
-			<groups></groups>
+			<groups>
+				<Group name="Pilz" />
+			</groups>
 		</Ingredient>
 		<Ingredient>
 			<Name>Zwiebel</Name>
@@ -668,6 +721,7 @@
 			<Name>Chiliflocken</Name>
 			<Name>Chilipulver</Name>
 			<groups>
+				<Group name="Gewürz" />
 				<Group name="Gemüse" />
 			</groups>
 		</Ingredient>
@@ -696,34 +750,55 @@
 			<Name>Maggi</Name>
 			<groups>
 				<Group name="Gewürz" />
+				<Group name="Kraut" />
 			</groups>
 		</Ingredient>
 		<Ingredient>
 			<Name>Tomate</Name>
+			<Name>Pizzatomaten</Name>
 			<groups>
 				<Group name="Gemüse" />
 			</groups>
 		</Ingredient>
 		<Ingredient>
-			<Name>Reis</Name>
-			<groups></groups>
+			<Name>Schmelzkäse</Name>
+			<groups>
+				<Group name="Käse" />
+			</groups>
+		</Ingredient>
+		<Ingredient>
+			<Name>Basilikum</Name>
+			<groups>
+				<Group name="Gewürz" />
+				<Group name="Kraut" />
+			</groups>
 		</Ingredient>
 		<Ingredient>
 			<Name>Knoblauch</Name>
 			<Name>Knoblauchzehe</Name>
-			<groups></groups>
+			<groups>
+				<Group name="Gewürz" />
+			</groups>
 		</Ingredient>
 		<Ingredient>
 			<Name>Oregano</Name>
-			<groups></groups>
+			<groups>
+				<Group name="Gewürz" />
+				<Group name="Kraut" />
+			</groups>
 		</Ingredient>
 		<Ingredient>
 			<Name>Weißwein</Name>
-			<groups></groups>
+			<groups>
+				<Group name="Wein" />
+			</groups>
 		</Ingredient>
 		<Ingredient>
 			<Name>Gemüsebrühe</Name>
-			<groups></groups>
+			<groups>
+				<Group name="Brühe" />
+				<Group name="Flüssigkeit" />
+			</groups>
 		</Ingredient>
 		<Ingredient>
 			<Name>Mischung</Name>
@@ -755,6 +830,9 @@
 			<groups>
 				<Group name="Sauce" />
 			</groups>
+		</Ingredient>
+		<Ingredient>
+			<Name>Tomatenmark</Name>
 		</Ingredient>
 	</ingredients>
 	<cookingActions>
