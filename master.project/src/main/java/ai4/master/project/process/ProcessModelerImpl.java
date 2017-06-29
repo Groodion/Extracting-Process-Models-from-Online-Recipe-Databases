@@ -31,6 +31,8 @@ public class ProcessModelerImpl implements ProcessModeler {
     // TODO Add a possibility to use a parallel or a XOR gateway using nodes isXor
 
 
+    private String fileName = "test";
+
     BpmnModelInstance modelInstance;
     List<UserTask> userTasks = new ArrayList<>();
     List<SequenceFlow> flows = new ArrayList<>();
@@ -207,7 +209,7 @@ public class ProcessModelerImpl implements ProcessModeler {
                     if (!gateExists("parallel_gateway_" + node.getData().getText())) {
                         System.out.println("Creating a parallel gateway for" + node.getData().getText());
 
-                        parallelGateway = createElement(process, "parallel_gateway_" + node.getData().getText(), "parallel_gateway_" + node.getData().getText(), ParallelGateway.class, plane, taskX, taskY, 30, 30, false);
+                        parallelGateway = createElement(process, "parallel_gateway_" + createIdOf(node.getData().getText()), "parallel_gateway_" + node.getData().getText(), ParallelGateway.class, plane, taskX, taskY, 30, 30, false);
                         gates.add(parallelGateway);
                         incXby(150);
                         // First we need to connect the parent to the parallel gateway.
@@ -415,6 +417,11 @@ public class ProcessModelerImpl implements ProcessModeler {
         s = s.replace("ü", "ue");
         s = s.replace(",", "");
         s = s.replace(".", "");
+        s = s.replace("/","_durch_");
+        s = s.replace("°", "_Grad_");
+        s = s.replace(":","_");
+        s = s.replace("(","_");
+        s = s.replace(")","_");
         return s.replace(" ", "_");
     }
 
@@ -425,8 +432,8 @@ public class ProcessModelerImpl implements ProcessModeler {
      */
     public void createXml() {
         Bpmn.validateModel(modelInstance);
-
-        XMLWriter xmlWriter = new XMLWriter("test-from-recipe");
+        System.out.println("Writing to " + fileName);
+        XMLWriter xmlWriter = new XMLWriter(fileName);
         xmlWriter.writeTo(Bpmn.convertToString(modelInstance));
     }
 
@@ -437,5 +444,9 @@ public class ProcessModelerImpl implements ProcessModeler {
 
     private void incYby(int value) {
         this.taskY += value;
+    }
+
+    public void setFileName(String name){
+        this.fileName = name;
     }
 }

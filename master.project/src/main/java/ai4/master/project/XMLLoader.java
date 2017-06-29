@@ -74,7 +74,7 @@ public class XMLLoader {
 			}
 		}
 		
-		System.out.println(kwdb.toXML());
+//		System.out.println(kwdb.toXML());
 		
 		return kwdb;
 	}
