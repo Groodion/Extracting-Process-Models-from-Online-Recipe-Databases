@@ -23,7 +23,7 @@ public class RecipeToTreeConverter {
         treeList.add(tree);
 
         List<Step> steps = recipe.getSteps();
-        translateSteps(steps);
+       // translateSteps(steps);
         for (int i = 0; i < steps.size(); i++) {
             if (i == 0) {
                 //If i = 0 we need to add it as the root because its the first node.
@@ -108,19 +108,4 @@ public class RecipeToTreeConverter {
         return false;
     }
 
-
-
-    private void translateSteps(List<Step> steps){
-        for (Step s:
-                steps){
-
-            s.setText(s.getText().replace("ä","ae"));
-            s.setText(s.getText().replace("ö","oe"));
-            s.setText(s.getText().replace("ü","ue"));
-            s.setText(s.getText().replace(",",""));
-            s.setText(s.getText().replace(".",""));
-
-
-        }
-    }
 }

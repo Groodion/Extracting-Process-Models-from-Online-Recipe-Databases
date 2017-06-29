@@ -31,21 +31,19 @@ public class ProcessModelerImpl implements ProcessModeler {
     // TODO Add a possibility to use a parallel or a XOR gateway using nodes isXor
 
 
-    private int taskX = 100;
-    private int taskY = 50;
-    private int tempX = 0; //for the position of the start node
-
-    private int userTaskHeight = 80;
-    private int userTaskWidth = 100;
-    /*
-    If a node has more than one children we need a parallel gate. So maybe we could call a method that creates everything starting from there (the gate) on?
-    We give the method the "subtree" and create the BPMN Model from there on and return and append it maybe.
-     */
-
     BpmnModelInstance modelInstance;
     List<UserTask> userTasks = new ArrayList<>();
     List<SequenceFlow> flows = new ArrayList<>();
     List<ParallelGateway> gates = new ArrayList<>();
+    private int taskX = 100;
+    /*
+    If a node has more than one children we need a parallel gate. So maybe we could call a method that creates everything starting from there (the gate) on?
+    We give the method the "subtree" and create the BPMN Model from there on and return and append it maybe.
+     */
+    private int taskY = 50;
+    private int tempX = 0; //for the position of the start node
+    private int userTaskHeight = 80;
+    private int userTaskWidth = 100;
 
     public BpmnModelInstance convertToProcess(Recipe recipe) {
 
@@ -257,9 +255,9 @@ public class ProcessModelerImpl implements ProcessModeler {
 
                 System.out.println("Node " + node.getData().getText() + " parent size: " + node.getParent().getChildren().size());
 
-               // TODO this doesn't work as expected but it works somehow..
+                // TODO this doesn't work as expected but it works somehow..
                 if (node.getParent().getChildren().size() > 1) {
-                    incYby(150);
+                    // incYby(150);
                 } else {
                     taskY = tempTaskY;
                     incXby(150);
@@ -411,8 +409,13 @@ public class ProcessModelerImpl implements ProcessModeler {
     /*
     Creates a ID by replacing all spaces with _
      */
-    private String createIdOf(String input) {
-        return input.replace(" ", "_");
+    private String createIdOf(String s) {
+        s = s.replace("ä", "ae");
+        s = s.replace("ö", "oe");
+        s = s.replace("ü", "ue");
+        s = s.replace(",", "");
+        s = s.replace(".", "");
+        return s.replace(" ", "_");
     }
 
     /**
