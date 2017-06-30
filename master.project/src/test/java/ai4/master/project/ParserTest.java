@@ -20,8 +20,8 @@ public class ParserTest {
 		"43611014899035"
 	};
     public static void main(String[] args) throws Exception {
-    	testParser();
-//    	testProcessModeler();
+//    	testParser();
+    	testProcessModeler();
     }
     
 	public static void testParser() throws Exception {
@@ -53,6 +53,11 @@ public class ParserTest {
             try {
                 Recipe recipe = new RecipeGetterChefkoch().getRecipe(currentRecipe);
                 parser.parseRecipe(recipe);
+                
+        		for(Step step : recipe.getSteps()) {
+        			System.out.println(step.toEasyToReadString());
+        		}
+
                 //Now steps are saved in recipe
                 ProcessModeler processModeler = new ProcessModelerImpl();
                 processModeler.setFileName(currentRecipe + "toBpmn");

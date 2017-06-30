@@ -179,7 +179,7 @@ public class ProcessModelerImpl implements ProcessModeler {
 
     }
 
-
+    int i = 0;
     /*
     Creates connection to children. Every parent is connected to every children. If there are more than one children we need a gateway in between.
      */
@@ -206,7 +206,7 @@ public class ProcessModelerImpl implements ProcessModeler {
                     }
                 } else if (node.getChildren().size() > 1) {
                     ParallelGateway parallelGateway = null;
-                    if (!gateExists("parallel_gateway_" + node.getData().getText())) {
+                    if (!gateExists("parallel_gateway_" + createIdOf(node.getData().getText()))) {
                         System.out.println("Creating a parallel gateway for" + node.getData().getText());
 
                         parallelGateway = createElement(process, "parallel_gateway_" + createIdOf(node.getData().getText()), "parallel_gateway_" + node.getData().getText(), ParallelGateway.class, plane, taskX, taskY, 30, 30, false);
