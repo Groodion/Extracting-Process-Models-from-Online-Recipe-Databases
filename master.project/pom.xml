@@ -63,13 +63,13 @@
 			<artifactId>snowball-stemmer</artifactId>
 			<version>1.3.0.581.1</version>
 		</dependency>
- -->	<dependency>
+ 	<dependency>
 			<groupId>stanford-german-corenlp-2016-10-31-models</groupId>
 			<artifactId>stanford-german-corenlp-2016-10-31-models</artifactId>
 			<scope>system</scope>
 			<version>3.7.0</version>
 			<systemPath>${basedir}\lib\stanford-german-corenlp-2016-10-31-models.jar</systemPath>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>stanford-postagger-3.7.0</groupId>
 			<artifactId>stanford-postagger-3.7.0</artifactId>
