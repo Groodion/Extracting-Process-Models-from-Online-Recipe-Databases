@@ -1,6 +1,7 @@
 package ai4.master.project.process;
 
 import ai4.master.project.output.XMLWriter;
+import ai4.master.project.recipe.CookingEvent;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
 import ai4.master.project.recipe.object.Ingredient;
@@ -91,7 +92,7 @@ public class ProcessModelerImpl implements ProcessModeler {
         // validate and write model to file
         Bpmn.validateModel(modelInstance);
         createXml();
-        System.out.println(Bpmn.convertToString(modelInstance));
+      //  System.out.println(Bpmn.convertToString(modelInstance));
 
         System.out.println("----");
 
@@ -254,7 +255,21 @@ public class ProcessModelerImpl implements ProcessModeler {
             if (!idExists(createIdOf(node.getData().getText()))) { //Avoid duplicates by having more than one dependence which creates two parts in the tree.
 
                 UserTask userTask = createElement(process, createIdOf(node.getData().getText()), node.getData().getText(), UserTask.class, plane, taskX, taskY, userTaskHeight, userTaskWidth, false);
+                List<CookingEvent> events =  node.getData().getEvents();
 
+                for(CookingEvent event : events){
+                   // BoundaryEvent boundaryEvent = createElement(process, createIdOf(event.getText()), event.getText(), BoundaryEvent.class, plane, taskX, taskY, 30, 30, true);
+                   // userTask.setCamundaAsyncBefore(true);
+                   userTask.builder().boundaryEvent().timerWithDuration(event.getText());
+
+                 //  List<TimeDuration> bEvents = (List<TimeDuration>) userTask.getChildElementsByType(TimeDuration.class);
+                   // System.out.println(bEvents.size() + "bEvents size");
+                  /*  if(event.getPos() == Position.BEFORE){
+                        userTask.builder().boundaryEvent().timerWithDuration(event.getText());
+                    }else{
+                        userTask.builder().boundaryEvent().timerWithDuration(event.getText());
+                    }*/
+                }
                 System.out.println("Node " + node.getData().getText() + " parent size: " + node.getParent().getChildren().size());
 
                 // TODO this doesn't work as expected but it works somehow..

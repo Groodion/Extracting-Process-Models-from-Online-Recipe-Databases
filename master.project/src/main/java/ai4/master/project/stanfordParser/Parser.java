@@ -1,12 +1,7 @@
-﻿package ai4.master.project.stanfordParser;
+package ai4.master.project.stanfordParser;
 
 import ai4.master.project.KeyWordDatabase;
-import ai4.master.project.recipe.CookingEvent;
-import ai4.master.project.recipe.EventType;
-import ai4.master.project.recipe.IngredientList;
-import ai4.master.project.recipe.Position;
-import ai4.master.project.recipe.Recipe;
-import ai4.master.project.recipe.Step;
+import ai4.master.project.recipe.*;
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.Regex;
@@ -44,7 +39,7 @@ public class Parser {
 	
 	private List<Sentence> analyzeText(String text) {
 		List<Sentence> sentences = new ArrayList<Sentence>();
-		//Text wird in s�tze zerlegt
+		//Text wird in saetze zerlegt
 		List<List<TaggedWord>> taggedList = tagger.process(getSplittedSentencesFromString(text));
 		Sentence sentence = null;
 		
