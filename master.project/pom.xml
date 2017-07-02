@@ -82,12 +82,5 @@
 			<artifactId>opennlp-tools</artifactId>
 			<version>1.8.0</version>
 		</dependency>
-		<dependency>
-			<groupId>java-fx</groupId>
-			<artifactId>jfxrt</artifactId>
-			<scope>system</scope>
-			<version>1.0</version>
-			<systemPath>${basedir}\lib\jfxrt.jar</systemPath>
-		</dependency>
 	</dependencies>
 </project>

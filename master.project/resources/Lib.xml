@@ -933,14 +933,11 @@
 		<CookingAction>
 			<Name>schneiden</Name>
 			<regs>
-				<Regex result="all" ingredientsNeeded="true" id="KernRegex">.*Kern.*heraus</Regex>
 				<Regex result="all" ingredientsNeeded="true">.*</Regex>
 			</regs>
 			<transformations>
-				<Transformation regexRefIds="KernRegex">
-					<AddIngredientTag>entkernt</AddIngredientTag>
-				</Transformation>
 				<Transformation>
+					<ingredients></ingredients>
 					<AddIngredientTag>geschnitten</AddIngredientTag>
 				</Transformation>
 			</transformations>

@@ -43,17 +43,7 @@ public class XMLLoader {
 	public static final String ELEMENT_ADD_INGREDIENT_TAG = "AddIngredientTag";
 	public static final String ELEMENT_ADD_QUANTIFIER_TAG = "AddQuantifierTag";
 
-	public KeyWordDatabase load_noException(String filePath) {
-		KeyWordDatabase kwdb = null;
-		
-		try {
-			kwdb = load(new URL("file", "", filePath));
-		} catch(Exception e) {
-			
-		}
-		
-		return kwdb;
-	}
+	
 	/**
 	 * Loads XML-File from URL and puts the elements into lists
 	 *

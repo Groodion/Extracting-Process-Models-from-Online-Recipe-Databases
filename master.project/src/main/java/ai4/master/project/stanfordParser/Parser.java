@@ -123,8 +123,6 @@ public class Parser {
 	}
 
 	public void parseRecipe(Recipe recipe) {
-		recipe.getSteps().clear();
-		
 		String text = recipe.getPreparation();
 		recipe.setPreparation(text);
 

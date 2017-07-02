@@ -13,8 +13,6 @@ import java.util.List;
 
 public class KeyWordDatabase {
 	
-	public static final KeyWordDatabase KWDB_GERMAN = new XMLLoader().load_noException("resources/Lib.xml");
-	
 	private List<BaseTool> tools;
 	private List<BaseIngredient> ingredients;
 	private List<BaseCookingAction> cookingActions;
@@ -23,7 +21,6 @@ public class KeyWordDatabase {
 	private List<String> lastSentenceReferences;
 	private List<String> conditionIndicators;
 	private List<String> eventIndicators;
-	
 	
 	public KeyWordDatabase() {
 		tools = new ArrayList<BaseTool>();
