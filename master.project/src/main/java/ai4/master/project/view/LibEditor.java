@@ -229,7 +229,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 
 	public void initializeComponents() throws Exception {
 		loader = new XMLLoader();
-		kwdb = loader.load(new URL("file:///C:\\Users\\Public\\Lib.xml"));
+		kwdb = KeyWordDatabase.KWDB_GERMAN;
 
 		initializeToolsPane();
 		initializeGroupsPane();
