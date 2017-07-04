@@ -23,7 +23,7 @@
 <!ELEMENT transformations (Transformation*)>
 <!ELEMENT Transformation (ingredients?, (AddIngredientTag | AddQuantifierTag | Ingredient)?)>
 <!ATTLIST Transformation
-	regexRefIds CDATA
+	regexRefIds CDATA #IMPLIED
 >
 <!ELEMENT AddIngredientTag (#PCDATA)>
 <!ELEMENT AddQuantifierTag (#PCDATA)>
@@ -31,7 +31,7 @@
 <!ELEMENT regs (Regex*)>
 <!ELEMENT Regex (#PCDATA)>
 <!ATTLIST Regex
-	id CDATA
+	id CDATA #IMPLIED
 	result (first|last|all|prev|no_result) "first"
 	ingredientsNeeded (true|false) "true"
 	referencePreviousProducts (true|false) "false"

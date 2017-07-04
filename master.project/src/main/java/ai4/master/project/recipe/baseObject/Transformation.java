@@ -13,10 +13,12 @@ public class Transformation {
 	private Ingredient product;
 	private List<Ingredient> mandatoryIngredients;
 	private IngredientTag tag;
+	private List<String> regexIds;
 	
 	
 	public Transformation() {
 		mandatoryIngredients = new ArrayList<Ingredient>();
+		regexIds = new ArrayList<String>();
 	}
 	
 	public Ingredient getProduct() {
@@ -30,6 +32,9 @@ public class Transformation {
 	}
 	public void setTag(IngredientTag tag) {
 		this.tag = tag;
+	}
+	public List<String> getRegexIds() {
+		return regexIds;
 	}
 
 	public List<Ingredient> getMandatoryIngredients() {

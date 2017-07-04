@@ -7,20 +7,20 @@
 	<groupId>ai4</groupId>
 	<artifactId>master.project</artifactId>
 	<version>1.0-SNAPSHOT</version>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
-    <dependencies>
+	<dependencies>
 		<!-- https://mvnrepository.com/artifact/org.jdom/jdom2 -->
 		<dependency>
 			<groupId>org.jdom</groupId>
@@ -58,18 +58,11 @@
 			<artifactId>stanford-corenlp</artifactId>
 			<version>3.7.0</version>
 		</dependency>
-<!-- 		<dependency>
-			<groupId>com.github.rholder</groupId>
-			<artifactId>snowball-stemmer</artifactId>
-			<version>1.3.0.581.1</version>
-		</dependency>
- 	<dependency>
-			<groupId>stanford-german-corenlp-2016-10-31-models</groupId>
-			<artifactId>stanford-german-corenlp-2016-10-31-models</artifactId>
-			<scope>system</scope>
-			<version>3.7.0</version>
-			<systemPath>${basedir}\lib\stanford-german-corenlp-2016-10-31-models.jar</systemPath>
-		</dependency> -->
+		<!-- <dependency> <groupId>com.github.rholder</groupId> <artifactId>snowball-stemmer</artifactId> 
+			<version>1.3.0.581.1</version> </dependency> <dependency> <groupId>stanford-german-corenlp-2016-10-31-models</groupId> 
+			<artifactId>stanford-german-corenlp-2016-10-31-models</artifactId> <scope>system</scope> 
+			<version>3.7.0</version> <systemPath>${basedir}\lib\stanford-german-corenlp-2016-10-31-models.jar</systemPath> 
+			</dependency> -->
 		<dependency>
 			<groupId>stanford-postagger-3.7.0</groupId>
 			<artifactId>stanford-postagger-3.7.0</artifactId>
@@ -83,6 +76,11 @@
 			<scope>system</scope>
 			<version>1.0</version>
 			<systemPath>${basedir}\lib\jfxrt.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>org.controlsfx</groupId>
+			<artifactId>controlsfx</artifactId>
+			<version>8.40.12</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.opennlp</groupId>

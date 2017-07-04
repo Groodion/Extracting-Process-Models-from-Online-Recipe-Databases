@@ -9,6 +9,7 @@ public class Regex {
 	private Result result;
 	private boolean ingredientsNeeded;
 	private boolean referencePreviousProducts;
+	private String id = null;
 	
 	
 	public Regex(String expression, Result result, boolean ingredientsNeeded, boolean referencePreviousProducts) {
@@ -30,6 +31,21 @@ public class Regex {
 	public boolean isIngredientsNeeded() {
 		return ingredientsNeeded;
 	}
+	public boolean isReferencePreviousProducts() {
+		return referencePreviousProducts;
+	}
+
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	public boolean canExecute(Transformation transformation) {
+		return transformation.getRegexIds().isEmpty() || transformation.getRegexIds().contains(id);
+	}
+	
 	public String toXML() {
 		StringBuilder sB = new StringBuilder();
 		
@@ -44,8 +60,5 @@ public class Regex {
 		sB.append("</Regex>");
 		
 		return sB.toString();
-	}
-	public boolean isReferencePreviousProducts() {
-		return referencePreviousProducts;
 	}
 }
