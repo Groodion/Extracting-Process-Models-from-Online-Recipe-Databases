@@ -5,6 +5,7 @@ import ai4.master.project.recipe.CookingEvent;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
 import ai4.master.project.recipe.object.Ingredient;
+import ai4.master.project.recipe.object.Tool;
 import ai4.master.project.tree.Node;
 import ai4.master.project.tree.Tree;
 import ai4.master.project.tree.TreeTraverser;
@@ -38,6 +39,8 @@ public class ProcessModelerImpl implements ProcessModeler {
     List<UserTask> userTasks = new ArrayList<>();
     List<SequenceFlow> flows = new ArrayList<>();
     List<ParallelGateway> gates = new ArrayList<>();
+    StartEvent startEvent = null;
+    EndEvent endEvent = null;
     private int taskX = 100;
     /*
     If a node has more than one children we need a parallel gate. So maybe we could call a method that creates everything starting from there (the gate) on?
@@ -70,7 +73,7 @@ public class ProcessModelerImpl implements ProcessModeler {
         definitions.addChildElement(diagram);
         /** INITIALIZATION END **/
 
-        StartEvent startEvent = createElement(process, "start", "Start", StartEvent.class, plane, taskX, taskY, 50, 50, true);
+        startEvent = createElement(process, "start", "Start", StartEvent.class, plane, taskX, taskY, 50, 50, true);
         tempX = taskX + 150; //tempX is used in case we generate a parallel gateway
         incXby(300);
 
@@ -84,15 +87,18 @@ public class ProcessModelerImpl implements ProcessModeler {
         // The first node is an empty root node. Every children from there has to be connected to the start node.
         createStartEventToConnections(t, startEvent, process, plane);
 
-        EndEvent endEvent = createElement(process, "end", "Ende", EndEvent.class, plane, taskX, taskY, 50, 50, false);
+        endEvent = createElement(process, "end", "Ende", EndEvent.class, plane, taskX, taskY, 50, 50, false);
 
         //Every node without children belongs to the endEvent
         createNodeToEndEventConnection(nodes, endEvent, process, plane);
 
+      /*  Layouter layouter = new Layouter(modelInstance);
+        layouter.createLayout(flows);*/
+
         // validate and write model to file
         Bpmn.validateModel(modelInstance);
         createXml();
-      //  System.out.println(Bpmn.convertToString(modelInstance));
+        //  System.out.println(Bpmn.convertToString(modelInstance));
 
         System.out.println("----");
 
@@ -102,24 +108,6 @@ public class ProcessModelerImpl implements ProcessModeler {
     }
 
 
-    private void initializeModel(Process process, BpmnPlane plane) {
-        // create an empty model
-        modelInstance = Bpmn.createEmptyModel();
-        Definitions definitions = modelInstance.newInstance(Definitions.class);
-        definitions.setTargetNamespace("http://ai4.uni-bayreuth.de/master-project/converting-online-recipes-to-process-models/");
-        modelInstance.setDefinitions(definitions);
-
-        // create the process
-        process = modelInstance.newInstance(Process.class);
-        process.setAttributeValue("id", "process-one-task", true);
-        definitions.addChildElement(process);
-
-        BpmnDiagram diagram = modelInstance.newInstance(BpmnDiagram.class);
-        plane = modelInstance.newInstance(BpmnPlane.class);
-        plane.setBpmnElement(process);
-        diagram.setBpmnPlane(plane);
-        definitions.addChildElement(diagram);
-    }
 
     /*
     Connects every "last" node with the endpoint.
@@ -181,6 +169,7 @@ public class ProcessModelerImpl implements ProcessModeler {
     }
 
     int i = 0;
+
     /*
     Creates connection to children. Every parent is connected to every children. If there are more than one children we need a gateway in between.
      */
@@ -194,13 +183,12 @@ public class ProcessModelerImpl implements ProcessModeler {
             }
             UserTask from = getUserTaskTo(node);
 
-            // TODO refactoring this part.
-            if (!node.isXor()) {
                 if (node.getChildren().size() == 1) {
                     //If we have only one child we can connect it directly.
                     UserTask to = getUserTaskTo(node.getChildren().get(0));
 
                     if (!sequenceExists(createId(from, to))) {
+
                         flows.add(createSequenceFlow(process, from, to, plane,
                                 LayoutUtils.getCenterCoordinates(from)[0], LayoutUtils.getCenterCoordinates(from)[1],
                                 LayoutUtils.getCenterCoordinates(to)[0], LayoutUtils.getCenterCoordinates(to)[1]));
@@ -209,7 +197,6 @@ public class ProcessModelerImpl implements ProcessModeler {
                     ParallelGateway parallelGateway = null;
                     if (!gateExists("parallel_gateway_" + createIdOf(node.getData().getText()))) {
                         System.out.println("Creating a parallel gateway for" + node.getData().getText());
-
                         parallelGateway = createElement(process, "parallel_gateway_" + createIdOf(node.getData().getText()), "parallel_gateway_" + node.getData().getText(), ParallelGateway.class, plane, taskX, taskY, 30, 30, false);
                         gates.add(parallelGateway);
                         incXby(150);
@@ -219,12 +206,14 @@ public class ProcessModelerImpl implements ProcessModeler {
                                     LayoutUtils.getCenterCoordinates(parallelGateway)[0], LayoutUtils.getCenterCoordinates(parallelGateway)[1]));
                         }
                         //Now we create a connection from the gateway to every child
+                        int i = 1;
                         for (Node<Step> childNode :
                                 node.getChildren()) {
 
                             UserTask to = getUserTaskTo(childNode);
                             System.out.println("From: " + from.getAttributeValue("name") + " to: " + to.getAttributeValue("name"));
-
+                            to.getDiagramElement().getBounds().setY(to.getDiagramElement().getBounds().getY()+i*150);
+                            i++;
                             if (!sequenceExists(createId(from, to))) {
                                 flows.add(createSequenceFlow(process, parallelGateway, to, plane, LayoutUtils.getCenterCoordinates(from)[0], LayoutUtils.getCenterCoordinates(from)[1],
                                         LayoutUtils.getCenterCoordinates(to)[0], LayoutUtils.getCenterCoordinates(to)[1]));
@@ -233,11 +222,12 @@ public class ProcessModelerImpl implements ProcessModeler {
 
                         }
                     }
+                    incXby(150);
 
 
                 }
             }
-        }
+
     }
 
 
@@ -245,7 +235,6 @@ public class ProcessModelerImpl implements ProcessModeler {
     Create all user tasks.
      */
     private void createUserTasks(List<Node<Step>> nodes, Process process, BpmnPlane plane) {
-        int tempTaskY = taskY;
 
         for (Node<Step> node : nodes) {
             if (node.getData().getText() == null) {
@@ -255,30 +244,14 @@ public class ProcessModelerImpl implements ProcessModeler {
             if (!idExists(createIdOf(node.getData().getText()))) { //Avoid duplicates by having more than one dependence which creates two parts in the tree.
 
                 UserTask userTask = createElement(process, createIdOf(node.getData().getText()), node.getData().getText(), UserTask.class, plane, taskX, taskY, userTaskHeight, userTaskWidth, false);
-                List<CookingEvent> events =  node.getData().getEvents();
+                List<CookingEvent> events = node.getData().getEvents();
 
-                for(CookingEvent event : events){
-                   // BoundaryEvent boundaryEvent = createElement(process, createIdOf(event.getText()), event.getText(), BoundaryEvent.class, plane, taskX, taskY, 30, 30, true);
-                   // userTask.setCamundaAsyncBefore(true);
-                   userTask.builder().boundaryEvent().timerWithDuration(event.getText());
-
-                 //  List<TimeDuration> bEvents = (List<TimeDuration>) userTask.getChildElementsByType(TimeDuration.class);
-                   // System.out.println(bEvents.size() + "bEvents size");
-                  /*  if(event.getPos() == Position.BEFORE){
-                        userTask.builder().boundaryEvent().timerWithDuration(event.getText());
-                    }else{
-                        userTask.builder().boundaryEvent().timerWithDuration(event.getText());
-                    }*/
+                for (CookingEvent event : events) {
+                    userTask.builder().boundaryEvent().timerWithDuration(event.getText());
                 }
                 System.out.println("Node " + node.getData().getText() + " parent size: " + node.getParent().getChildren().size());
+                incXby(150);
 
-                // TODO this doesn't work as expected but it works somehow..
-                if (node.getParent().getChildren().size() > 1) {
-                    // incYby(150);
-                } else {
-                    taskY = tempTaskY;
-                    incXby(150);
-                }
                 /* Iterate over the Input parameter ( = ingredients) and output parameter ( = products) and add them */
                 for (Ingredient ingredient : node.getData().getIngredients()) {
                     userTask.builder().camundaInputParameter("Ingredient", ingredient.getName());
@@ -287,14 +260,16 @@ public class ProcessModelerImpl implements ProcessModeler {
                 for (Ingredient product : node.getData().getProducts()) {
                     userTask.builder().camundaOutputParameter("Product", product.getName());
                 }
+                /* Add tools as input parameter */
+                for(Tool tool : node.getData().getTools()){
+                    userTask.builder().camundaInputParameter("Tool",tool.getName());
+                }
 
 
                 userTasks.add(userTask);
             }
 
         }
-        incXby(150);
-        taskY = tempTaskY;
     }
 
     /*
@@ -302,7 +277,7 @@ public class ProcessModelerImpl implements ProcessModeler {
      */
     @NotNull
     private String createId(FlowNode from, FlowNode to) {
-        return from.getId() + "-" + to.getId();
+        return  from.getId() + "-" + to.getId();
     }
 
 
@@ -432,11 +407,11 @@ public class ProcessModelerImpl implements ProcessModeler {
         s = s.replace("ü", "ue");
         s = s.replace(",", "");
         s = s.replace(".", "");
-        s = s.replace("/","_durch_");
+        s = s.replace("/", "_durch_");
         s = s.replace("°", "_Grad_");
-        s = s.replace(":","_");
-        s = s.replace("(","_");
-        s = s.replace(")","_");
+        s = s.replace(":", "_");
+        s = s.replace("(", "_");
+        s = s.replace(")", "_");
         return s.replace(" ", "_");
     }
 
@@ -461,7 +436,7 @@ public class ProcessModelerImpl implements ProcessModeler {
         this.taskY += value;
     }
 
-    public void setFileName(String name){
+    public void setFileName(String name) {
         this.fileName = name;
     }
 }

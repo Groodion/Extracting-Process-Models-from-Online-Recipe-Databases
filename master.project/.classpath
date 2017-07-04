@@ -23,6 +23,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Martin Käppel/Uni_Workspace/Extracting-Process-Models-from-Online-Recipe-Databases/master.project/lib/jfxrt.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

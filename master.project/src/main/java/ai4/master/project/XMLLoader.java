@@ -44,6 +44,19 @@ public class XMLLoader {
 	public static final String ELEMENT_ADD_QUANTIFIER_TAG = "AddQuantifierTag";
 
 	
+	public static KeyWordDatabase load(String path) {
+		KeyWordDatabase kwdb = null;
+		
+		try {
+			kwdb = new XMLLoader().load(new URL("file", "", path));
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		return kwdb;
+	}
+
 	/**
 	 * Loads XML-File from URL and puts the elements into lists
 	 *
@@ -51,6 +64,7 @@ public class XMLLoader {
 	 * @throws IOException 
 	 * @throws JDOMException 
 	 */
+		
 	public KeyWordDatabase load(URL url) throws JDOMException, IOException {
 		KeyWordDatabase kwdb = new KeyWordDatabase();
 		

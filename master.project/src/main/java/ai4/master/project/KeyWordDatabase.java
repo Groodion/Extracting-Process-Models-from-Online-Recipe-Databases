@@ -13,6 +13,8 @@ import java.util.List;
 
 public class KeyWordDatabase {
 	
+	public static final KeyWordDatabase GERMAN_KWDB = XMLLoader.load("resources/Lib.xml");
+	
 	private List<BaseTool> tools;
 	private List<BaseIngredient> ingredients;
 	private List<BaseCookingAction> cookingActions;
