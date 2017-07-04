@@ -21,7 +21,7 @@ public class CookingActionEntry {
 	private ObservableList<Transformation> transformations;	
 	private ObservableList<BaseTool> tools;	
 	
-	public CookingActionEntry(BaseCookingAction cookingAction, ObservableList<CookingActionEntry> parent, final KeyWordDatabase kwdb, Map<ObservableList<Transformation>, ObservableList<String>> refIdMap, Map<ObservableList<Regex>, ObservableList<String>> regexIdMap) {
+	public CookingActionEntry(BaseCookingAction cookingAction, ObservableList<CookingActionEntry> parent, final KeyWordDatabase kwdb, Map<Object, ObservableList<String>> regexIdMap) {
 		ObservableList<String> regexIds = FXCollections.observableArrayList();
 		
 		name = new SimpleStringProperty();
@@ -65,8 +65,25 @@ public class CookingActionEntry {
 		
 		synonyms.addListener(lcListener);
 		
-		refIdMap.put(transformations, regexIds);
-		regexIdMap.put(regex, regexIds);
+		for(Regex regex : this.regex) {
+			regexIdMap.put(regex, regexIds);
+		}
+		for(Transformation transformation : transformations) {
+			regexIdMap.put(transformation, regexIds);
+		}
+		
+		ListChangeListener<Object> regexIdChange = change -> {
+			while(change.next()) {
+				for(Object o : change.getRemoved()) {
+					regexIdMap.remove(o);
+				}
+				for(Object o : change.getAddedSubList()) {
+					regexIdMap.put(o, regexIds);
+				}
+			}
+		};
+		this.regex.addListener(regexIdChange);
+		this.transformations.addListener(regexIdChange);
 		
 		for(Regex regex : this.regex) {
 			if(regex.getId() != null && regex.getId().length() != 0) {

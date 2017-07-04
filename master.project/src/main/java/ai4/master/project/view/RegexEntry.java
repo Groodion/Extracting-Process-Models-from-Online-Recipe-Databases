@@ -1,6 +1,5 @@
 package ai4.master.project.view;
 
-import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.Regex;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
