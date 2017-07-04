@@ -211,7 +211,7 @@ public class KeyWordDatabase {
 
 		sB.append("<ingredients>");
 		for(BaseIngredient ingredient : ingredients) {
-			sB.append(ingredient.toXML());
+		//	sB.append(ingredient.toXML());
 		}
 		sB.append("</ingredients>");
 

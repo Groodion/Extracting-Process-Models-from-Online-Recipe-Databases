@@ -7,6 +7,8 @@ import java.util.Observer;
 import java.util.Set;
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.XMLLoader;
+import ai4.master.project.recipe.baseObject.BaseIngredient;
+import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
 import ai4.master.project.recipe.baseObject.BaseTool;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -53,13 +55,25 @@ public class LibEditor extends Dialog<Object> implements Observer {
 	private VBox eventIndicatorsView;
 	
 	private StackPane stackPane;
+	
 	private TableView<ToolEntry> toolTable;
 	private ObservableList<ToolEntry> toolsList = FXCollections.observableArrayList();
-	private ObservableList<String> eventIndicatorsList = FXCollections.observableArrayList();
-
 	
-	private TableView<String> eventIndicatorsTable;
+	private ObservableList<EventIndicatorEntry> eventIndicatorsList = FXCollections.observableArrayList();
+	private TableView<EventIndicatorEntry> eventIndicatorsTable;
 
+	private TableView<LastSentenceReferenceEntry> lastSentenceReferencesTable;
+	private ObservableList<LastSentenceReferenceEntry> lastSentenceReferencesList = FXCollections.observableArrayList();
+
+	private TableView<PartIndicatorEntry> partIndicatorsTable;
+	private ObservableList<PartIndicatorEntry> partIndicatorsList = FXCollections.observableArrayList();
+	
+	private TableView<GroupEntry> groupsTable;
+	private ObservableList<GroupEntry> groupsList = FXCollections.observableArrayList();
+	
+	private TableView<IngredientEntry> ingredientsTable;
+	private ObservableList<IngredientEntry> ingredientsList = FXCollections.observableArrayList();
+	
 	public LibEditor() {
 		cancelButtonType = new ButtonType("Abbrechen", ButtonData.CANCEL_CLOSE);
 		okayButtonType = new ButtonType("Okay", ButtonData.OK_DONE);
@@ -74,6 +88,81 @@ public class LibEditor extends Dialog<Object> implements Observer {
 
 	public void initializeGroupsPane() {
 		groupsView = new VBox();
+		groupsView.setSpacing(10);
+		
+		for (BaseIngredientGroup g : kwdb.getIngredientGroups()) {
+			String groupSynonymes = "";
+			for (String s : g.getNames()) {
+				if (!s.equals(g.toString())) {
+					groupSynonymes = groupSynonymes + s + ";";
+				}
+			}
+			GroupEntry groupEntry = new GroupEntry(g.toString(), groupSynonymes);
+			groupsList.add(groupEntry);
+		}
+
+		HBox addGroups = new HBox();
+		addGroups.setSpacing(10);
+		addGroups.getChildren().add(new Label("Group: "));
+		
+		TextField tFName = new TextField();
+		tFName.setPromptText("Group");
+		
+		addGroups.getChildren().add(tFName);
+		addGroups.getChildren().add(new Label("Synonymes: "));
+		TextField tFSynonyms = new TextField();
+		tFSynonyms.setPromptText("Synonymes");
+		addGroups.getChildren().add(tFSynonyms);
+		Button addGroup = new Button("Add");
+		addGroups.getChildren().add(addGroup);
+
+		addGroup.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent e) {
+				Set<String> groupEntries = new HashSet<String>();
+
+				for (BaseIngredientGroup g : kwdb.getIngredientGroups()) {
+					for (String s : g.getNames()) {
+						groupEntries.add(s);
+					}
+				}
+
+				if (!tFName.getText().equals("")) {
+					if (!groupEntries.contains(tFName.getText())) {
+						groupsList.add(new GroupEntry(tFName.getText(), tFSynonyms.getText()));
+					} else {
+						System.err.println("Error: This Group already exists. Maybe as own Group or as Synonym");
+					}
+				} else {
+					System.err.println("Error: Empty name field!");
+				}
+			}
+		});
+
+		groupsTable = new TableView<GroupEntry>();
+		groupsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+		groupsTable.setEditable(true);
+
+		TableColumn<GroupEntry, String> name = new TableColumn<GroupEntry, String>("Group name");
+		name.setCellValueFactory(new PropertyValueFactory<GroupEntry, String>("groupName"));
+
+		TableColumn<GroupEntry, String> synonyms = new TableColumn<GroupEntry, String>("Group synonyms");
+		synonyms.setCellValueFactory(new PropertyValueFactory<GroupEntry, String>("groupSynonyms"));
+
+		groupsTable.getColumns().add(name);
+		groupsTable.getColumns().add(synonyms);
+		groupsTable.setItems(groupsList);
+
+		Button removeGroup = new Button("Remove");
+		removeGroup.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent e) {
+				GroupEntry selectedItem = groupsTable.getSelectionModel().getSelectedItem();
+				groupsTable.getItems().remove(selectedItem);
+			}
+		});
+
+		groupsView.getChildren().addAll(addGroups, groupsTable, removeGroup);
 	}
 
 	public void initializeCookingActionsPane() {
@@ -82,33 +171,170 @@ public class LibEditor extends Dialog<Object> implements Observer {
 
 	public void initializePartIndicatorsPane() {
 		partIndicatorsView = new VBox();
+		partIndicatorsView.setSpacing(10);
+		
+		HBox addPartIndicatorsPane = new HBox();
+		addPartIndicatorsPane.setSpacing(10);
+		
+		addPartIndicatorsPane.getChildren().add(new Label("Part Indicator: "));
+		TextField tFName = new TextField();
+		tFName.setPromptText("Part Indicator");
+		addPartIndicatorsPane.getChildren().add(tFName);
+		Button addPartIndicator = new Button("Add");
+		addPartIndicatorsPane.getChildren().add(addPartIndicator);
+		
+		addPartIndicator.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent e) {
+				partIndicatorsList.add(new PartIndicatorEntry(tFName.getText()));
+				if(!kwdb.getPartIndicators().contains(tFName.getText())) {
+					kwdb.getPartIndicators().add(tFName.getText());
+				}
+				System.out.println(kwdb.toXML());
+			}
+			});
+		
+		
+		partIndicatorsTable = new TableView<PartIndicatorEntry>();
+		partIndicatorsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+		partIndicatorsTable.setEditable(true);
+
+		TableColumn<PartIndicatorEntry, String> partIndicators = new TableColumn<PartIndicatorEntry, String>("Part Indicators");
+		partIndicators.setCellValueFactory(new PropertyValueFactory<PartIndicatorEntry, String>("partIndicator"));
+		
+		partIndicatorsTable.getColumns().add(partIndicators);
+		
+		for(String s : kwdb.getPartIndicators()) {
+			PartIndicatorEntry e = new PartIndicatorEntry(s);
+			partIndicatorsList.add(e);
+		}
+	
+		partIndicatorsTable.setItems(partIndicatorsList);
+		
+		Button removePartIndicators = new Button("Remove");
+		removePartIndicators.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent e) {
+				PartIndicatorEntry selectedItem = partIndicatorsTable.getSelectionModel().getSelectedItem();
+				partIndicatorsTable.getItems().remove(selectedItem);
+				kwdb.getPartIndicators().remove(selectedItem.getPartIndicator());
+				kwdb.toXML();
+			}
+		});
+
+		partIndicatorsView.getChildren().addAll(addPartIndicatorsPane, partIndicatorsTable, removePartIndicators);
 	}
 
 	public void initializeLastSentenceReferencesPane() {
 		lastSentenceReferencesView = new VBox();
+		lastSentenceReferencesView.setSpacing(10);
+		
+		HBox addLastSentenceReferencesPane = new HBox();
+		addLastSentenceReferencesPane.setSpacing(10);
+		
+		addLastSentenceReferencesPane.getChildren().add(new Label("Indicator: "));
+		TextField tFName = new TextField();
+		tFName.setPromptText("Last Sentence Reference");
+		addLastSentenceReferencesPane.getChildren().add(tFName);
+		Button addLastSentenceRef = new Button("Add");
+		addLastSentenceReferencesPane.getChildren().add(addLastSentenceRef);
+		
+		addLastSentenceRef.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent e) {
+				lastSentenceReferencesList.add(new LastSentenceReferenceEntry(tFName.getText()));
+				if(!kwdb.getLastSentenceReferences().contains(tFName.getText())) {
+					kwdb.getLastSentenceReferences().add(tFName.getText());
+				}
+				System.out.println(kwdb.toXML());
+			}
+			});
+		
+		
+		lastSentenceReferencesTable = new TableView<LastSentenceReferenceEntry>();
+		lastSentenceReferencesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+		lastSentenceReferencesTable.setEditable(true);
+
+		TableColumn<LastSentenceReferenceEntry, String> lastSentenceReferences = new TableColumn<LastSentenceReferenceEntry, String>("Last Sentences References");
+		lastSentenceReferences.setCellValueFactory(new PropertyValueFactory<LastSentenceReferenceEntry, String>("lastSentenceReference"));
+		
+		lastSentenceReferencesTable.getColumns().add(lastSentenceReferences);
+		
+		for(String s : kwdb.getLastSentenceReferences()) {
+			LastSentenceReferenceEntry e = new LastSentenceReferenceEntry(s);
+			lastSentenceReferencesList.add(e);
+		}
+	
+		lastSentenceReferencesTable.setItems(lastSentenceReferencesList);
+		
+		Button removeLastSentenceRef = new Button("Remove");
+		removeLastSentenceRef.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent e) {
+				LastSentenceReferenceEntry selectedItem = lastSentenceReferencesTable.getSelectionModel().getSelectedItem();
+				lastSentenceReferencesTable.getItems().remove(selectedItem);
+				kwdb.getLastSentenceReferences().remove(selectedItem.getLastSentenceReference());
+				kwdb.toXML();
+			}
+		});
+
+		lastSentenceReferencesView.getChildren().addAll(addLastSentenceReferencesPane, lastSentenceReferencesTable, removeLastSentenceRef);
 	}
 
 	public void initializeEventIndicatorsPane() {
 		eventIndicatorsView = new VBox();
+		eventIndicatorsView.setSpacing(10);
 		
-		eventIndicatorsTable = new TableView<String>();
+		HBox addEventIndicatorPane = new HBox();
+		addEventIndicatorPane.setSpacing(10);
+		
+		addEventIndicatorPane.getChildren().add(new Label("Indicator: "));
+		TextField tFName = new TextField();
+		tFName.setPromptText("Indicator");
+		addEventIndicatorPane.getChildren().add(tFName);
+		Button addEvent = new Button("Add");
+		addEventIndicatorPane.getChildren().add(addEvent);
+		
+		addEvent.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent e) {
+				eventIndicatorsList.add(new EventIndicatorEntry(tFName.getText()));
+				if(!kwdb.getEventIndicators().contains(tFName.getText())) {
+					kwdb.getEventIndicators().add(tFName.getText());
+				}
+				System.out.println(kwdb.toXML());
+			}
+			});
+		
+		
+		eventIndicatorsTable = new TableView<EventIndicatorEntry>();
 		eventIndicatorsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		eventIndicatorsTable.setEditable(true);
 
-		TableColumn<String, String> eventIndicators = new TableColumn<String, String>("Event Indicators");
-		eventIndicators.setCellValueFactory(new PropertyValueFactory<String, String>("Event Indicators"));
+		TableColumn<EventIndicatorEntry, String> eventIndicators = new TableColumn<EventIndicatorEntry, String>("Event Indicators");
+		eventIndicators.setCellValueFactory(new PropertyValueFactory<EventIndicatorEntry, String>("eventIndicator"));
 		
 		eventIndicatorsTable.getColumns().add(eventIndicators);
 		
 		for(String s : kwdb.getEventIndicators()) {
-			System.out.println(s);
-			eventIndicatorsList.add(s);
+			EventIndicatorEntry e = new EventIndicatorEntry(s);
+			eventIndicatorsList.add(e);
 		}
 	
 		eventIndicatorsTable.setItems(eventIndicatorsList);
 		
+		Button removeEvent = new Button("Remove");
+		removeEvent.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent e) {
+				EventIndicatorEntry selectedItem = eventIndicatorsTable.getSelectionModel().getSelectedItem();
+				eventIndicatorsTable.getItems().remove(selectedItem);
+				kwdb.getEventIndicators().remove(selectedItem.getEventIndicator());
+				kwdb.toXML();
+			}
+		});
 
-		eventIndicatorsView.getChildren().addAll(eventIndicatorsTable);
+		eventIndicatorsView.getChildren().addAll(addEventIndicatorPane, eventIndicatorsTable, removeEvent);
 	}
 
 	public void initializeDialog() {
@@ -225,6 +451,98 @@ public class LibEditor extends Dialog<Object> implements Observer {
 
 	public void initializeIngredientsPane() {
 		ingredientsView = new VBox();
+		ingredientsView.setSpacing(10);
+		
+		for (BaseIngredient i : kwdb.getIngredients()) {
+			String ingredientSynonymes = "";
+			String ingredientGroups = "";
+			for (String s : i.getNames()) {
+				if (!s.equals(i.toString())) {
+					ingredientSynonymes = ingredientSynonymes + s + ";";
+				}
+			}
+			
+			//for (BaseIngredientGroup ig : i.getIngredientGroups()) {
+			//	if (!ig.toString().equals(i.toString())) {
+			//		ingredientGroups = ingredientGroups + ig.toString() + ";";
+			//	}
+			//}
+			IngredientEntry ingredientEntry = new IngredientEntry(i.toString(), ingredientSynonymes, ingredientGroups);
+			ingredientsList.add(ingredientEntry);
+		}
+
+		HBox addIngredientPane = new HBox();
+		addIngredientPane.setSpacing(10);
+		
+		addIngredientPane.getChildren().add(new Label("Ingredient: "));
+		TextField tFName = new TextField();
+		tFName.setPromptText("Ingredient");
+		addIngredientPane.getChildren().add(tFName);
+		
+		addIngredientPane.getChildren().add(new Label("Synonymes: "));
+		TextField tFSynonyms = new TextField();
+		tFSynonyms.setPromptText("Synonymes");
+		addIngredientPane.getChildren().add(tFSynonyms);
+		
+		addIngredientPane.getChildren().add(new Label("Group: "));
+		TextField tFGroups = new TextField();
+		tFGroups.setPromptText("Groups");
+		addIngredientPane.getChildren().add(tFGroups);
+		
+		Button addIngredient = new Button("Add");
+		addIngredientPane.getChildren().add(addIngredient);
+
+		addIngredient.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent e) {
+				Set<String> ingredientEntries = new HashSet<String>();
+
+				for (BaseIngredient i : kwdb.getIngredients()) {
+					for (String s : i.getNames()) {
+						ingredientEntries.add(s);
+					}
+				}
+
+				if (!tFName.getText().equals("")) {
+					if (!ingredientEntries.contains(tFName.getText())) {
+						ingredientsList.add(new IngredientEntry(tFName.getText(), tFSynonyms.getText(), tFGroups.getText()));
+					} else {
+						System.err.println("Error: This Ingredient already exists. Maybe as own Ingredient or as Synonym");
+					}
+				} else {
+					System.err.println("Error: Empty name field!");
+				}
+			}
+		});
+
+		ingredientsTable = new TableView<IngredientEntry>();
+		ingredientsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+		ingredientsTable.setEditable(true);
+
+		TableColumn<IngredientEntry, String> name = new TableColumn<IngredientEntry, String>("Ingredient name");
+		name.setCellValueFactory(new PropertyValueFactory<IngredientEntry, String>("ingredientName"));
+
+		TableColumn<IngredientEntry, String> synonyms = new TableColumn<IngredientEntry, String>("Ingredient synonyms");
+		synonyms.setCellValueFactory(new PropertyValueFactory<IngredientEntry, String>("ingredientSynonyms"));
+		
+		TableColumn<IngredientEntry, String> groups = new TableColumn<IngredientEntry, String>("Ingredient groups");
+		synonyms.setCellValueFactory(new PropertyValueFactory<IngredientEntry, String>("ingredientGroups"));
+
+		ingredientsTable.getColumns().add(name);
+		ingredientsTable.getColumns().add(synonyms);
+		ingredientsTable.getColumns().add(groups);
+		ingredientsTable.setItems(ingredientsList);
+
+		Button removeIngredient = new Button("Remove");
+		removeIngredient.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent e) {
+				IngredientEntry selectedItem = ingredientsTable.getSelectionModel().getSelectedItem();
+				ingredientsTable.getItems().remove(selectedItem);
+			}
+		});
+
+		ingredientsView.getChildren().addAll(addIngredientPane, ingredientsTable, removeIngredient);
 	}
 
 	public void initializeComponents() throws Exception {
