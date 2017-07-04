@@ -1,5 +1,7 @@
 package ai4.master.project.view;
 
+import java.util.Map;
+
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseTool;
@@ -19,7 +21,9 @@ public class CookingActionEntry {
 	private ObservableList<Transformation> transformations;	
 	private ObservableList<BaseTool> tools;	
 	
-	public CookingActionEntry(BaseCookingAction cookingAction, ObservableList<CookingActionEntry> parent, final KeyWordDatabase kwdb) {
+	public CookingActionEntry(BaseCookingAction cookingAction, ObservableList<CookingActionEntry> parent, final KeyWordDatabase kwdb, Map<ObservableList<Transformation>, ObservableList<String>> refIdMap, Map<ObservableList<Regex>, ObservableList<String>> regexIdMap) {
+		ObservableList<String> regexIds = FXCollections.observableArrayList();
+		
 		name = new SimpleStringProperty();
 				
 		synonyms = FXCollections.observableArrayList();
@@ -42,15 +46,33 @@ public class CookingActionEntry {
 		
 		name.addListener((b, o, n) -> {
 			if(n == null || n.length() == 0) {
-				kwdb.getCookingActions().remove(cookingAction);
-				parent.remove(this);
+				if(synonyms.isEmpty()) {
+					kwdb.getCookingActions().remove(cookingAction);
+					parent.remove(this);
+				} else {
+					name.set(synonyms.remove(0));
+					updateCookingAction(cookingAction, this);
+				}
 			} else {
 				updateCookingAction(cookingAction, this);
 			}
 		});
-		ListChangeListener<String> lcListener = change -> updateCookingAction(cookingAction, this);
+		ListChangeListener<String> lcListener = change -> {
+			while(change.next()) {
+				updateCookingAction(cookingAction, this);
+			}
+		};
 		
 		synonyms.addListener(lcListener);
+		
+		refIdMap.put(transformations, regexIds);
+		regexIdMap.put(regex, regexIds);
+		
+		for(Regex regex : this.regex) {
+			if(regex.getId() != null && regex.getId().length() != 0) {
+				regexIds.add(regex.getId());
+			}
+		}
 		
 		parent.add(this);
 	}

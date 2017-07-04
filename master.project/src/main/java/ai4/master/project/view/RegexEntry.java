@@ -1,5 +1,6 @@
 package ai4.master.project.view;
 
+import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.Regex;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -17,9 +18,31 @@ public class RegexEntry {
 	private BooleanProperty referencePreviousProducts;
 	private ObjectProperty<Regex.Result> result;
 	
-	public RegexEntry(Regex regex, ObservableList<RegexEntry> parent, final ObservableList<Regex> regexList) {
+	public RegexEntry(Regex regex, ObservableList<RegexEntry> parent, final ObservableList<Regex> regexList, ObservableList<String> regexIdList) {
 		expression = new SimpleStringProperty(regex.getExpression());
 		id = new SimpleStringProperty(regex.getId());
+		
+		id.addListener((b, o, n) -> {
+			if(regexIdList.contains(o)) {
+				int i = regexIdList.indexOf(o);
+				if(n == null || n.trim().length() == 0) {
+					regexIdList.remove(i);
+				} else {
+					regexIdList.set(i, n);
+				}
+			} else if(n == null || n.trim().length() == 0) {
+				
+			} else {
+				regexIdList.add(n);
+			}
+		});
+		if(regex.getId() != null && regex.getId().trim().length() != 0) {
+			regexIdList.add(regex.getId());
+		}
+		
+		if(regex.getId() != null && regex.getId().length() != 0) {
+			regexIdList.add(regex.getId());
+		}
 		
 		ingredientsNeeded = new SimpleBooleanProperty(regex.isIngredientsNeeded());
 		referencePreviousProducts = new SimpleBooleanProperty(regex.isReferencePreviousProducts());
