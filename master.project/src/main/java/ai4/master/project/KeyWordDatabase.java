@@ -64,6 +64,8 @@ public class KeyWordDatabase {
 	public BaseTool findTool(String text, double error) {
 		if(text == null) return null;
 		
+		text = text.toLowerCase();
+
 		BaseTool bestMatch = null;
 		double e = 1.0;
 		
@@ -85,6 +87,8 @@ public class KeyWordDatabase {
 	}
 	public BaseIngredient findIngredient(String text) {
 		if(text == null) return null;
+		
+		text = text.toLowerCase();
 
 		for(BaseIngredient ingredient : ingredients) {
 			if(ingredient.getStemmedNames().contains(Word.stem(text))) {
@@ -99,6 +103,8 @@ public class KeyWordDatabase {
 	}
 	public BaseCookingAction findCookingAction(String text, double error) {
 		if(text == null) return null;
+
+		text = text.toLowerCase();
 
 		
 		BaseCookingAction bestMatch = null;
@@ -121,6 +127,8 @@ public class KeyWordDatabase {
 		return bestMatch;
 	}
 	public BaseIngredientGroup findIngredientGroup(String text) {
+		text = text.toLowerCase();
+
 		for(BaseIngredientGroup group : ingredientGroups) {
 			if(group.getStemmedNames().contains(Word.stem(text))) {
 				return group;

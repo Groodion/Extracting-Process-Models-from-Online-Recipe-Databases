@@ -246,10 +246,15 @@ public class View extends Application {
 		localFileChoose.getChildren().addAll(path, load);
 		localFileSource.setContent(localFileChoose);
 
+		TitledPane preferences = new TitledPane();
+		preferences.setText("Edit Library");
+		HBox preferencesActionField = new HBox();
+		preferencesActionField.setSpacing(10);
+		
 		VBox sources = new VBox();
 		sources.setSpacing(10);
 		sources.setMaxHeight(Double.MAX_VALUE);
-		sources.getChildren().addAll(gridTitlePane, localFileSource);
+		sources.getChildren().addAll(gridTitlePane, localFileSource, preferences);
 
 		mainView = new GridPane();
 		ColumnConstraints column2 = new ColumnConstraints();

@@ -25,7 +25,7 @@ public abstract class BaseNamedObject<N extends NamedObject<B>, B extends BaseNa
 	
 	public void addName(String name) {
 		names.add(name);
-		stemmedNames.add(Word.stem(name));
+		stemmedNames.add(Word.stem(name.toLowerCase()));
 	}
 	
 	@Override
