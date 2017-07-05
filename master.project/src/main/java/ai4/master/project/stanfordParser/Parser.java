@@ -5,6 +5,7 @@ import ai4.master.project.recipe.*;
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.Regex;
+import ai4.master.project.recipe.baseObject.Regex.Result;
 import ai4.master.project.recipe.object.CookingAction;
 import ai4.master.project.recipe.object.Ingredient;
 import ai4.master.project.recipe.object.IngredientGroup;
@@ -23,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
 public class Parser {
 
 	public static final double ERROR = .20;
@@ -31,36 +31,36 @@ public class Parser {
 	private MaxentTagger tagger;
 	private KeyWordDatabase kwdb;
 
-	
 	public Parser(String taggerUrl) {
 		tagger = new MaxentTagger(taggerUrl);
 		kwdb = new KeyWordDatabase();
 	}
-	
+
 	private List<Sentence> analyzeText(String text) {
 		List<Sentence> sentences = new ArrayList<Sentence>();
-		//Text wird in saetze zerlegt
+		// Text wird in saetze zerlegt
 		List<List<TaggedWord>> taggedList = tagger.process(getSplittedSentencesFromString(text));
 		Sentence sentence = null;
-		
-		for(List<TaggedWord> taggedSentence : taggedList) {			
+
+		for (List<TaggedWord> taggedSentence : taggedList) {
 			sentence = new Sentence(sentence);
 			SentencePart part = new SentencePart(sentence);
-			
+
 			Word word = null;
-			
-			for(TaggedWord taggedWord : taggedSentence) {
-				if(taggedWord.tag().equals(STTSTag.KON.name())) {
-					//Wenn ein UND oder ODER gefunden wird, wird ein neuer Satzteil erzeugt
+
+			for (TaggedWord taggedWord : taggedSentence) {
+				if (taggedWord.tag().equals(STTSTag.KON.name())) {
+					// Wenn ein UND oder ODER gefunden wird, wird ein neuer
+					// Satzteil erzeugt
 					word = null;
 					part = new SentencePart(part, sentence);
 				}
-				
-				if(taggedWord.word().equals("-LRB-")) {
+
+				if (taggedWord.word().equals("-LRB-")) {
 					taggedWord.setWord("(");
 					taggedWord.setTag("$(");
 				}
-				if(taggedWord.word().equals("-RRB-")) {
+				if (taggedWord.word().equals("-RRB-")) {
 					taggedWord.setWord(")");
 					taggedWord.setTag("$(");
 				}
@@ -68,18 +68,20 @@ public class Parser {
 				try {
 					STTSTag tag = STTSTag.valueOf(taggedWord.tag());
 					word = new Word(taggedWord.word(), tag, word, part);
-				} catch(Exception e) {
-					//Satzzeichen erzeugen neuen Satzteil
+				} catch (Exception e) {
+					// Satzzeichen erzeugen neuen Satzteil
 					new PunctuationMark(taggedWord.word(), part);
 					word = null;
 					part = new SentencePart(part, sentence);
 				}
 			}
-			
-			//Satzteile ohne eigenes Verb werden mit dem n�chsten Satzteil verschmolzen
-			for(int j = 0; j < sentence.getParts().size() - 1; j++) {
-				if(!sentence.getParts().get(j).containsVerb()) {
-					if(sentence.getParts().get(j).containsWord("ebenfalls") || sentence.getParts().get(j).containsWord(")")) {
+
+			// Satzteile ohne eigenes Verb werden mit dem n�chsten Satzteil
+			// verschmolzen
+			for (int j = 0; j < sentence.getParts().size() - 1; j++) {
+				if (!sentence.getParts().get(j).containsVerb()) {
+					if (sentence.getParts().get(j).containsWord("ebenfalls")
+							|| sentence.getParts().get(j).containsWord(")")) {
 						sentence.getParts().get(j - 1).mergeWith(sentence.getParts().get(j));
 					} else {
 						sentence.getParts().get(j).mergeWith(sentence.getParts().get(j + 1));
@@ -87,18 +89,17 @@ public class Parser {
 					j--;
 				}
 			}
-			
-			if(sentence.getParts().get(sentence.getParts().size() - 1).getWords().isEmpty()) {
+
+			if (sentence.getParts().get(sentence.getParts().size() - 1).getWords().isEmpty()) {
 				sentence.getParts().remove(sentence.getParts().size() - 1);
 			}
-			
-			
+
 			sentences.add(sentence);
 		}
-				
+
 		return sentences;
 	}
-	
+
 	private List<List<HasWord>> getSplittedSentencesFromString(String text) {
 		StringReader reader = new StringReader(text);
 
@@ -106,18 +107,20 @@ public class Parser {
 
 		Iterator<List<HasWord>> sentences = dp.iterator();
 		List<List<HasWord>> sentencesList = new ArrayList<List<HasWord>>();
-		
-		while(sentences.hasNext()) {
+
+		while (sentences.hasNext()) {
 			sentencesList.add(sentences.next());
 		}
-		
+
 		reader.close();
-		
+
 		return sentencesList;
 	}
+
 	public KeyWordDatabase getKwdb() {
 		return kwdb;
 	}
+
 	public void setKwdb(KeyWordDatabase kwdb) {
 		this.kwdb = kwdb;
 	}
@@ -126,111 +129,122 @@ public class Parser {
 		String text = recipe.getPreparation();
 		recipe.setPreparation(text);
 
-		List<Sentence> sentences =  analyzeText(text);
-		
-		for(Sentence sentence : sentences) {
+		List<Sentence> sentences = analyzeText(text);
+
+		for (Sentence sentence : sentences) {
 			sentence.init(kwdb);
 		}
 
 		IngredientList activeIngredients = new IngredientList();
-		
-		for(String s : recipe.getIngredients()) {
+
+		for (String s : recipe.getIngredients()) {
 			String name = s.split("\\(")[0];
 			BaseIngredient ingredient = kwdb.findIngredient(name);
-			
-			if(ingredient != null) {
+
+			if (ingredient != null) {
 				activeIngredients.add(ingredient.toObject());
 			} else {
 				System.err.println("Unknown Ingredient: " + name);
 			}
 		}
-				
+
 		Step lastStep = null;
-		
-		for(Sentence s : sentences) {
-			for(SentencePart sP : s.getParts()) {
-				if(sP.getCookingAction() == null) {
+
+		for (Sentence s : sentences) {
+			for (SentencePart sP : s.getParts()) {
+				if (sP.getCookingAction() == null) {
 					System.err.println("Can't convert to Step:");
 					System.err.println(sP.getText());
 				} else {
 					Step step = new Step();
 					BaseCookingAction action = sP.getCookingAction();
-					
+
 					step.setText(sP.getText());
 					step.setCookingAction(new CookingAction(sP.getMainVerb().getText(), action));
-					
+
 					step.getIngredients().addAll(sP.getIngredients());
 					step.getTools().addAll(sP.getTools());
-					
+
 					boolean needsImplicitTool = !step.getCookingAction().getBaseObject().getImplicitTools().isEmpty();
-					
-					if(needsImplicitTool) {
-						for(Tool tool : step.getTools()) {
-							if(step.getCookingAction().getBaseObject().getImplicitTools().contains(tool.getBaseObject())) {
+
+					if (needsImplicitTool) {
+						for (Tool tool : step.getTools()) {
+							if (step.getCookingAction().getBaseObject().getImplicitTools()
+									.contains(tool.getBaseObject())) {
 								needsImplicitTool = false;
 								break;
 							}
 						}
-						if(needsImplicitTool) {
-							Tool implicitTool = step.getCookingAction().getBaseObject().getImplicitTools().get(0).toObject();
+						if (needsImplicitTool) {
+							Tool implicitTool = step.getCookingAction().getBaseObject().getImplicitTools().get(0)
+									.toObject();
 							implicitTool.setImplicit(true);
 							step.getTools().add(implicitTool);
 						}
 					}
-					
-					if(sP.containsLastSentenceProductReference()) {
-						if(lastStep == null) {
+
+					if (sP.containsLastSentenceProductReference()) {
+						if (lastStep == null) {
 							System.err.println("LastSentenceReference in first sentence!");
 						} else {
 							step.getIngredients().addAll(lastStep.getProducts());
 						}
 					}
 
-					if(lastStep != null) {
-						for(int i = 0; i < step.getIngredients().size(); i++) {
-							for(Ingredient product : lastStep.getProducts()) {
-								if(step.getIngredients().get(i).getBaseObject() == product.getBaseObject() && step.getIngredients().get(i).getTags().isEmpty()) {
+					if (lastStep != null) {
+						for (int i = 0; i < step.getIngredients().size(); i++) {
+							for (Ingredient product : lastStep.getProducts()) {
+								if (step.getIngredients().get(i).getBaseObject() == product.getBaseObject()
+										&& step.getIngredients().get(i).getTags().isEmpty()) {
 									step.getIngredients().set(i, product);
 								}
 							}
 						}
 					}
-					
+
 					boolean noResult = false;
 					boolean ingredientsNeeded = true;
+					Regex mRegex = new Regex(".*", Result.ALL);
 					
-					for(Ingredient ingredient : step.getIngredients()) {
-						if(ingredient instanceof IngredientGroup) {
-							((IngredientGroup) ingredient).getIngredients().addAll(activeIngredients.get(ingredient.getBaseObject()));
+					for (Ingredient ingredient : step.getIngredients()) {
+						if (ingredient instanceof IngredientGroup) {
+							List<Ingredient> aIngredients = activeIngredients.get(ingredient.getBaseObject());
+							if(aIngredients.size() != 1 || aIngredients.get(0).getBaseObject() != ingredient.getBaseObject()) {
+								((IngredientGroup) ingredient).getIngredients().addAll(aIngredients);
+							}
 						}
 					}
-
-					for(Regex regex : action.getRegexList()) {
-						if(sP.matches(regex.getExpression(), false)) {
+					for (Regex regex : action.getRegexList()) {
+						if (sP.matches(regex.getExpression(), false)) {
 							ingredientsNeeded = regex.isIngredientsNeeded();
+							mRegex = regex;
 							
-							if(regex.isReferencePreviousProducts()) {
+							if (regex.isReferencePreviousProducts()) {
 								step.getIngredients().addAll(lastStep.getProducts());
 							}
-							
-							switch(regex.getResult()) {
+
+							switch (regex.getResult()) {
 							case ALL:
-								for(Ingredient ingredient : step.getIngredients()) {
-									step.getProducts().addAll(action.transform(ingredient, step.getIngredients()));
+								for (Ingredient ingredient : step.getIngredients()) {
+									step.getProducts().addAll(action.transform(ingredient, step.getIngredients(), regex));
 								}
 								break;
 							case FIRST:
-								if(!step.getIngredients().isEmpty())
-									step.getProducts().addAll(action.transform(step.getIngredients().get(0), step.getIngredients()));
+								if (!step.getIngredients().isEmpty())
+									step.getProducts().addAll(
+											action.transform(step.getIngredients().get(0), step.getIngredients(), regex));
 								break;
 							case LAST:
-								if(!step.getIngredients().isEmpty())
-									step.getProducts().addAll(action.transform(step.getIngredients().get(step.getIngredients().size() - 1), step.getIngredients()));
+								if (!step.getIngredients().isEmpty())
+									step.getProducts()
+											.addAll(action.transform(
+													step.getIngredients().get(step.getIngredients().size() - 1),
+													step.getIngredients(), regex));
 								break;
 							case PREV:
 								step.getIngredients().addAll(lastStep.getProducts());
-								for(Ingredient ingredient : lastStep.getProducts()) {
-									step.getProducts().addAll(action.transform(ingredient, step.getIngredients()));
+								for (Ingredient ingredient : lastStep.getProducts()) {
+									step.getProducts().addAll(action.transform(ingredient, step.getIngredients(), regex));
 								}
 								break;
 							case NO_RESULT:
@@ -242,47 +256,43 @@ public class Parser {
 							break;
 						}
 					}
-
-					
 					sP.clearMemory();
-					if(lastStep != null && ingredientsNeeded) {
-						if(step.getIngredients().isEmpty()) {
+					
+					if (lastStep != null && ingredientsNeeded) {
+						if (step.getIngredients().isEmpty()) {
 							step.getIngredients().addAll(lastStep.getProducts());
-						
-							if(!noResult) {
-								for(Ingredient ingredient : lastStep.getProducts()) {
-									if(ingredient != null) {
-										step.getProducts().addAll(action.transform(ingredient, step.getIngredients()));
+
+							if (!noResult) {
+								for (Ingredient ingredient : lastStep.getProducts()) {
+									if (ingredient != null) {
+										step.getProducts().addAll(action.transform(ingredient, step.getIngredients(), mRegex));
 									}
 								}
 							}
 						}
 					}
+					
+					while (step.getIngredients().remove(null));
+					while (step.getProducts().remove(null));
 
-					
-					while(step.getIngredients().remove(null));
-					while(step.getProducts().remove(null));
-					
-					for(int i = 0; i < step.getIngredients().size(); i++) {
+					for (int i = 0; i < step.getIngredients().size(); i++) {
 						Ingredient ingredient = step.getIngredients().get(i);
-						if(activeIngredients.contains(ingredient.getBaseObject())) {
+						if (activeIngredients.contains(ingredient.getBaseObject())) {
 							step.getIngredients().remove(i);
 							step.getIngredients().addAll(activeIngredients.get(ingredient.getBaseObject()));
 							activeIngredients.remove(ingredient.getBaseObject());
 						}
 					}
 
-					
 					step.getProducts().forEach(product -> activeIngredients.add(product));
-					
+
 					step.getEvents().addAll(sP.getEvents());
-					
-					if(step.getEvents().isEmpty() && sP.containsEventIndicator()) {
+
+					if (step.getEvents().isEmpty() && sP.containsEventIndicator()) {
 						step.getEvents().add(new CookingEvent(sP.getText(), EventType.TIMER, Position.AFTER));
 					}
-					
+
 					recipe.getSteps().add(step);
-					
 					
 					lastStep = step;
 				}

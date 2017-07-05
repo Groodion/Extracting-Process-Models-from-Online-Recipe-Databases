@@ -4,20 +4,21 @@ import ai4.master.project.recipe.object.Ingredient;
 import ai4.master.project.recipe.object.IngredientGroup;
 import ai4.master.project.recipe.object.ingredientTag.IngredientTag;
 import ai4.master.project.recipe.object.ingredientTag.QuantifierTag;
+import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Transformation {
 
 	private Ingredient product;
-	private List<Ingredient> mandatoryIngredients;
+	private ObservableList<Ingredient> mandatoryIngredients;
 	private IngredientTag tag;
-	private List<String> regexIds;
-	
+	private List<String> regexIds;	
 	
 	public Transformation() {
-		mandatoryIngredients = new ArrayList<Ingredient>();
+		mandatoryIngredients = javafx.collections.FXCollections.observableArrayList();
 		regexIds = new ArrayList<String>();
 	}
 	
@@ -52,15 +53,21 @@ public class Transformation {
 		if(mandatoryIngredients.isEmpty()) {
 			return true;
 		}
+		f:for(Ingredient mI : mandatoryIngredients) {
+			if(mI.getBaseObject() == ingredient.getBaseObject() && ingredient.getTags().containsAll(mI.getTags())) {
+				continue;
+			} else {
+				for(Ingredient i : list) {
+					if(mI.getBaseObject() == i.getBaseObject() && i.getTags().containsAll(mI.getTags())) {
+						continue f;
+					}
+				}
+			}
+			
+			return false;
+		}
 		
-		List<Ingredient> checkList = new ArrayList<Ingredient>();
-		
-		checkList.addAll(mandatoryIngredients);
-		
-		checkList.remove(ingredient);
-		checkList.remove(list);
-		
-		return checkList.isEmpty();
+		return true;
 	}
 	
 	/**

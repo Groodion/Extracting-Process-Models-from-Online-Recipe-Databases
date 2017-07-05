@@ -1,6 +1,9 @@
 package ai4.master.project.view;
 
 import java.util.HashSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
@@ -11,10 +14,12 @@ import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.recipe.baseObject.Regex;
 import ai4.master.project.recipe.baseObject.Regex.Result;
-import javafx.beans.property.SimpleObjectProperty;
+import ai4.master.project.recipe.baseObject.Transformation;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -36,6 +41,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.ChoiceBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.control.cell.ComboBoxListCell;
@@ -73,13 +79,16 @@ public class LibEditor extends Dialog<Object> implements Observer {
 	private TableView<ToolEntry> toolTable;
 	private ObservableList<BaseTool> realToolsList = FXCollections.observableArrayList();
 
+
 	private ObservableList<String> realEventIndicatorsList = FXCollections.observableArrayList();
+
 	private TableView<EventIndicatorEntry> eventIndicatorsTable;
 
 	private TableView<LastSentenceReferenceEntry> lastSentenceReferencesTable;
 	private ObservableList<String> realLastSentenceReferencesList = FXCollections.observableArrayList();
 
 	private TableView<PartIndicatorEntry> partIndicatorsTable;
+
 	private ObservableList<String> realPartIndicatorsList = FXCollections.observableArrayList();
 
 	private TableView<GroupEntry> groupsTable;
@@ -113,6 +122,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 
 		addGroupsPane.getChildren().add(tFName);
 		addGroupsPane.getChildren().add(new Label("Synonymes: "));
+
 		TextField tFSynonyms = new TextField();
 		tFSynonyms.setPromptText("Synonymes");
 		tFSynonyms.disableProperty().bind(tFName.textProperty().isEmpty());
@@ -248,6 +258,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 	}
 
 	public void initializeCookingActionsPane() {
+		Map<Object, ObservableList<String>> regexIdMap = new HashMap<Object, ObservableList<String>>();
 		ObservableList<Regex.Result> results = FXCollections.observableArrayList();
 		for (Regex.Result result : Regex.Result.values()) {
 			results.add(result);
@@ -257,6 +268,23 @@ public class LibEditor extends Dialog<Object> implements Observer {
 
 		TableView<CookingActionEntry> tableView = new TableView<CookingActionEntry>();
 
+		ContextMenu cookingActionTableCM = new ContextMenu();
+		MenuItem removeCookingAction = new MenuItem("Remove CookingAction");
+		removeCookingAction.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
+		removeCookingAction.setOnAction(e -> {
+			int index = tableView.getSelectionModel().getSelectedIndex();
+			tableView.getItems().remove(index);
+			realCookingActionsList.remove(index);
+		});
+		cookingActionTableCM.getItems().add(removeCookingAction);
+		tableView.setOnMouseClicked(e -> {
+			if (e.getButton() == MouseButton.SECONDARY) {
+				cookingActionTableCM.show(tableView, e.getScreenX(), e.getScreenY());
+			} else {
+				cookingActionTableCM.hide();
+			}
+		});
+
 		tableView.setEditable(true);
 
 		TableColumn<CookingActionEntry, String> nameColumn = new TableColumn<CookingActionEntry, String>("Name");
@@ -265,30 +293,59 @@ public class LibEditor extends Dialog<Object> implements Observer {
 
 		TableColumn<CookingActionEntry, ObservableList<String>> synoymsColumn = new TableColumn<CookingActionEntry, ObservableList<String>>(
 				"Synonyme");
-		synoymsColumn.setCellValueFactory(
-				data -> new SimpleObjectProperty<ObservableList<String>>(data.getValue().getSynonyms()));
+		synoymsColumn
+				.setCellValueFactory(new PropertyValueFactory<CookingActionEntry, ObservableList<String>>("synonyms"));
 		synoymsColumn.setCellFactory(column -> {
 			TableCell<CookingActionEntry, ObservableList<String>> cell = new TableCell<CookingActionEntry, ObservableList<String>>() {
 				@Override
 				public void updateItem(ObservableList<String> synonyms, boolean empty) {
 					super.updateItem(synonyms, empty);
+
 					VBox layout = new VBox();
 
 					Button addSynonymBtn = new Button("Add Synonym");
+
 					ListView<String> synonymsView = new ListView<String>();
 					synonymsView.setCellFactory(TextFieldListCell.forListView());
 					synonymsView.setMinHeight(0);
 					synonymsView.setPrefHeight(50);
 					synonymsView.setEditable(true);
 
+
 					addSynonymBtn.setOnAction(e -> {
 						synonyms.add("new Synonym " + synonyms.size());
 						synonymsView.requestFocus();
+
+					ContextMenu synonymsViewCM = new ContextMenu();
+					MenuItem addSynonym = new MenuItem("Add new Synonym");
+					addSynonym.setOnAction(e -> {
+						synonyms.add("synonym" + synonyms.size());
+						Platform.runLater(() -> {
+							synonymsView.getSelectionModel().select(synonyms.size() - 1);
+						});
+					});
+					synonymsViewCM.getItems().add(addSynonym);
+					MenuItem removeSynonym = new MenuItem("Remove Synonym");
+					removeSynonym.disableProperty()
+							.bind(synonymsView.getSelectionModel().selectedItemProperty().isNull());
+					removeSynonym.setOnAction(e -> {
+						int index = synonymsView.getSelectionModel().getSelectedIndex();
+						synonymsView.getItems().remove(index);
+					});
+					synonymsViewCM.getItems().add(removeSynonym);
+					synonymsView.setOnMouseClicked(e -> {
+						if (e.getButton() == MouseButton.SECONDARY) {
+							synonymsViewCM.show(synonymsView, e.getScreenX(), e.getScreenY());
+						} else {
+							synonymsViewCM.hide();
+						}
+
 					});
 
 					if (synonyms != null) {
 						synonymsView.setItems(synonyms);
 					}
+
 
 					addSynonymBtn.visibleProperty()
 							.bind(synonymsView.focusedProperty().or(addSynonymBtn.focusedProperty()));
@@ -297,6 +354,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 					layout.getChildren().add(addSynonymBtn);
 
 					setGraphic(layout);
+
 				}
 			};
 			return cell;
@@ -304,8 +362,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 
 		TableColumn<CookingActionEntry, ObservableList<Regex>> regexColumn = new TableColumn<CookingActionEntry, ObservableList<Regex>>(
 				"Regex");
-		regexColumn.setCellValueFactory(
-				data -> new SimpleObjectProperty<ObservableList<Regex>>(data.getValue().getRegex()));
+		regexColumn.setCellValueFactory(new PropertyValueFactory<CookingActionEntry, ObservableList<Regex>>("regex"));
 		regexColumn.setCellFactory(column -> {
 			TableCell<CookingActionEntry, ObservableList<Regex>> cell = new TableCell<CookingActionEntry, ObservableList<Regex>>() {
 
@@ -316,10 +373,34 @@ public class LibEditor extends Dialog<Object> implements Observer {
 					VBox layout = new VBox();
 
 					Button addRegexBtn = new Button("Add Regex");
+
 					TableView<RegexEntry> regexTable = new TableView<RegexEntry>();
 					regexTable.setMinHeight(0);
 					regexTable.setPrefHeight(75);
 					regexTable.setEditable(true);
+
+
+					ContextMenu regexTableCM = new ContextMenu();
+					MenuItem addRegex = new MenuItem("Add new Regex");
+					addRegex.setOnAction(e -> {
+						regexList.add(new Regex(".*", Result.ALL));
+					});
+					regexTableCM.getItems().add(addRegex);
+					MenuItem removeRegex = new MenuItem("Remove Regex");
+					removeRegex.disableProperty().bind(regexTable.getSelectionModel().selectedItemProperty().isNull());
+					removeRegex.setOnAction(e -> {
+						int index = regexTable.getSelectionModel().getSelectedIndex();
+						regexList.remove(index);
+					});
+					regexTableCM.getItems().add(removeRegex);
+					regexTable.setOnMouseClicked(e -> {
+						if (e.getButton() == MouseButton.SECONDARY) {
+							regexTableCM.show(regexTable, e.getScreenX(), e.getScreenY());
+						} else {
+							regexTableCM.hide();
+						}
+					});
+
 
 					TableColumn<RegexEntry, String> idColumn = new TableColumn<RegexEntry, String>("Id");
 					idColumn.setCellValueFactory(new PropertyValueFactory<RegexEntry, String>("id"));
@@ -354,6 +435,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 					regexTable.getColumns().add(ingredientsNeededColumn);
 					regexTable.getColumns().add(referencePreviousProductsColumn);
 
+
 					addRegexBtn.setOnAction(e -> {
 						Regex regex = new Regex(".*", Result.ALL);
 						regexList.add(regex);
@@ -373,6 +455,192 @@ public class LibEditor extends Dialog<Object> implements Observer {
 					layout.getChildren().add(addRegexBtn);
 
 					setGraphic(layout);
+
+					if (regexList != null) {
+						for (Regex regex : regexList) {
+							new RegexEntry(regex, regexTable.getItems(), regexList, regexIdMap.get(regex));
+						}
+					}
+
+					setGraphic(regexTable);
+				}
+			};
+			return cell;
+		});
+
+		TableColumn<CookingActionEntry, ObservableList<Transformation>> transformationsColumn = new TableColumn<CookingActionEntry, ObservableList<Transformation>>(
+				"Transformations");
+		transformationsColumn.setCellValueFactory(
+				new PropertyValueFactory<CookingActionEntry, ObservableList<Transformation>>("transformations"));
+		transformationsColumn.setCellFactory(column -> {
+			TableCell<CookingActionEntry, ObservableList<Transformation>> cell = new TableCell<CookingActionEntry, ObservableList<Transformation>>() {
+				@Override
+				public void updateItem(ObservableList<Transformation> transformations, boolean empty) {
+					super.updateItem(transformations, empty);
+
+					TableView<TransformationEntry> transformationsTable = new TableView<TransformationEntry>();
+					transformationsTable.setMinHeight(0);
+					transformationsTable.setPrefHeight(125);
+					transformationsTable.setEditable(true);
+
+					ContextMenu transformationsTableCM = new ContextMenu();
+					MenuItem addTransformation = new MenuItem("Add new Transformation");
+					addTransformation.setOnAction(e -> {
+						Transformation transformation = new Transformation();
+						transformations.add(transformation);
+						new TransformationEntry(transformation, transformationsTable.getItems(), transformations,
+								regexIdMap.get(transformation));
+						transformationsTable.requestFocus();
+					});
+					transformationsTableCM.getItems().add(addTransformation);
+					MenuItem removeTransformation = new MenuItem("Remove Transformation");
+					removeTransformation.disableProperty()
+							.bind(transformationsTable.getSelectionModel().selectedItemProperty().isNull());
+					removeTransformation.setOnAction(e -> {
+						int index = transformationsTable.getSelectionModel().getSelectedIndex();
+						transformations.remove(index);
+						System.out.println(index + " " + transformations);
+					});
+					transformationsTableCM.getItems().add(removeTransformation);
+					transformationsTable.setOnMouseClicked(e -> {
+						if (e.getButton() == MouseButton.SECONDARY) {
+							transformationsTableCM.show(transformationsTable, e.getScreenX(), e.getScreenY());
+						} else {
+							transformationsTableCM.hide();
+						}
+					});
+
+					TableColumn<TransformationEntry, ObservableList<String>> refIdColumn = new TableColumn<TransformationEntry, ObservableList<String>>(
+							"RefRegexIds");
+					refIdColumn.setCellValueFactory(
+							new PropertyValueFactory<TransformationEntry, ObservableList<String>>("refRegexIds"));
+					refIdColumn.setCellFactory(column -> {
+						TableCell<TransformationEntry, ObservableList<String>> cell = new TableCell<TransformationEntry, ObservableList<String>>() {
+							@Override
+							public void updateItem(ObservableList<String> refIds, boolean empty) {
+								super.updateItem(refIds, empty);
+								
+								ListView<String> refIdsView = new ListView<String>();
+								if (transformations.size() != 0)
+									refIdsView.setCellFactory(
+											ComboBoxListCell.forListView(regexIdMap.get(transformations.get(0))));
+								refIdsView.setMinHeight(0);
+								refIdsView.setPrefHeight(50);
+								refIdsView.setEditable(true);
+
+								ContextMenu transformationsTableCM = new ContextMenu();
+								MenuItem addTransformation = new MenuItem("Add RegexId");
+								addTransformation.setOnAction(e -> {
+									refIds.add(null);
+									refIdsView.requestFocus();
+								});
+								transformationsTableCM.getItems().add(addTransformation);
+								MenuItem removeTransformation = new MenuItem("Remove RegexId");
+								removeTransformation.disableProperty()
+										.bind(refIdsView.getSelectionModel().selectedItemProperty().isNull());
+								removeTransformation.setOnAction(e -> {
+									refIds.remove(refIdsView.getSelectionModel().getSelectedItem());
+									refIdsView.requestFocus();
+								});
+								transformationsTableCM.getItems().add(removeTransformation);
+								refIdsView.setOnMouseClicked(e -> {
+									if (e.getButton() == MouseButton.SECONDARY) {
+										transformationsTableCM.show(refIdsView, e.getScreenX(), e.getScreenY());
+									} else {
+										transformationsTableCM.hide();
+									}
+								});
+
+								if (refIds != null) {
+									refIdsView.setItems(refIds);
+								}
+
+								setGraphic(refIdsView);
+							}
+						};
+						return cell;
+					});
+					TableColumn<TransformationEntry, ObservableList<BaseIngredient>> ingredientsColumn = new TableColumn<TransformationEntry, ObservableList<BaseIngredient>>(
+							"ingredients");
+					ingredientsColumn.setCellValueFactory(
+							new PropertyValueFactory<TransformationEntry, ObservableList<BaseIngredient>>(
+									"ingredients"));
+					ingredientsColumn.setCellFactory(column -> {
+						TableCell<TransformationEntry, ObservableList<BaseIngredient>> cell = new TableCell<TransformationEntry, ObservableList<BaseIngredient>>() {
+							@Override
+							public void updateItem(ObservableList<BaseIngredient> ingredients, boolean empty) {
+								super.updateItem(ingredients, empty);
+
+								ListView<BaseIngredient> ingredientsView = new ListView<BaseIngredient>();
+								ingredientsView.setCellFactory(ComboBoxListCell.forListView(realIngredientsList));
+								ingredientsView.setMinHeight(0);
+								ingredientsView.setPrefHeight(50);
+								ingredientsView.setEditable(true);
+
+								ContextMenu transformationsTableCM = new ContextMenu();
+								MenuItem addTransformation = new MenuItem("Add RegexId");
+								addTransformation.setOnAction(e -> {
+									ingredients.add(null);
+									ingredientsView.requestFocus();
+								});
+								transformationsTableCM.getItems().add(addTransformation);
+								MenuItem removeTransformation = new MenuItem("Remove RegexId");
+								removeTransformation.disableProperty()
+										.bind(ingredientsView.getSelectionModel().selectedItemProperty().isNull());
+								removeTransformation.setOnAction(e -> {
+									ingredients.remove(ingredientsView.getSelectionModel().getSelectedItem());
+								});
+								transformationsTableCM.getItems().add(removeTransformation);
+								ingredientsView.setOnMouseClicked(e -> {
+									if (e.getButton() == MouseButton.SECONDARY) {
+										transformationsTableCM.show(ingredientsView, e.getScreenX(), e.getScreenY());
+									} else {
+										transformationsTableCM.hide();
+									}
+								});
+								
+								if (ingredients != null) {
+									ingredientsView.setItems(ingredients);
+								}
+
+								setGraphic(ingredientsView);
+							}
+						};
+						return cell;
+					});
+
+					TableColumn<TransformationEntry, String> ingredientTagColumn = new TableColumn<TransformationEntry, String>(
+							"IngredientTag");
+					ingredientTagColumn.setCellValueFactory(
+							new PropertyValueFactory<TransformationEntry, String>("ingredientTag"));
+					ingredientTagColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+
+					TableColumn<TransformationEntry, String> quantifierTagColumn = new TableColumn<TransformationEntry, String>(
+							"QuantifierTag");
+					quantifierTagColumn.setCellValueFactory(
+							new PropertyValueFactory<TransformationEntry, String>("quantifierTag"));
+					quantifierTagColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+
+					TableColumn<TransformationEntry, BaseIngredient> productColumn = new TableColumn<TransformationEntry, BaseIngredient>(
+							"Product");
+					productColumn.setCellValueFactory(
+							new PropertyValueFactory<TransformationEntry, BaseIngredient>("product"));
+					productColumn.setCellFactory(ComboBoxTableCell.forTableColumn(realIngredientsList));
+
+					transformationsTable.getColumns().add(refIdColumn);
+					transformationsTable.getColumns().add(ingredientsColumn);
+					transformationsTable.getColumns().add(ingredientTagColumn);
+					transformationsTable.getColumns().add(quantifierTagColumn);
+					transformationsTable.getColumns().add(productColumn);
+
+					if (transformations != null) {
+						for (Transformation transformation : transformations) {
+							new TransformationEntry(transformation, transformationsTable.getItems(), transformations,
+									regexIdMap.get(transformation));
+						}
+					}
+
+					setGraphic(transformationsTable);
 				}
 			};
 			return cell;
@@ -387,31 +655,47 @@ public class LibEditor extends Dialog<Object> implements Observer {
 				@Override
 				public void updateItem(ObservableList<BaseTool> tools, boolean empty) {
 					super.updateItem(tools, empty);
-					VBox layout = new VBox();
-					HBox btns = new HBox();
-					Button addToolBtn = new Button("Add Tool");
-					Button removeToolBtn = new Button("Remove Tool");
 					ListView<BaseTool> toolsView = new ListView<BaseTool>();
 					toolsView.setCellFactory(ComboBoxListCell.forListView(realToolsList));
 					toolsView.setMinHeight(0);
 					toolsView.setPrefHeight(50);
 					toolsView.setEditable(true);
 
+
 					addToolBtn.setOnAction(e -> {
+
+					ContextMenu toolsViewCM = new ContextMenu();
+					MenuItem addTool = new MenuItem("Add new Tool");
+					addTool.setOnAction(e -> {
+
 						tools.add(null);
 						toolsView.requestFocus();
 						toolsView.edit(tools.size() - 1);
 					});
-					removeToolBtn.setOnAction(e -> {
+					toolsViewCM.getItems().add(addTool);
+					MenuItem removeTool = new MenuItem("Remove Tool");
+					removeTool.disableProperty().bind(toolsView.getSelectionModel().selectedItemProperty().isNull());
+					removeTool.setOnAction(e -> {
 						tools.remove(toolsView.getSelectionModel().getSelectedItem());
 						toolsView.requestFocus();
 					});
 
+
 					removeToolBtn.disableProperty().bind(toolsView.getSelectionModel().selectedItemProperty().isNull());
+					toolsViewCM.getItems().add(removeTool);
+					toolsView.setOnMouseClicked(e -> {
+						if (e.getButton() == MouseButton.SECONDARY) {
+							toolsViewCM.show(toolsView, e.getScreenX(), e.getScreenY());
+						} else {
+							toolsViewCM.hide();
+						}
+					});
+
 
 					if (tools != null) {
 						toolsView.setItems(tools);
 					}
+
 
 					addToolBtn.visibleProperty().bind(toolsView.focusedProperty().or(addToolBtn.focusedProperty()));
 					removeToolBtn.visibleProperty()
@@ -423,6 +707,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 					layout.getChildren().add(btns);
 
 					setGraphic(layout);
+
 				}
 			};
 			return cell;
@@ -431,10 +716,11 @@ public class LibEditor extends Dialog<Object> implements Observer {
 		tableView.getColumns().add(nameColumn);
 		tableView.getColumns().add(synoymsColumn);
 		tableView.getColumns().add(regexColumn);
+		tableView.getColumns().add(transformationsColumn);
 		tableView.getColumns().add(toolsColumn);
 
 		for (BaseCookingAction cookingAction : KeyWordDatabase.GERMAN_KWDB.getCookingActions()) {
-			new CookingActionEntry(cookingAction, tableView.getItems(), KeyWordDatabase.GERMAN_KWDB);
+			new CookingActionEntry(cookingAction, tableView.getItems(), KeyWordDatabase.GERMAN_KWDB, regexIdMap);
 		}
 
 		cookingActionsView.getChildren().add(tableView);
@@ -534,6 +820,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 		addLastSentenceReference.disableProperty().bind(tFName.textProperty().isEmpty());
 		addLastSentenceReferencePane.getChildren().add(addLastSentenceReference);
 
+
 		lastSentenceReferencesTable = new TableView<LastSentenceReferenceEntry>();
 		lastSentenceReferencesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		lastSentenceReferencesTable.setEditable(true);
@@ -604,6 +891,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 		addEventIndicatorPane.setSpacing(10);
 		
 		addEventIndicatorPane.getChildren().add(new Label("Event Indicator: "));
+
 		TextField tFName = new TextField();
 		tFName.setPromptText("Event Indicator");
 		addEventIndicatorPane.getChildren().add(tFName);
@@ -619,6 +907,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 		TableColumn<EventIndicatorEntry, String> nameColumn = new TableColumn<EventIndicatorEntry, String>("Event Indicator");
 		nameColumn.setCellValueFactory(new PropertyValueFactory<EventIndicatorEntry, String>("eventIndicator"));
 		nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+
 
 		eventIndicatorsTable.getColumns().add(nameColumn);
 
@@ -644,6 +933,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 				tFName.setText("");
 			}
 		});
+
 
 		for (
 
@@ -674,6 +964,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 
 		VBox.setVgrow(eventIndicatorsTable, Priority.ALWAYS);
 		eventIndicatorsView.getChildren().addAll(addEventIndicatorPane, eventIndicatorsTable);
+
 	}
 
 	public void initializeDialog() {
@@ -1039,6 +1330,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 						alert.setTitle("Warning Dialog");
 						alert.setContentText("The Group " + p + " doesn't exists exists!");
 
+
 						alert.showAndWait();
 						return;
 					}
@@ -1091,6 +1383,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 		realEventIndicatorsList.addAll(kwdb.getEventIndicators());
 		realPartIndicatorsList.addAll(kwdb.getPartIndicators());
 		realLastSentenceReferencesList.addAll(kwdb.getLastSentenceReferences());
+
 
 		initializeToolsPane();
 		initializeGroupsPane();

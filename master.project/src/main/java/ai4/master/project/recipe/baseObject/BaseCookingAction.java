@@ -52,12 +52,13 @@ public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookin
 	 * aus der Liste aus und wendet diese auf die Hauptzutat an.
 	 * @param ingredient Die zu transformierende Zutat
 	 * @param list Liste mit restlichen Zutaten des Step-Objekts
+	 * @param regex 
 	 * @return transformaierte Zutat
 	 */
-	public List<Ingredient> transform(Ingredient ingredient, List<Ingredient> list) {
+	public List<Ingredient> transform(Ingredient ingredient, List<Ingredient> list, Regex regex) {
 		List<Ingredient> transformedIngredients = new ArrayList<Ingredient>();
 		for(Transformation transformation : transformations) {
-			if(transformation.matches(ingredient, list)) {
+			if(regex.canExecute(transformation) && transformation.matches(ingredient, list)) {
 				if(ingredient instanceof IngredientGroup && !((IngredientGroup) ingredient).getIngredients().isEmpty()) {
 					for(Ingredient i : ((IngredientGroup) ingredient).getIngredients()) {
 						transformedIngredients.add(transformation.transform(i, list));
