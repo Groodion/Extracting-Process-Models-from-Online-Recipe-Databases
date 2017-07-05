@@ -42,6 +42,8 @@ public class XMLLoader {
 	public static final String ELEMENT_TRANSFORMATION = "Transformation";
 	public static final String ELEMENT_ADD_INGREDIENT_TAG = "AddIngredientTag";
 	public static final String ELEMENT_ADD_QUANTIFIER_TAG = "AddQuantifierTag";
+	public static final String ATTRIBUTE_ID = "id";
+	public static final String ATTRIBUTE_REGEX_REF_IDS = "regexRefIds";
 
 	
 	public static KeyWordDatabase load(String path) {
@@ -270,6 +272,15 @@ public class XMLLoader {
 	private void readTransformation(Element element, KeyWordDatabase kwdb, BaseCookingAction cookingAction) {
 		Transformation transformation = new Transformation();
 		
+		String ids = element.getAttributeValue(ATTRIBUTE_REGEX_REF_IDS);
+		if(ids != null) {
+			ids.replace(',', ' ');
+			ids = ids.trim();
+			for(String id : ids.split(" ")) {
+				transformation.getRegexIds().add(id);
+			}
+		}
+		
 		for(Element child : element.getChildren()) {
 			if(child.getName().equals(ELEMENT_INGREDIENTS)) {
 				readTransformationIngredientes(child, kwdb, transformation);
@@ -337,8 +348,11 @@ public class XMLLoader {
 		try {
 			rPP = element.getAttribute(ATTRIBUTE_REFERENCE_PREVIOUS_PRODUCTS).getBooleanValue();
 		} catch(Exception e) { }
+		Regex regex = new Regex(expression, result, iN, rPP);
 		
-		cA.getRegexList().add(new Regex(expression, result, iN, rPP));
+		regex.setId(element.getAttributeValue("ATTRIBUTE_ID"));
+		
+		cA.getRegexList().add(regex);
 	}
 
 	private void readPartIndicators(Element element, KeyWordDatabase kwdb) {
