@@ -948,6 +948,12 @@
 				<Transformation regexRefIds="noChange" />
 				<Transformation>
 					<ingredients>
+						<Ingredient name="Brühwürfel" />
+					</ingredients>
+					<Ingredient name="Suppe" />
+				</Transformation>
+				<Transformation>
+					<ingredients>
 						<Ingredient name="Hefe" />
 						<Ingredient name="Milch" />
 						<Ingredient name="Zucker" />
@@ -1120,8 +1126,7 @@
 		<CookingAction>
 			<Name>abschmecken</Name>
 			<regs>
-				<Regex result="first">.*~INGREDIENT.* mit .*~INGREDIENT.*~ACTION</Regex>
-				<Regex result="prev">.*</Regex>
+				<Regex result="first">.*</Regex>
 			</regs>
 			<transformations>
 				<Transformation>

@@ -208,8 +208,10 @@ public class Parser {
 					
 					for (Ingredient ingredient : step.getIngredients()) {
 						if (ingredient instanceof IngredientGroup) {
-							((IngredientGroup) ingredient).getIngredients()
-									.addAll(activeIngredients.get(ingredient.getBaseObject()));
+							List<Ingredient> aIngredients = activeIngredients.get(ingredient.getBaseObject());
+							if(aIngredients.size() != 1 || aIngredients.get(0).getBaseObject() != ingredient.getBaseObject()) {
+								((IngredientGroup) ingredient).getIngredients().addAll(aIngredients);
+							}
 						}
 					}
 					for (Regex regex : action.getRegexList()) {
@@ -291,7 +293,7 @@ public class Parser {
 					}
 
 					recipe.getSteps().add(step);
-
+					
 					lastStep = step;
 				}
 			}
