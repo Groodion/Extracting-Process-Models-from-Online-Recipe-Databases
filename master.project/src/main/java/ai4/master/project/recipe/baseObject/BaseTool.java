@@ -14,4 +14,19 @@ public class BaseTool extends BaseNamedObject<Tool, BaseTool> {
 		}
 		return new Tool(name, this);
 	}
+
+	@Override
+	public String toXML() {
+		StringBuilder sB = new StringBuilder();
+		
+		sB.append("<Tool>");
+		for(String name : getNames()) {
+			sB.append("<Name>");
+			sB.append(name);
+			sB.append("</Name>");			
+		}
+		sB.append("</Tool>");
+		
+		return sB.toString();
+	}
 }

@@ -127,7 +127,7 @@ public class RecipeConverter {
         StringBuilder ingredientBuilder = new StringBuilder();
         for (Ingredient i :
                 step.getIngredients()) {
-            ingredientBuilder.append(i.getIngredientName());
+            ingredientBuilder.append(i.getCompleteName());
         }
         userTaskBuilder.camundaInputParameter("Ingredients",ingredientBuilder.toString());
     }

@@ -1,0 +1,123 @@
+.background {
+	-fx-background-color: #F3F3F4;
+}
+
+.hbackground {
+	-fx-background-color: #000000;
+}
+
+.separator {
+	-fx-border-style: solid;
+	-fx-background-color: BD8500;
+	-fx-border-width: 0 0 0 0; /* its make really one-pixel-border */
+	-fx-border-color: FFFFFF;
+}
+
+.button-type-1 {
+	-fx-font-family: "Helvetica Neue";
+	-fx-font-size: 20;
+	-fx-font-weight: bold;
+	-fx-text-fill: white;
+	-fx-background-color: #000000;
+	-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0), 5, 0.0, 0, 1);
+}
+
+.databaseLabel:hover {
+	-fx-background-color: #dae7f3;
+}
+
+.chefkoch-label {
+	-fx-background-color: #FFFFFF;
+	-fx-font-family: "Helvetica Neue";
+	-fx-font-size: 14;
+	-fx-text-fill: FB2568;
+}
+
+.attribute-value {
+	-fx-background-color: #FFFFFF;
+	-fx-font-family: "Courier New";
+	-fx-font-size: 14;
+	-fx-text-fill: FB2568;
+}
+
+.process-step-header {
+	-fx-background-color: #FFFFFF;
+	-fx-font-family: "Helvetica Neue";
+	-fx-font-size: 20;
+	-fx-font-wieght: bold;
+	-fx-text-fill: #BDBDBD;
+}
+
+.process-step-description {
+	-fx-background-color: #FFFFFF;
+	-fx-font-family: "Helvetica Neue";
+	-fx-font-size: 14;
+	-fx-text-fill: #BDBDBD;
+}
+
+.process-step-description-active {
+	-fx-background-color: #FFFFFF;
+	-fx-font-family: "Helvetica Neue";
+	-fx-font-size: 14;
+	-fx-text-fill: #000000;
+}
+
+.process-step-header-active {
+	-fx-background-color: #FFFFFF;
+	-fx-font-family: "Helvetica Neue";
+	-fx-font-size: 20;
+	-fx-font-wieght: bold;
+	-fx-text-fill: #47AFD1;
+}
+
+.process-tracker {
+	-fx-background-color: #FFFFFF;
+}
+
+.header-label {
+	-fx-background-color: #FFFFFF;
+	-fx-font-family: "Helvetica Neue";
+	-fx-font-weight: bold;
+	-fx-font-size: 18;
+	-fx-text-fill: BD8500;
+}
+
+.kochbar-label {
+	-fx-background-color: #FFFFFF;
+	-fx-font-family: "Helvetica Neue";
+	-fx-font-size: 14;
+}
+
+.food2fork-label {
+	-fx-background-color: #FFFFFF;
+	-fx-font-family: "Helvetica Neue";
+	-fx-font-size: 14;
+}
+
+.stop-button {
+	-fx-font: 18px "helvetica-neue-condensed_0";
+	-fx-font-color: yellow;
+	-fx-background-color: #C43409;
+	-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0), 5, 0.0, 0, 1);
+}
+
+.chart-title {
+	-fx-font-size: 20px;
+}
+
+.chart-legend {
+	-fx-font-size: 16px;
+}
+
+.header {
+	
+}
+
+@font-face {
+	font-family: 'HelveticaNeue';
+	src: url('resources/fonts/HelveticaNeue.tff');
+}
+
+.root dialog-pane .content {
+	-fx-font: 20px "Arial" !important;
+}

@@ -17,15 +17,20 @@ public class Step {
 	
 	private String text;
 	
-	private CookingEvent event;
+	private List<CookingEvent> events;
 	
 	
 	public Step() {
 		ingredients = new ArrayList<Ingredient>();
 		tools = new ArrayList<Tool>();
 		products = new ArrayList<>();
+		events = new ArrayList<CookingEvent>();
 	}
 	
+	/**
+	 * Liste mit im Arbeitsschritt verwendeten Werkzeugen. Sowohl implizite als auch explizite.
+	 * @return Werkzeugliste
+	 */
 	public List<Tool> getTools() {
 		return tools;
 	}
@@ -45,21 +50,53 @@ public class Step {
 	public void setText(String text) {
 		this.text = text;
 	}
+	/**
+	 * Liste mit Zutaten die im aktuellen Arbeitsschritt benötigt werden. Enthällt auch implizierte 
+	 * und referenzierte Objekte.
+	 * @return Zutatenliste
+	 */
 	public List<Ingredient> getIngredients() {
 		return ingredients;
 	}
 
-	public CookingEvent getEvent() {
-		return event;
-	}
-	public void setEvent(CookingEvent event) {
-		this.event = event;
+	public List<CookingEvent> getEvents() {
+		return events;
 	}
 	
 	@Override
 	public String toString() {
 		return "Step [ingredients=" + ingredients + ", tools=" + tools + ", cookingAction=" + cookingAction + ", products="
 				+ products + ", \'" + text + "']";
+	}
+	public String toEasyToReadString() {
+		StringBuilder sB = new StringBuilder();
+		
+		sB.append("Step [\n");
+		sB.append("\tingredients=[\n");
+		for(Ingredient i : ingredients) {
+			sB.append("\t\t" + i + "\n");
+		}
+		sB.append("\t],\n");
+		sB.append("\ttools=[\n");
+		for(Tool t: tools) {
+			sB.append("\t\t" + t + "\n");
+		}
+		sB.append("\t],\n");
+		sB.append("\tcookingAction=" + cookingAction + ",\n");
+		sB.append("\tproducts=[\n");
+		for(Ingredient i : products) {
+			sB.append("\t\t" + i + "\n");
+		}
+		sB.append("\t],\n");
+		sB.append("\tevents=[\n");
+		for(CookingEvent e : events) {
+			sB.append("\t\t" + e + "\n");
+		}
+		sB.append("\t],\n");
+		sB.append("\t'" + text + "'\n");
+		sB.append("]");
+		
+		return sB.toString();
 	}
 
 	public String printIngredients(){

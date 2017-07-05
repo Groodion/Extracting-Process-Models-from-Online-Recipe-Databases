@@ -1,7 +1,6 @@
 package ai4.master.project.apirequests;
 
 import ai4.master.project.recipe.Recipe;
-import ai4.master.project.recipe.object.Ingredient;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -18,7 +17,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 /**
- * Created by René Bärnreuther on 04.05.2017.
+ * Created by Rene Bärnreuther on 04.05.2017.
 
  * Source for this:
  * http://www.pebra.net/blog/2012/10/31/how-to-get-recipes-fromchefkoch-dot-de/
@@ -118,8 +117,8 @@ public class RecipeGetterChefkoch implements RecipeGetter {
             stringBuilder.append(" ");
             stringBuilder.append(ingredigent.get("einheit"));
             stringBuilder.append("\n");
-            recipe.getIngredients().add(new Ingredient(stringBuilder.toString(), null));
 
+            recipe.getIngredients().add(ingredigent.get("name").toString());
         }
 
         return stringBuilder.toString();

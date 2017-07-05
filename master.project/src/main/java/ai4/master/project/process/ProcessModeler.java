@@ -1,8 +1,7 @@
 package ai4.master.project.process;
 
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-
 import ai4.master.project.recipe.Recipe;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 
 /**
@@ -17,4 +16,6 @@ public interface ProcessModeler {
      * @param recipe The recipe containing the steps annd other informations for convesion
      */
     BpmnModelInstance convertToProcess(Recipe recipe);
+
+    void setFileName(String name);
 }

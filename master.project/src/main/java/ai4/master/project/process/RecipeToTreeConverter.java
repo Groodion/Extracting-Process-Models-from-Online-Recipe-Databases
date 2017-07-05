@@ -12,7 +12,6 @@ import java.util.List;
 
 /**
  * Created by Michael, René on 08.06.2017.
- * // TODO Implement a method to determine whether we need "XOR" or "AND" Gateway using isXor() / setIsXor(true|false)
  */
 public class RecipeToTreeConverter {
 
@@ -24,7 +23,7 @@ public class RecipeToTreeConverter {
         treeList.add(tree);
 
         List<Step> steps = recipe.getSteps();
-
+       // translateSteps(steps);
         for (int i = 0; i < steps.size(); i++) {
             if (i == 0) {
                 //If i = 0 we need to add it as the root because its the first node.
@@ -77,6 +76,12 @@ public class RecipeToTreeConverter {
         Tree<Step> finalTree = new Tree<>(new Node<>(new Step()));
         for (Tree t :
                 treeList) {
+            if(finalTree.getRoot() == null){
+                System.out.println("FinalTree root == null");
+            }
+            if(t.getRoot() == null){
+                System.out.println("Child root == null");
+            }
             finalTree.getRoot().addChild(t.getRoot());
         }
 
@@ -103,9 +108,11 @@ public class RecipeToTreeConverter {
                 //System.out.println("Comparing: Input: " + input.getIngredientName() + " with Output: " + output.getIngredientName());
                 if (input.equals(output)) {
                     return true;
+
                 }
             }
         }
         return false;
     }
+
 }

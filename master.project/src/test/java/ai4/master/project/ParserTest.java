@@ -1,24 +1,84 @@
 package ai4.master.project;
 
+import ai4.master.project.apirequests.RecipeGetterChefkoch;
+import ai4.master.project.process.ProcessModeler;
+import ai4.master.project.process.ProcessModelerImpl;
+import ai4.master.project.recipe.Recipe;
+import ai4.master.project.recipe.Step;
+import ai4.master.project.recipe.TestRecipeFactory;
+import ai4.master.project.stanfordParser.Parser;
+
 import java.net.URL;
 
-import ai4.master.project.recipe.Step;
-import ai4.master.project.stanfordParser.*;
-import ai4.master.project.stanfordParser.sentence.Word;
-
 public class ParserTest {
-	public static void main(String[] args) throws Exception {
+
+
+/*    static String[] ids = {"1340271238839144", "997991205154456", "185511079703831", "150681066371674", "1726761281857676", "2397571379105119", "982031203667502", "914011196708021",
+            "1033741208508759", "965881202287446", "43611014899035"};
+*/
+	
+	static String[] ids = {
+		"43611014899035"
+	};
+    public static void main(String[] args) throws Exception {
+//    	testParser();
+   	testProcessModeler();
+    	//testSimpleProcessExample();
+    }
+
+
+    public static void testSimpleProcessExample(){
+            Recipe r = new TestRecipeFactory().create();
+            ProcessModeler processModeler = new ProcessModelerImpl();
+            processModeler.setFileName("test-layout");
+            processModeler.convertToProcess(r);
+    }
+	public static void testParser() throws Exception {
 		XMLLoader loader = new XMLLoader();
-		KeyWordDatabase kwdb = loader.load(new URL("file:///D:\\Dropbox\\workspace\\Extracting-Process-Models-from-Online-Recipe-Databases\\master.project\\resources\\Lib.xml"));
-				
-		String text = "Den Blätterteig aufrollen und eine Teighälfte mit gut der Hälfte des Schmands bestreichen. Die Hälfte der Schinkenwürfel und des Käses darauf verteilen.\nDie Seite des Blätterteiges, die nicht belegt ist auf die andere Seite klappen.\nWiederum die Hälfte des Teiges mit dem restlichen Schmand bestreichen und die Schinkenwürfel und Käseraspel darauf geben. Die unbestrichene Teighälfte darüber klappen.\nDen Blätterteig in Streifen schneiden. Vorsichtig spiralförmig drehen und auf ein mit Backpapier belegtes Blech legen.\nBei 180° ca. 25 Minuten backen.";
-		//String text = "Aus möglichst großen Kartoffeln mit einem Kugelausstecher kleine Kugeln ausstechen. Diese kurz in kochendem Salzwasser garen, bis sie halb gar sind. Dann in einer Pfanne mit heißer Butter goldbraun anbraten. Zum Schluss die Butter in der Pfanne mit der Fleischbrühe verrühren und unter Rühren kurz einkochen lassen bis eine Sauce entsteht. Mit Salz, Pfeffer und Rosmarin abschmecken. ";
-		//String text = "Aus Mehl, Hefe, Salz, Zucker, Milch oder Wasser einen Hefeteig herstellen. Den fertigen Teig 1 Stunde ruhen lassen, bis er das doppelte Volumen erreicht hat. In der Zwischenzeit die Pflaumen waschen und entsteinen. Den Teig kurz durchkneten, in eine Tarteform von 24-26cm Durchmesser legen, Rand hochziehen. Die Pflaumen auf dem Teigboden verteilen. Für den Guss: den Zwieback fein reiben oder zerbröseln. Die Eier, mit dem Zucker und dem Zimt schaumig schlagen, die Zwiebackbrösel untermischen. Das ganze über die Pflaumen geben und im Backofen bei 180°C ca. 40 Minuten backen. ";
-		//String text = "Aus Mehl, Hefe, Salz, Zucker, Milch oder Wasser einen Hefeteig herstellen. Den fertigen Teig 1 Stunde ruhen lassen, bis er das doppelte Volumen erreicht hat. In der Zwischenzeit die Pflaumen waschen und entsteinen. Den Teig kurz durchkneten, in eine Tarteform von 24-26cm Durchmesser legen, Rand hochziehen. Die Pflaumen auf dem Teigboden verteilen. Für den Guss: den Zwieback fein reiben oder zerbröseln. Die Eier, mit dem Zucker und dem Zimt schaumig schlagen, die Zwiebackbrösel untermischen. Das Ganze über die Pflaumen geben und im Backofen bei 180°C ca. 40 Minuten backen. ";
+		KeyWordDatabase kwdb = loader.load(new URL("file","","resources/Lib.xml"));
 		Parser parser = new Parser("lib/models/german-fast.tagger");
 		parser.setKwdb(kwdb);
-				
+		//1340271238839144
+		//997991205154456,185511079703831,150681066371674,1726761281857676,2397571379105119,982031203667502,914011196708021,1033741208508759,965881202287446,43611014899035,
+
+		Recipe recipe = new RecipeGetterChefkoch().getRecipe("1340271238839144");
 		
-		//System.out.println(Word.stem("Käse") + " " + Word.stem("Käses"));
+		parser.parseRecipe(recipe);
+		
+		for(Step step : recipe.getSteps()) {
+			System.out.println(step.toEasyToReadString());
+		}
 	}
+
+    public static void testProcessModeler() throws Exception {
+
+        XMLLoader loader = new XMLLoader();
+        KeyWordDatabase kwdb = loader.load(new URL("file", "", "resources/Lib.xml"));
+        Parser parser = new Parser("lib/models/german-fast.tagger");
+        parser.setKwdb(kwdb);
+        for (int i = 0; i < ids.length; i++) {
+            String currentRecipe = ids[i];
+            System.out.println("PARSING RECIPE WITH ID " + currentRecipe);
+            try {
+                Recipe recipe = new RecipeGetterChefkoch().getRecipe(currentRecipe);
+                parser.parseRecipe(recipe);
+                
+        		for(Step step : recipe.getSteps()) {
+        			System.out.println(step.toEasyToReadString());
+        		}
+
+                //Now steps are saved in recipe
+                ProcessModeler processModeler = new ProcessModelerImpl();
+                processModeler.setFileName(currentRecipe + "toBpmn");
+                processModeler.convertToProcess(recipe);
+            } catch (Exception ex) {
+                System.err.println("Could not parse Recipe with id: " + currentRecipe);
+                System.err.println("Following error occured: ");
+                ex.printStackTrace();
+            }
+            System.out.println("FINISHED PARSING RECIPE WITH ID " + currentRecipe);
+            System.out.println("#################################################");
+        }
+
+    }
 }

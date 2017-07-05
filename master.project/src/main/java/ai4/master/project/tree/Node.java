@@ -6,7 +6,6 @@ import java.util.List;
 public class Node<T> {
     private T data = null;
 
-    boolean childrenOr = false;
     private List<Node<T>> children = new ArrayList<Node<T>>();
     private Node<T> parent = null;
 
@@ -34,13 +33,7 @@ public class Node<T> {
     }
 
 
-    public boolean isXor(){
-        return this.childrenOr;
-    }
 
-    public void setIsXor(boolean val){
-        this.childrenOr = val;
-    }
     public List<Node<T>> getChildren() {
         return children;
     }

@@ -1,19 +1,10 @@
 package ai4.master.project.recipe;
 
-import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
-import ai4.master.project.recipe.baseObject.BaseTool;
-import ai4.master.project.recipe.object.CookingAction;
 import ai4.master.project.recipe.object.Ingredient;
-import ai4.master.project.recipe.object.Tool;
-import ai4.master.project.recipe.object.ingredientTag.IngredientTag;
-import ai4.master.project.recipe.object.ingredientTag.QuantifierTag;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TestRecipeFactory {
-
+/*
 	public Recipe createRecipe() {
 		Recipe recipe = new Recipe(LANG_FLAG.DE);
 
@@ -300,7 +291,7 @@ public class TestRecipeFactory {
 		recipe.getIngredients().add(bI_schmand.toObject());
 
 		return recipe;
-	}
+	}*/
 
 	/*
 	 * Bäume sehen so aus: (aufgelistet die Ingredients)
@@ -382,11 +373,11 @@ Brötchen + Schinken/Zwiebeln	Brötchen mit Schinken/Marmelade
 		Recipe recipe = new Recipe(LANG_FLAG.DE);
 
 		// One line
-//		Step a1 = new Step();
-//		a1.setText("A1");
-//		a1.getIngredients().add(new Ingredient("A",new BaseIngredient()));
-//		a1.getProducts().add(new Ingredient("A_Out",new BaseIngredient()));
-//		recipe.getSteps().add(a1);
+		Step a1 = new Step();
+		a1.setText("A1");
+		a1.getIngredients().add(new Ingredient("A",new BaseIngredient()));
+		a1.getProducts().add(new Ingredient("A_Out",new BaseIngredient()));
+		recipe.getSteps().add(a1);
 
 		Step a2 = new Step();
 		a2.setText("A2");
@@ -410,23 +401,23 @@ Brötchen + Schinken/Zwiebeln	Brötchen mit Schinken/Marmelade
 
 //		//Connect
 //
-		Step c1 = new Step();
-		c1.setText("C1");
-		c1.getIngredients().add(new Ingredient("B2_Out", new BaseIngredient()));
-		c1.getIngredients().add(new Ingredient("A2_Out",new BaseIngredient()));
-		c1.getProducts().add(new Ingredient("Asd", new BaseIngredient()));
-		recipe.getSteps().add(c1);
+//		Step c1 = new Step();
+//		c1.setText("C1");
+//		c1.getIngredients().add(new Ingredient("B2_Out", new BaseIngredient()));
+//		c1.getIngredients().add(new Ingredient("A2_Out",new BaseIngredient()));
+//		c1.getProducts().add(new Ingredient("Asd", new BaseIngredient()));
+//		recipe.getSteps().add(c1);
+////
+//		Step c2 = new Step();
+//		c2.setText("C2");
+//		c2.getIngredients().add(new Ingredient("Asd", new BaseIngredient()));
+//		recipe.getSteps().add(c2);
+////
 //
-		Step c2 = new Step();
-		c2.setText("C2");
-		c2.getIngredients().add(new Ingredient("Asd", new BaseIngredient()));
-		recipe.getSteps().add(c2);
-//
-
-		Step d1 = new Step();
-		d1.setText("D1");
-		d1.getIngredients().add(new Ingredient("Asd", new BaseIngredient()));
-		recipe.getSteps().add(d1);
+//		Step d1 = new Step();
+//		d1.setText("D1");
+//		d1.getIngredients().add(new Ingredient("Asd", new BaseIngredient()));
+//		recipe.getSteps().add(d1);
 
 		return recipe;
 	}
