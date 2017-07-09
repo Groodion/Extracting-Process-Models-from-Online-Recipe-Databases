@@ -20,17 +20,19 @@
 	-fx-text-fill: white;
 	-fx-background-color: #000000;
 	-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0), 5, 0.0, 0, 1);
+	-fx-border-radius: 10 10 10 10;
+	-fx-border-width: 1 1 1 1; /* its make really one-pixel-border */
+	-fx-border-color: FFFFFF;
 }
 
-.databaseLabel:hover {
-	-fx-background-color: #dae7f3;
-}
-
-.chefkoch-label {
+.database-label {
 	-fx-background-color: #FFFFFF;
 	-fx-font-family: "Helvetica Neue";
 	-fx-font-size: 14;
 	-fx-text-fill: FB2568;
+}
+.database-label:hover {
+	-fx-background-color: #dae7f3;
 }
 
 .attribute-value {
@@ -80,18 +82,6 @@
 	-fx-font-weight: bold;
 	-fx-font-size: 18;
 	-fx-text-fill: BD8500;
-}
-
-.kochbar-label {
-	-fx-background-color: #FFFFFF;
-	-fx-font-family: "Helvetica Neue";
-	-fx-font-size: 14;
-}
-
-.food2fork-label {
-	-fx-background-color: #FFFFFF;
-	-fx-font-family: "Helvetica Neue";
-	-fx-font-size: 14;
 }
 
 .stop-button {

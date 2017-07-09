@@ -2,7 +2,6 @@ package ai4.master.project.view;
 
 import java.util.HashSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
@@ -79,7 +78,6 @@ public class LibEditor extends Dialog<Object> implements Observer {
 	private TableView<ToolEntry> toolTable;
 	private ObservableList<BaseTool> realToolsList = FXCollections.observableArrayList();
 
-
 	private ObservableList<String> realEventIndicatorsList = FXCollections.observableArrayList();
 
 	private TableView<EventIndicatorEntry> eventIndicatorsTable;
@@ -96,7 +94,10 @@ public class LibEditor extends Dialog<Object> implements Observer {
 
 	private TableView<IngredientEntry> ingredientsTable;
 	private ObservableList<BaseIngredient> realIngredientsList = FXCollections.observableArrayList();
+	
+	private ObservableList<BaseIngredient> realCookingActionsList = FXCollections.observableArrayList();
 
+	
 	public LibEditor() {
 		cancelButtonType = new ButtonType("Abbrechen", ButtonData.CANCEL_CLOSE);
 		okayButtonType = new ButtonType("Okay", ButtonData.OK_DONE);
@@ -155,24 +156,24 @@ public class LibEditor extends Dialog<Object> implements Observer {
 					synonymsView.setMinHeight(0);
 					synonymsView.setPrefHeight(50);
 					synonymsView.setEditable(true);
-					
-					
+
 					ContextMenu synonymCm = new ContextMenu();
 					MenuItem removeSynonymItem = new MenuItem("Remove synonym");
 					MenuItem addSynonymItem = new MenuItem("Add new synonym");
 					synonymCm.getItems().addAll(removeSynonymItem, addSynonymItem);
-					
-					removeSynonymItem.disableProperty().bind(synonymsView.getSelectionModel().selectedItemProperty().isNull());
+
+					removeSynonymItem.disableProperty()
+							.bind(synonymsView.getSelectionModel().selectedItemProperty().isNull());
 					removeSynonymItem.setOnAction(e -> {
 						int index = synonymsView.getSelectionModel().getSelectedIndex();
 						synonymsView.getItems().remove(index);
 					});
-					
+
 					addSynonymItem.setOnAction(e -> {
 						synonyms.add("new Synonym " + synonyms.size());
 						synonymsView.requestFocus();
 					});
-					
+
 					if (synonyms != null) {
 						synonymsView.setItems(synonyms);
 					}
@@ -180,12 +181,11 @@ public class LibEditor extends Dialog<Object> implements Observer {
 					synonymsView.setOnMouseClicked(e -> {
 						if (e.getButton() == MouseButton.SECONDARY) {
 							synonymCm.show(synonymsView, e.getScreenX(), e.getScreenY());
-						}
-						else {
+						} else {
 							synonymCm.hide();
 						}
 					});
-					
+
 					layout.getChildren().add(synonymsView);
 
 					setGraphic(layout);
@@ -197,35 +197,30 @@ public class LibEditor extends Dialog<Object> implements Observer {
 		groupsTable.getColumns().add(nameColumn);
 		groupsTable.getColumns().add(synonymsColumn);
 
-		addGroup.setOnMouseClicked(new EventHandler<MouseEvent>() {
+		addGroup.setOnMouseClicked(e -> {
+			BaseIngredientGroup group = new BaseIngredientGroup();
+			group.addName(tFName.getText());
+			String s = tFSynonyms.getText();
 
-			@Override
-			public void handle(MouseEvent e) {
-				BaseIngredientGroup group = new BaseIngredientGroup();
-				group.addName(tFName.getText());
-				String s = tFSynonyms.getText();
-
-				for (String t : s.split(";")) {
-					group.getNames().add(t);
-				}
-
-				for (String name : group.getNames()) {
-					if (kwdb.findIngredient(name) != null) {
-						Alert alert = new Alert(AlertType.WARNING);
-						alert.setTitle("Warning Dialog");
-						alert.setContentText("The given name " + name + " already exists!");
-
-						alert.showAndWait();
-						return;
-					}
-				}
-
-				new GroupEntry(group, groupsTable.getItems(), KeyWordDatabase.GERMAN_KWDB);
-				realGroupsList.add(group);
-				tFName.setText("");
-				tFSynonyms.setText("");
-
+			for (String t : s.split(";")) {
+				group.getNames().add(t);
 			}
+
+			for (String name : group.getNames()) {
+				if (kwdb.findIngredient(name) != null) {
+					Alert alert = new Alert(AlertType.WARNING);
+					alert.setTitle("Warning Dialog");
+					alert.setContentText("The given name " + name + " already exists!");
+
+					alert.showAndWait();
+					return;
+				}
+			}
+
+			new GroupEntry(group, groupsTable.getItems(), KeyWordDatabase.GERMAN_KWDB);
+			realGroupsList.add(group);
+			tFName.setText("");
+			tFSynonyms.setText("");
 		});
 
 		for (
@@ -247,8 +242,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 		groupsTable.setOnMouseClicked(e -> {
 			if (e.getButton() == MouseButton.SECONDARY) {
 				cm.show(groupsTable, e.getScreenX(), e.getScreenY());
-			}
-			else {
+			} else {
 				cm.hide();
 			}
 		});
@@ -315,9 +309,10 @@ public class LibEditor extends Dialog<Object> implements Observer {
 					addSynonymBtn.setOnAction(e -> {
 						synonyms.add("new Synonym " + synonyms.size());
 						synonymsView.requestFocus();
-
+					});
 					ContextMenu synonymsViewCM = new ContextMenu();
 					MenuItem addSynonym = new MenuItem("Add new Synonym");
+					
 					addSynonym.setOnAction(e -> {
 						synonyms.add("synonym" + synonyms.size());
 						Platform.runLater(() -> {
@@ -366,113 +361,101 @@ public class LibEditor extends Dialog<Object> implements Observer {
 		regexColumn.setCellFactory(column -> {
 			TableCell<CookingActionEntry, ObservableList<Regex>> cell = new TableCell<CookingActionEntry, ObservableList<Regex>>() {
 
-				@Override
-				public void updateItem(ObservableList<Regex> regexList, boolean empty) {
-					super.updateItem(regexList, empty);
+	@Override
+	public void updateItem(ObservableList<Regex> regexList, boolean empty) {
+		super.updateItem(regexList, empty);
 
-					VBox layout = new VBox();
+		VBox layout = new VBox();
 
-					Button addRegexBtn = new Button("Add Regex");
+		Button addRegexBtn = new Button("Add Regex");
 
-					TableView<RegexEntry> regexTable = new TableView<RegexEntry>();
-					regexTable.setMinHeight(0);
-					regexTable.setPrefHeight(75);
-					regexTable.setEditable(true);
+		TableView<RegexEntry> regexTable = new TableView<RegexEntry>();
+		regexTable.setMinHeight(0);
+		regexTable.setPrefHeight(75);
+		regexTable.setEditable(true);
 
-
-					ContextMenu regexTableCM = new ContextMenu();
-					MenuItem addRegex = new MenuItem("Add new Regex");
-					addRegex.setOnAction(e -> {
-						regexList.add(new Regex(".*", Result.ALL));
-					});
-					regexTableCM.getItems().add(addRegex);
-					MenuItem removeRegex = new MenuItem("Remove Regex");
-					removeRegex.disableProperty().bind(regexTable.getSelectionModel().selectedItemProperty().isNull());
-					removeRegex.setOnAction(e -> {
-						int index = regexTable.getSelectionModel().getSelectedIndex();
-						regexList.remove(index);
-					});
-					regexTableCM.getItems().add(removeRegex);
-					regexTable.setOnMouseClicked(e -> {
-						if (e.getButton() == MouseButton.SECONDARY) {
-							regexTableCM.show(regexTable, e.getScreenX(), e.getScreenY());
-						} else {
-							regexTableCM.hide();
-						}
-					});
-
-
-					TableColumn<RegexEntry, String> idColumn = new TableColumn<RegexEntry, String>("Id");
-					idColumn.setCellValueFactory(new PropertyValueFactory<RegexEntry, String>("id"));
-					idColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-
-					TableColumn<RegexEntry, String> expressionColumn = new TableColumn<RegexEntry, String>(
-							"Expression");
-					expressionColumn.setCellValueFactory(new PropertyValueFactory<RegexEntry, String>("expression"));
-					expressionColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-
-					TableColumn<RegexEntry, Regex.Result> resultColumn = new TableColumn<RegexEntry, Regex.Result>(
-							"Result");
-					resultColumn.setCellValueFactory(new PropertyValueFactory<RegexEntry, Regex.Result>("result"));
-					resultColumn.setCellFactory(ChoiceBoxTableCell.forTableColumn(results));
-
-					TableColumn<RegexEntry, Boolean> ingredientsNeededColumn = new TableColumn<RegexEntry, Boolean>(
-							"IngredientsNeeded");
-					ingredientsNeededColumn
-							.setCellValueFactory(new PropertyValueFactory<RegexEntry, Boolean>("ingredientsNeeded"));
-					ingredientsNeededColumn.setCellFactory(CheckBoxTableCell.forTableColumn(ingredientsNeededColumn));
-
-					TableColumn<RegexEntry, Boolean> referencePreviousProductsColumn = new TableColumn<RegexEntry, Boolean>(
-							"ReferencePreviousProducts");
-					referencePreviousProductsColumn.setCellValueFactory(
-							new PropertyValueFactory<RegexEntry, Boolean>("referencePreviousProducts"));
-					referencePreviousProductsColumn
-							.setCellFactory(CheckBoxTableCell.forTableColumn(ingredientsNeededColumn));
-
-					regexTable.getColumns().add(idColumn);
-					regexTable.getColumns().add(expressionColumn);
-					regexTable.getColumns().add(resultColumn);
-					regexTable.getColumns().add(ingredientsNeededColumn);
-					regexTable.getColumns().add(referencePreviousProductsColumn);
-
-
-					addRegexBtn.setOnAction(e -> {
-						Regex regex = new Regex(".*", Result.ALL);
-						regexList.add(regex);
-						new RegexEntry(regex, regexTable.getItems(), regexList);
-						regexTable.requestFocus();
-					});
-
-					if (regexList != null) {
-						for (Regex regex : regexList) {
-							new RegexEntry(regex, regexTable.getItems(), regexList);
-						}
-					}
-
-					addRegexBtn.visibleProperty().bind(regexTable.focusedProperty().or(addRegexBtn.focusedProperty()));
-
-					layout.getChildren().add(regexTable);
-					layout.getChildren().add(addRegexBtn);
-
-					setGraphic(layout);
-
-					if (regexList != null) {
-						for (Regex regex : regexList) {
-							new RegexEntry(regex, regexTable.getItems(), regexList, regexIdMap.get(regex));
-						}
-					}
-
-					setGraphic(regexTable);
-				}
-			};
-			return cell;
+		ContextMenu regexTableCM = new ContextMenu();
+		MenuItem addRegex = new MenuItem("Add new Regex");
+		addRegex.setOnAction(e -> {
+			regexList.add(new Regex(".*", Result.ALL));
+		});
+		regexTableCM.getItems().add(addRegex);
+		MenuItem removeRegex = new MenuItem("Remove Regex");
+		removeRegex.disableProperty().bind(regexTable.getSelectionModel().selectedItemProperty().isNull());
+		removeRegex.setOnAction(e -> {
+			int index = regexTable.getSelectionModel().getSelectedIndex();
+			regexList.remove(index);
+		});
+		regexTableCM.getItems().add(removeRegex);
+		regexTable.setOnMouseClicked(e -> {
+			if (e.getButton() == MouseButton.SECONDARY) {
+				regexTableCM.show(regexTable, e.getScreenX(), e.getScreenY());
+			} else {
+				regexTableCM.hide();
+			}
 		});
 
-		TableColumn<CookingActionEntry, ObservableList<Transformation>> transformationsColumn = new TableColumn<CookingActionEntry, ObservableList<Transformation>>(
-				"Transformations");
-		transformationsColumn.setCellValueFactory(
-				new PropertyValueFactory<CookingActionEntry, ObservableList<Transformation>>("transformations"));
-		transformationsColumn.setCellFactory(column -> {
+		TableColumn<RegexEntry, String> idColumn = new TableColumn<RegexEntry, String>("Id");
+		idColumn.setCellValueFactory(new PropertyValueFactory<RegexEntry, String>("id"));
+		idColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+
+		TableColumn<RegexEntry, String> expressionColumn = new TableColumn<RegexEntry, String>("Expression");
+		expressionColumn.setCellValueFactory(new PropertyValueFactory<RegexEntry, String>("expression"));
+		expressionColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+
+		TableColumn<RegexEntry, Regex.Result> resultColumn = new TableColumn<RegexEntry, Regex.Result>("Result");
+		resultColumn.setCellValueFactory(new PropertyValueFactory<RegexEntry, Regex.Result>("result"));
+		resultColumn.setCellFactory(ChoiceBoxTableCell.forTableColumn(results));
+
+		TableColumn<RegexEntry, Boolean> ingredientsNeededColumn = new TableColumn<RegexEntry, Boolean>(
+				"IngredientsNeeded");
+		ingredientsNeededColumn.setCellValueFactory(new PropertyValueFactory<RegexEntry, Boolean>("ingredientsNeeded"));
+		ingredientsNeededColumn.setCellFactory(CheckBoxTableCell.forTableColumn(ingredientsNeededColumn));
+
+		TableColumn<RegexEntry, Boolean> referencePreviousProductsColumn = new TableColumn<RegexEntry, Boolean>(
+				"ReferencePreviousProducts");
+		referencePreviousProductsColumn
+				.setCellValueFactory(new PropertyValueFactory<RegexEntry, Boolean>("referencePreviousProducts"));
+		referencePreviousProductsColumn.setCellFactory(CheckBoxTableCell.forTableColumn(ingredientsNeededColumn));
+
+		regexTable.getColumns().add(idColumn);
+		regexTable.getColumns().add(expressionColumn);
+		regexTable.getColumns().add(resultColumn);
+		regexTable.getColumns().add(ingredientsNeededColumn);
+		regexTable.getColumns().add(referencePreviousProductsColumn);
+
+		addRegexBtn.setOnAction(e -> {
+			Regex regex = new Regex(".*", Result.ALL);
+			regexList.add(regex);
+			new RegexEntry(regex, regexTable.getItems(), regexList);
+			regexTable.requestFocus();
+		});
+
+		if (regexList != null) {
+			for (Regex regex : regexList) {
+				new RegexEntry(regex, regexTable.getItems(), regexList);
+			}
+		}
+
+		addRegexBtn.visibleProperty().bind(regexTable.focusedProperty().or(addRegexBtn.focusedProperty()));
+
+		layout.getChildren().add(regexTable);
+		layout.getChildren().add(addRegexBtn);
+
+		setGraphic(layout);
+
+		if (regexList != null) {
+			for (Regex regex : regexList) {
+				new RegexEntry(regex, regexTable.getItems(), regexList, regexIdMap.get(regex));
+			}
+		}
+
+		setGraphic(regexTable);
+	}};return cell;});
+
+	TableColumn<CookingActionEntry, ObservableList<Transformation>> transformationsColumn = new TableColumn<CookingActionEntry, ObservableList<Transformation>>(
+			"Transformations");transformationsColumn.setCellValueFactory(new PropertyValueFactory<CookingActionEntry,ObservableList<Transformation>>("transformations"));transformationsColumn.setCellFactory(column->
+	{
 			TableCell<CookingActionEntry, ObservableList<Transformation>> cell = new TableCell<CookingActionEntry, ObservableList<Transformation>>() {
 				@Override
 				public void updateItem(ObservableList<Transformation> transformations, boolean empty) {
@@ -609,48 +592,31 @@ public class LibEditor extends Dialog<Object> implements Observer {
 						return cell;
 					});
 
-					TableColumn<TransformationEntry, String> ingredientTagColumn = new TableColumn<TransformationEntry, String>(
-							"IngredientTag");
-					ingredientTagColumn.setCellValueFactory(
-							new PropertyValueFactory<TransformationEntry, String>("ingredientTag"));
-					ingredientTagColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+	TableColumn<TransformationEntry, String> ingredientTagColumn = new TableColumn<TransformationEntry, String>(
+			"IngredientTag");ingredientTagColumn.setCellValueFactory(new PropertyValueFactory<TransformationEntry,String>("ingredientTag"));ingredientTagColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 
-					TableColumn<TransformationEntry, String> quantifierTagColumn = new TableColumn<TransformationEntry, String>(
-							"QuantifierTag");
-					quantifierTagColumn.setCellValueFactory(
-							new PropertyValueFactory<TransformationEntry, String>("quantifierTag"));
-					quantifierTagColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+	TableColumn<TransformationEntry, String> quantifierTagColumn = new TableColumn<TransformationEntry, String>(
+			"QuantifierTag");quantifierTagColumn.setCellValueFactory(new PropertyValueFactory<TransformationEntry,String>("quantifierTag"));quantifierTagColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 
-					TableColumn<TransformationEntry, BaseIngredient> productColumn = new TableColumn<TransformationEntry, BaseIngredient>(
-							"Product");
-					productColumn.setCellValueFactory(
-							new PropertyValueFactory<TransformationEntry, BaseIngredient>("product"));
-					productColumn.setCellFactory(ComboBoxTableCell.forTableColumn(realIngredientsList));
+	TableColumn<TransformationEntry, BaseIngredient> productColumn = new TableColumn<TransformationEntry, BaseIngredient>(
+			"Product");productColumn.setCellValueFactory(new PropertyValueFactory<TransformationEntry,BaseIngredient>("product"));productColumn.setCellFactory(ComboBoxTableCell.forTableColumn(realIngredientsList));
 
-					transformationsTable.getColumns().add(refIdColumn);
-					transformationsTable.getColumns().add(ingredientsColumn);
-					transformationsTable.getColumns().add(ingredientTagColumn);
-					transformationsTable.getColumns().add(quantifierTagColumn);
-					transformationsTable.getColumns().add(productColumn);
+	transformationsTable.getColumns().add(refIdColumn);transformationsTable.getColumns().add(ingredientsColumn);transformationsTable.getColumns().add(ingredientTagColumn);transformationsTable.getColumns().add(quantifierTagColumn);transformationsTable.getColumns().add(productColumn);
 
-					if (transformations != null) {
-						for (Transformation transformation : transformations) {
-							new TransformationEntry(transformation, transformationsTable.getItems(), transformations,
-									regexIdMap.get(transformation));
-						}
-					}
+	if(transformations!=null)
+	{
+		for (Transformation transformation : transformations) {
+			new TransformationEntry(transformation, transformationsTable.getItems(), transformations,
+					regexIdMap.get(transformation));
+		}
+	}
 
-					setGraphic(transformationsTable);
-				}
-			};
-			return cell;
-		});
+	setGraphic(transformationsTable);
+				}};return cell;});
 
-		TableColumn<CookingActionEntry, ObservableList<BaseTool>> toolsColumn = new TableColumn<CookingActionEntry, ObservableList<BaseTool>>(
-				"Implied Tools");
-		toolsColumn
-				.setCellValueFactory(new PropertyValueFactory<CookingActionEntry, ObservableList<BaseTool>>("tools"));
-		toolsColumn.setCellFactory(column -> {
+	TableColumn<CookingActionEntry, ObservableList<BaseTool>> toolsColumn = new TableColumn<CookingActionEntry, ObservableList<BaseTool>>(
+			"Implied Tools");toolsColumn.setCellValueFactory(new PropertyValueFactory<CookingActionEntry,ObservableList<BaseTool>>("tools"));toolsColumn.setCellFactory(column->
+	{
 			TableCell<CookingActionEntry, ObservableList<BaseTool>> cell = new TableCell<CookingActionEntry, ObservableList<BaseTool>>() {
 				@Override
 				public void updateItem(ObservableList<BaseTool> tools, boolean empty) {
@@ -732,12 +698,12 @@ public class LibEditor extends Dialog<Object> implements Observer {
 
 		HBox addPartIndicatorPane = new HBox();
 		addPartIndicatorPane.setSpacing(10);
-		
+
 		addPartIndicatorPane.getChildren().add(new Label("Part Indicator: "));
 		TextField tFName = new TextField();
 		tFName.setPromptText("Part Indicator");
 		addPartIndicatorPane.getChildren().add(tFName);
-		
+
 		Button addPartIndicator = new Button("Add");
 		addPartIndicator.disableProperty().bind(tFName.textProperty().isEmpty());
 		addPartIndicatorPane.getChildren().add(addPartIndicator);
@@ -746,7 +712,8 @@ public class LibEditor extends Dialog<Object> implements Observer {
 		partIndicatorsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		partIndicatorsTable.setEditable(true);
 
-		TableColumn<PartIndicatorEntry, String> nameColumn = new TableColumn<PartIndicatorEntry, String>("Part Indicator");
+		TableColumn<PartIndicatorEntry, String> nameColumn = new TableColumn<PartIndicatorEntry, String>(
+				"Part Indicator");
 		nameColumn.setCellValueFactory(new PropertyValueFactory<PartIndicatorEntry, String>("partIndicator"));
 		nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 
@@ -757,9 +724,9 @@ public class LibEditor extends Dialog<Object> implements Observer {
 			@Override
 			public void handle(MouseEvent e) {
 				String newPartIndicator = tFName.getText();
-				
-				for(PartIndicatorEntry entry : partIndicatorsTable.getItems()) {
-					if(newPartIndicator.equals(entry.getPartIndicator())) {
+
+				for (PartIndicatorEntry entry : partIndicatorsTable.getItems()) {
+					if (newPartIndicator.equals(entry.getPartIndicator())) {
 						Alert alert = new Alert(AlertType.WARNING);
 						alert.setTitle("Warning Dialog");
 						alert.setContentText("The given name " + newPartIndicator + " already exists!");
@@ -767,7 +734,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 						alert.showAndWait();
 						return;
 					}
-				}				
+				}
 
 				new PartIndicatorEntry(newPartIndicator, partIndicatorsTable.getItems(), KeyWordDatabase.GERMAN_KWDB);
 				realPartIndicatorsList.add(newPartIndicator);
@@ -794,8 +761,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 		partIndicatorsTable.setOnMouseClicked(e -> {
 			if (e.getButton() == MouseButton.SECONDARY) {
 				cm.show(partIndicatorsTable, e.getScreenX(), e.getScreenY());
-			}
-			else {
+			} else {
 				cm.hide();
 			}
 		});
@@ -810,23 +776,24 @@ public class LibEditor extends Dialog<Object> implements Observer {
 
 		HBox addLastSentenceReferencePane = new HBox();
 		addLastSentenceReferencePane.setSpacing(10);
-		
+
 		addLastSentenceReferencePane.getChildren().add(new Label("Last Sentence Reference: "));
 		TextField tFName = new TextField();
 		tFName.setPromptText("Last Sentence Reference");
 		addLastSentenceReferencePane.getChildren().add(tFName);
-		
+
 		Button addLastSentenceReference = new Button("Add");
 		addLastSentenceReference.disableProperty().bind(tFName.textProperty().isEmpty());
 		addLastSentenceReferencePane.getChildren().add(addLastSentenceReference);
-
 
 		lastSentenceReferencesTable = new TableView<LastSentenceReferenceEntry>();
 		lastSentenceReferencesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		lastSentenceReferencesTable.setEditable(true);
 
-		TableColumn<LastSentenceReferenceEntry, String> nameColumn = new TableColumn<LastSentenceReferenceEntry, String>("Last Sentence Reference");
-		nameColumn.setCellValueFactory(new PropertyValueFactory<LastSentenceReferenceEntry, String>("lastSentenceReference"));
+		TableColumn<LastSentenceReferenceEntry, String> nameColumn = new TableColumn<LastSentenceReferenceEntry, String>(
+				"Last Sentence Reference");
+		nameColumn.setCellValueFactory(
+				new PropertyValueFactory<LastSentenceReferenceEntry, String>("lastSentenceReference"));
 		nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 
 		lastSentenceReferencesTable.getColumns().add(nameColumn);
@@ -836,9 +803,9 @@ public class LibEditor extends Dialog<Object> implements Observer {
 			@Override
 			public void handle(MouseEvent e) {
 				String newLastSentenceReference = tFName.getText();
-				
-				for(LastSentenceReferenceEntry entry : lastSentenceReferencesTable.getItems()) {
-					if(newLastSentenceReference.equals(entry.getLastSentenceReference())) {
+
+				for (LastSentenceReferenceEntry entry : lastSentenceReferencesTable.getItems()) {
+					if (newLastSentenceReference.equals(entry.getLastSentenceReference())) {
 						Alert alert = new Alert(AlertType.WARNING);
 						alert.setTitle("Warning Dialog");
 						alert.setContentText("The given name " + newLastSentenceReference + " already exists!");
@@ -846,9 +813,10 @@ public class LibEditor extends Dialog<Object> implements Observer {
 						alert.showAndWait();
 						return;
 					}
-				}				
+				}
 
-				new LastSentenceReferenceEntry(newLastSentenceReference, lastSentenceReferencesTable.getItems(), KeyWordDatabase.GERMAN_KWDB);
+				new LastSentenceReferenceEntry(newLastSentenceReference, lastSentenceReferencesTable.getItems(),
+						KeyWordDatabase.GERMAN_KWDB);
 				realLastSentenceReferencesList.add(newLastSentenceReference);
 				tFName.setText("");
 			}
@@ -857,7 +825,8 @@ public class LibEditor extends Dialog<Object> implements Observer {
 		for (
 
 		String lastSentenceReference : KeyWordDatabase.GERMAN_KWDB.getLastSentenceReferences()) {
-			new LastSentenceReferenceEntry(lastSentenceReference, lastSentenceReferencesTable.getItems(), KeyWordDatabase.GERMAN_KWDB);
+			new LastSentenceReferenceEntry(lastSentenceReference, lastSentenceReferencesTable.getItems(),
+					KeyWordDatabase.GERMAN_KWDB);
 		}
 
 		ContextMenu cm = new ContextMenu();
@@ -873,8 +842,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 		lastSentenceReferencesTable.setOnMouseClicked(e -> {
 			if (e.getButton() == MouseButton.SECONDARY) {
 				cm.show(lastSentenceReferencesTable, e.getScreenX(), e.getScreenY());
-			}
-			else {
+			} else {
 				cm.hide();
 			}
 		});
@@ -889,13 +857,13 @@ public class LibEditor extends Dialog<Object> implements Observer {
 
 		HBox addEventIndicatorPane = new HBox();
 		addEventIndicatorPane.setSpacing(10);
-		
+
 		addEventIndicatorPane.getChildren().add(new Label("Event Indicator: "));
 
 		TextField tFName = new TextField();
 		tFName.setPromptText("Event Indicator");
 		addEventIndicatorPane.getChildren().add(tFName);
-		
+
 		Button addEventIndicator = new Button("Add");
 		addEventIndicator.disableProperty().bind(tFName.textProperty().isEmpty());
 		addEventIndicatorPane.getChildren().add(addEventIndicator);
@@ -904,10 +872,10 @@ public class LibEditor extends Dialog<Object> implements Observer {
 		eventIndicatorsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		eventIndicatorsTable.setEditable(true);
 
-		TableColumn<EventIndicatorEntry, String> nameColumn = new TableColumn<EventIndicatorEntry, String>("Event Indicator");
+		TableColumn<EventIndicatorEntry, String> nameColumn = new TableColumn<EventIndicatorEntry, String>(
+				"Event Indicator");
 		nameColumn.setCellValueFactory(new PropertyValueFactory<EventIndicatorEntry, String>("eventIndicator"));
 		nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-
 
 		eventIndicatorsTable.getColumns().add(nameColumn);
 
@@ -916,9 +884,9 @@ public class LibEditor extends Dialog<Object> implements Observer {
 			@Override
 			public void handle(MouseEvent e) {
 				String newIndicator = tFName.getText();
-				
-				for(EventIndicatorEntry entry : eventIndicatorsTable.getItems()) {
-					if(newIndicator.equals(entry.getEventIndicator())) {
+
+				for (EventIndicatorEntry entry : eventIndicatorsTable.getItems()) {
+					if (newIndicator.equals(entry.getEventIndicator())) {
 						Alert alert = new Alert(AlertType.WARNING);
 						alert.setTitle("Warning Dialog");
 						alert.setContentText("The given name " + newIndicator + " already exists!");
@@ -926,14 +894,13 @@ public class LibEditor extends Dialog<Object> implements Observer {
 						alert.showAndWait();
 						return;
 					}
-				}				
+				}
 
 				new EventIndicatorEntry(newIndicator, eventIndicatorsTable.getItems(), KeyWordDatabase.GERMAN_KWDB);
 				realEventIndicatorsList.add(newIndicator);
 				tFName.setText("");
 			}
 		});
-
 
 		for (
 
@@ -956,8 +923,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 		eventIndicatorsTable.setOnMouseClicked(e -> {
 			if (e.getButton() == MouseButton.SECONDARY) {
 				cm.show(eventIndicatorsTable, e.getScreenX(), e.getScreenY());
-			}
-			else {
+			} else {
 				cm.hide();
 			}
 		});
@@ -1088,61 +1054,59 @@ public class LibEditor extends Dialog<Object> implements Observer {
 
 		add.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
-			@Override
-			public void handle(MouseEvent e) {
-				BaseTool tool = new BaseTool();
-				tool.addName(tFName.getText());
-				String s = tFSynonyms.getText();
+	@Override
+	public void handle(MouseEvent e) {
+		BaseTool tool = new BaseTool();
+		tool.addName(tFName.getText());
+		String s = tFSynonyms.getText();
 
-				for (String t : s.split(";")) {
-					tool.getNames().add(t);
-				}
-
-				for (String name : tool.getNames()) {
-					if (kwdb.findTool(name) != null) {
-						Alert alert = new Alert(AlertType.WARNING);
-						alert.setTitle("Warning Dialog");
-						alert.setContentText("The given name " + name + " already exists!");
-
-						alert.showAndWait();
-						return;
-					}
-				}
-
-				new ToolEntry(tool, toolTable.getItems(), KeyWordDatabase.GERMAN_KWDB);
-				realToolsList.add(tool);
-				tFName.setText("");
-				tFSynonyms.setText("");
-			}
-		});
-
-		for (
-
-		BaseTool tool : KeyWordDatabase.GERMAN_KWDB.getTools()) {
-			new ToolEntry(tool, toolTable.getItems(), KeyWordDatabase.GERMAN_KWDB);
+		for (String t : s.split(";")) {
+			tool.getNames().add(t);
 		}
 
-		ContextMenu cm = new ContextMenu();
-		MenuItem remove = new MenuItem("Remove Tool");
-		remove.disableProperty().bind(toolTable.getSelectionModel().selectedItemProperty().isNull());
-		remove.setOnAction(e -> {
-			int index = toolTable.getSelectionModel().getSelectedIndex();
-			realToolsList.remove(index);
-			toolTable.getItems().remove(index);
-		});
-		cm.getItems().add(remove);
+		for (String name : tool.getNames()) {
+			if (kwdb.findTool(name) != null) {
+				Alert alert = new Alert(AlertType.WARNING);
+				alert.setTitle("Warning Dialog");
+				alert.setContentText("The given name " + name + " already exists!");
 
-		toolTable.setOnMouseClicked(e -> {
-			if (e.getButton() == MouseButton.SECONDARY) {
-				cm.show(toolTable, e.getScreenX(), e.getScreenY());
+				alert.showAndWait();
+				return;
 			}
-			else {
-				cm.hide();
-			}
-		});
+		}
 
-		VBox.setVgrow(toolTable, Priority.ALWAYS);
-		toolsView.getChildren().addAll(addTools, toolTable);
+		new ToolEntry(tool, toolTable.getItems(), KeyWordDatabase.GERMAN_KWDB);
+		realToolsList.add(tool);
+		tFName.setText("");
+		tFSynonyms.setText("");
+	}});
+
+	for(
+
+	BaseTool tool:KeyWordDatabase.GERMAN_KWDB.getTools())
+	{
+		new ToolEntry(tool, toolTable.getItems(), KeyWordDatabase.GERMAN_KWDB);
+	}
+
+	ContextMenu cm = new ContextMenu();
+	MenuItem remove = new MenuItem(
+			"Remove Tool");remove.disableProperty().bind(toolTable.getSelectionModel().selectedItemProperty().isNull());remove.setOnAction(e->
+	{
+		int index = toolTable.getSelectionModel().getSelectedIndex();
+		realToolsList.remove(index);
+		toolTable.getItems().remove(index);
+	});cm.getItems().add(remove);
+
+	toolTable.setOnMouseClicked(e->
+	{
+		if (e.getButton() == MouseButton.SECONDARY) {
+			cm.show(toolTable, e.getScreenX(), e.getScreenY());
+		} else {
+			cm.hide();
+		}
+	});
+
+	VBox.setVgrow(toolTable,Priority.ALWAYS);toolsView.getChildren().addAll(addTools,toolTable);
 	}
 
 	public void initializeIngredientsPane() {
@@ -1242,7 +1206,8 @@ public class LibEditor extends Dialog<Object> implements Observer {
 				.setCellValueFactory(new PropertyValueFactory<IngredientEntry, ObservableList<BaseIngredientGroup>>("ingredientGroups"));
 		groupsColumn.setCellFactory(column -> {
 			TableCell<IngredientEntry, ObservableList<BaseIngredientGroup>> cell = new TableCell<IngredientEntry, ObservableList<BaseIngredientGroup>>() {
-				@Override
+
+	@Override
 				public void updateItem(ObservableList<BaseIngredientGroup> groups, boolean empty) {
 					super.updateItem(groups, empty);
 					VBox layout = new VBox();
@@ -1383,7 +1348,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 		realEventIndicatorsList.addAll(kwdb.getEventIndicators());
 		realPartIndicatorsList.addAll(kwdb.getPartIndicators());
 		realLastSentenceReferencesList.addAll(kwdb.getLastSentenceReferences());
-
+		realCookingActionsList.addAll(kwdb.getCookingActions());
 
 		initializeToolsPane();
 		initializeGroupsPane();

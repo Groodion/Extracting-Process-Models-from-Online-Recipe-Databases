@@ -1,5 +1,6 @@
 package ai4.master.project.recipe.baseObject;
 
+import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.object.Ingredient;
 import ai4.master.project.recipe.object.IngredientGroup;
 import ai4.master.project.recipe.object.ingredientTag.IngredientTag;
@@ -8,7 +9,7 @@ import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
 
 public class Transformation {
 
@@ -20,6 +21,20 @@ public class Transformation {
 	public Transformation() {
 		mandatoryIngredients = javafx.collections.FXCollections.observableArrayList();
 		regexIds = new ArrayList<String>();
+	}
+	private Transformation(Transformation parent, KeyWordDatabase kwdb) {
+		this();
+		
+		if(product != null) {
+			product = parent.product.clone(kwdb);
+		}
+		for(Ingredient ingredient : parent.mandatoryIngredients) {
+			mandatoryIngredients.add(ingredient.clone(kwdb));
+		}
+		if(tag != null) {
+			tag = parent.tag.clone(kwdb);
+		}
+		regexIds.addAll(parent.regexIds);
 	}
 	
 	public Ingredient getProduct() {
@@ -130,5 +145,9 @@ public class Transformation {
 		sB.append("</Transformation>");
 		
 		return sB.toString();
-	}	
+	}
+	
+	public Transformation clone(KeyWordDatabase kwdb) {
+		return new Transformation(this, kwdb);
+	}
 }

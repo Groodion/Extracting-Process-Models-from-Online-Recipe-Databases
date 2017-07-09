@@ -1,5 +1,6 @@
 package ai4.master.project.recipe.object.ingredientTag;
 
+import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.object.Ingredient;
 
 public class IngredientTag {
@@ -53,5 +54,9 @@ public class IngredientTag {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+
+	public IngredientTag clone(KeyWordDatabase kwdb) {
+		return new IngredientTag(name);
 	}
 }

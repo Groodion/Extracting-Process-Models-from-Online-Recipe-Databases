@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import ai4.master.project.viewFx.Controller?>
+<?import ai4.master.project.viewFx.components.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+
+<BorderPane styleClass="background" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ai4.master.project.viewFx.Controller">
+	<top>
+		<HBox styleClass="hbackground" spacing="10" BorderPane.alignment="CENTER">
+			<padding>
+				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+			</padding>
+			<children>
+				<ImageView fitHeight="59.0" fitWidth="192.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="NEVER">
+					<image>
+						<Image url="@../img/logo.png" />
+					</image>
+				</ImageView>
+				<Pane maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+				<Button styleClass="button-type-1" HBox.hgrow="NEVER" onAction="#showLibEditor">
+					<graphic>
+						<ImageView fitHeight="50" fitWidth="50" >
+							<image>
+								<Image url="@../img/language.png" />
+							</image>
+						</ImageView>
+					</graphic>
+				</Button>
+				<Button text="Info" styleClass="button-type-1" HBox.hgrow="NEVER">
+					<graphic>
+						<ImageView fitHeight="50" fitWidth="50" >
+							<image>
+								<Image url="@../img/information.png" />
+							</image>
+						</ImageView>
+					</graphic>
+				</Button>
+			</children>
+		</HBox>
+	</top>
+	<bottom>
+		<ProcessTracker fx:id="processTracker" />
+	</bottom>
+	<center>
+		<VBox>
+			<children>
+				<StackPane fx:id="contentStack" VBox.vgrow="ALWAYS" maxHeight="Infinity" BorderPane.alignment="CENTER">
+					<children>
+						<GridPane maxHeight="Infinity" hgap="10.0" vgap="10.0">
+							<columnConstraints>
+								<ColumnConstraints hgrow="NEVER" prefWidth="400.0" />
+								<ColumnConstraints hgrow="ALWAYS" />
+							</columnConstraints>
+							<rowConstraints>
+								<RowConstraints vgrow="ALWAYS" />
+							</rowConstraints>
+							<padding>
+								<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+							</padding>
+							<children>
+								<VBox spacing="10.0">
+									<children>
+										<TitledPane maxHeight="Infinity" text="Import recipe from online database" VBox.vgrow="SOMETIMES">
+											<content>
+												<VBox fx:id="recipeDatabasesPane" maxHeight="Infinity" />
+											</content>
+										</TitledPane>
+										<TitledPane maxHeight="Infinity" text="Import recipe from file" VBox.vgrow="SOMETIMES">
+											<content>
+												<HBox maxHeight="Infinity" spacing="10.0">
+													<children>
+														<TextField fx:id="recipeImportFilePathTF" onMouseClicked="#selectFileForRecipeImport" promptText="Path" HBox.hgrow="ALWAYS" />
+														<Button disable="${recipeImportFilePathTF.text == ''}" mnemonicParsing="false" onAction="#loadFileForRecipeImport" text="Import" />
+													</children>
+												</HBox>
+											</content>
+										</TitledPane>
+										<TitledPane maxHeight="Infinity" text="Library settings" VBox.vgrow="ALWAYS">
+											<content>
+												<HBox maxHeight="Infinity" spacing="10.0" />
+											</content>
+										</TitledPane>
+									</children>
+								</VBox>
+								<VBox spacing="10.0" GridPane.columnIndex="1">
+									<children>
+										<TitledPane collapsible="false" text="Ingredients" VBox.vgrow="ALWAYS">
+											<content>
+												<TextArea fx:id="ingredientsTA" maxHeight="Infinity" prefHeight="100.0" wrapText="true" />
+											</content>
+										</TitledPane>
+										<TitledPane collapsible="false" maxHeight="Infinity" text="Recipe" VBox.vgrow="ALWAYS">
+											<content>
+												<TextArea fx:id="preparationTA" maxHeight="Infinity" wrapText="true" />
+											</content>
+										</TitledPane>
+									</children>
+								</VBox>
+							</children>
+						</GridPane>
+						<GridPane maxHeight="Infinity" hgap="10.0" vgap="10.0" visible="false">
+							<columnConstraints>
+								<ColumnConstraints hgrow="ALWAYS" />
+								<ColumnConstraints hgrow="NEVER" />
+							</columnConstraints>
+							<rowConstraints>
+								<RowConstraints vgrow="ALWAYS" />
+								<RowConstraints vgrow="NEVER" />
+							</rowConstraints>
+							<padding>
+								<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+							</padding>
+							<children>
+								<VBox spacing="10" maxHeight="Infinity">
+									<children>
+										<TitledPane text="Ingredients">
+											<content>
+												<FlowPane fx:id="ingredientsPane" />
+											</content>
+										</TitledPane>
+										<TitledPane maxHeight="Infinity" text="Steps" collapsible="false" VBox.vgrow="ALWAYS">
+											<content>
+												<VBox fx:id="stepsPane" maxWidth="Infinity" maxHeight="Infinity" />
+											</content>
+										</TitledPane>
+									</children>
+								</VBox>
+								<VBox maxHeight="Infinity" GridPane.columnIndex="1" spacing="10">
+									<children>
+										<TitledPane maxHeight="Infinity" text="Tools" VBox.vgrow="ALWAYS">
+											<content>
+												<ListView fx:id="toolsListView" maxHeight="Infinity" />
+											</content>
+										</TitledPane>
+										<TitledPane maxHeight="Infinity" text="Ingredients" VBox.vgrow="ALWAYS">
+											<content>
+												<ListView fx:id="ingredientsListView" maxHeight="Infinity" />
+											</content>
+										</TitledPane>
+										<TitledPane maxHeight="Infinity" text="Actions" VBox.vgrow="ALWAYS">
+											<content>
+												<ListView fx:id="actionsListView" maxHeight="Infinity" />
+											</content>
+										</TitledPane>
+									</children>
+								</VBox>
+								<TitledPane text="Messages" GridPane.rowIndex="1">
+									<content>
+										<ListView fx:id="messagesListView" minHeight="50" maxHeight="50" />
+									</content>
+								</TitledPane>
+								<StackPane GridPane.rowIndex="1" GridPane.columnIndex="1">
+									<children>
+										<Button minHeight="40" text="Parse / Reparse" onAction="#parseRecipe" />
+									</children>
+								</StackPane>
+							</children>
+						</GridPane>
+					</children>
+				</StackPane>
+			</children>
+			<HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+				<padding>
+					<Insets bottom="10.0" left="10.0" right="10.0" />
+				</padding>
+				<children>
+					<Pane HBox.hgrow="ALWAYS" />
+					<Button visible="${processTracker.activeStep != 0}" managed="${processTracker.activeStep != 0}" disable="${preparationTA.text == ''}" mnemonicParsing="false" text="&lt; Prev" AnchorPane.rightAnchor="0.0" onAction="#prevStep" />
+					<Button visible="${processTracker.activeStep != 3}" managed="${processTracker.activeStep != 3}" disable="${(processTracker.activeStep == 0 &amp;&amp; preparationTA.text == '') || (processTracker.activeStep == 1 &amp;&amp; !controller.recipeParsed)}" mnemonicParsing="false" text="Next &gt;" AnchorPane.rightAnchor="0.0" onAction="#nextStep" />
+				</children>
+			</HBox>
+		</VBox>
+	</center>
+</BorderPane>

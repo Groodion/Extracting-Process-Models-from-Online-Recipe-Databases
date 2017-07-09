@@ -1,5 +1,6 @@
 package ai4.master.project.recipe.object;
 
+import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
 import ai4.master.project.recipe.object.ingredientTag.IngredientTag;
@@ -102,5 +103,9 @@ public class Ingredient extends NamedObject<BaseIngredient> {
 		} else if (!getBaseObject().equals(other.getBaseObject()))
 			return false;
 		return true;
+	}
+
+	public Ingredient clone(KeyWordDatabase kwdb) {
+		return new Ingredient(getName(), kwdb.findIngredient(getName()));
 	}	
 }

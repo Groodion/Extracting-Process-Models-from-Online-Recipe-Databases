@@ -1,5 +1,6 @@
 package ai4.master.project.recipe.baseObject;
 
+import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.object.NamedObject;
 import ai4.master.project.stanfordParser.sentence.Word;
 
@@ -8,12 +9,23 @@ import java.util.Set;
 
 public abstract class BaseNamedObject<N extends NamedObject<B>, B extends BaseNamedObject<N, B>> {
 	
+	private String firstName;
 	private Set<String> names;
 	private Set<String> stemmedNames;
 	
 	public BaseNamedObject() {
 		names = new HashSet<String>();
 		stemmedNames = new HashSet<String>();
+	}
+	protected BaseNamedObject(BaseNamedObject<N, B> parent, KeyWordDatabase kwdb) {
+		this();
+		firstName = parent.firstName;
+		names.addAll(parent.names);
+		stemmedNames.addAll(parent.stemmedNames);
+	}
+	
+	public String getFirstName() {
+		return firstName;
 	}
 	
 	public Set<String> getNames() {
@@ -24,16 +36,33 @@ public abstract class BaseNamedObject<N extends NamedObject<B>, B extends BaseNa
 	}
 	
 	public void addName(String name) {
+		if(firstName == null) {
+			firstName = name;
+		}
 		names.add(name);
-		stemmedNames.add(Word.stem(name.toLowerCase()));
+		stemmedNames.add(Word.stem(name));
+	}
+	public void removeName(String name) {
+		names.remove(name);
+		stemmedNames.remove(Word.stem(name));
+		
+		if(firstName.equals(name)) {
+			firstName = null;
+			
+			if(names.size() != 0) {
+				firstName = names.iterator().next();
+			}
+		}
 	}
 	
 	@Override
 	public String toString() {
-		return names.iterator().next();
+		return firstName;
 	}
 
 	public abstract N toObject();
 
 	public abstract String toXML();
+
+	public abstract B clone(KeyWordDatabase kwdb);
 }
