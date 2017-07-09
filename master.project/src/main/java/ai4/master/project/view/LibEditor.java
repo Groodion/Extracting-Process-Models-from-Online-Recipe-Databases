@@ -56,7 +56,7 @@ import javafx.scene.layout.VBox;
 
 public class LibEditor extends Dialog<Object> implements Observer {
 
-	private ButtonType okayButtonType;
+/*	private ButtonType okayButtonType;
 	private ButtonType cancelButtonType;
 	private Button okayButton;
 	private Button cancelButton;
@@ -1397,7 +1397,7 @@ public class LibEditor extends Dialog<Object> implements Observer {
 
 		getDialogPane().setContent(box);
 	}
-
+*/
 	@Override
 	public void update(Observable o, Object arg) {
 
