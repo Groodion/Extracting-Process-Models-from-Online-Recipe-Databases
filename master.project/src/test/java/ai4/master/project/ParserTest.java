@@ -7,7 +7,6 @@ import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
 import ai4.master.project.recipe.TestRecipeFactory;
 import ai4.master.project.stanfordParser.Parser;
-import lombok.extern.jbosslog.JBossLog;
 
 import java.net.URL;
 
@@ -19,7 +18,7 @@ public class ParserTest {
 */
 	//15XX not working with tool compare
 	static String[] ids = {
-		"43611014899035"
+		"997991205154456"
 	};
     public static void main(String[] args) throws Exception {
 //    	testParser();

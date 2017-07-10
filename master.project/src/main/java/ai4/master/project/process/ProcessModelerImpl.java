@@ -148,6 +148,25 @@ public class ProcessModelerImpl implements ProcessModeler {
                     LayoutUtils.getCenterCoordinates(userTask)[1],LayoutUtils.getCenterCoordinates(parallelGateway)[0],LayoutUtils.getCenterCoordinates(parallelGateway)[1]);
             flows.add(sequenceFlow);
         }
+
+
+        if(endEvent.getIncoming().size() > 1){
+            Collection<SequenceFlow> incomming = endEvent.getIncoming();
+            StringBuilder id = new StringBuilder();
+            for(SequenceFlow sequenceFlow : incomming){
+                id.append(sequenceFlow.getAttributeValue("id"));
+            }
+            ParallelGateway parallelGateway = createElement(process, "sync_"+id.toString(), "", ParallelGateway.class, plane,0,0,0,0,false);
+            gates.add(parallelGateway);
+
+            for(SequenceFlow sequenceFlow : incomming){
+                sequenceFlow.setTarget(parallelGateway);
+            }
+            endEvent.getIncoming().clear();
+            SequenceFlow sequenceFlow = createSequenceFlow(process, parallelGateway,endEvent,plane,LayoutUtils.getCenterCoordinates(endEvent)[0],
+                    LayoutUtils.getCenterCoordinates(endEvent)[1],LayoutUtils.getCenterCoordinates(parallelGateway)[0],LayoutUtils.getCenterCoordinates(parallelGateway)[1]);
+            flows.add(sequenceFlow);
+        }
     }
 
 
