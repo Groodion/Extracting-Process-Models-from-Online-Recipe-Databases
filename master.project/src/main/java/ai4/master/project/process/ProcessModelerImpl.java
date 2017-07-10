@@ -18,6 +18,7 @@ import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
 import org.camunda.bpm.model.bpmn.instance.di.Waypoint;
 import org.jetbrains.annotations.NotNull;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -40,6 +41,7 @@ public class ProcessModelerImpl implements ProcessModeler {
     List<UserTask> userTasks = new ArrayList<>();
     List<SequenceFlow> flows = new ArrayList<>();
     List<ParallelGateway> gates = new ArrayList<>();
+    List<DataObjectReference> dataObjects = new ArrayList<>();
     StartEvent startEvent = null;
     EndEvent endEvent = null;
     private int taskX = 100;
@@ -126,6 +128,9 @@ public class ProcessModelerImpl implements ProcessModeler {
 
 
 
+    /*
+    Creates synchronisation gatter for the parallel gateways.
+     */
     private void createSynchronisationGatter(Process process, BpmnPlane plane){
 
         for(UserTask userTask : userTasks){
@@ -307,8 +312,6 @@ public class ProcessModelerImpl implements ProcessModeler {
             if (!idExists(createIdOf(node.getData().getText()))) { //Avoid duplicates by having more than one dependence which creates two parts in the tree.
 
                 UserTask userTask = createElement(process, createIdOf(node.getData().getText()), node.getData().getText(), UserTask.class, plane, taskX, taskY, userTaskHeight, userTaskWidth, false);
-                DataObject dataObject = createElement(process, createIdOf("do-"+node.getData().getText()), node.getData().getIngredients().toString(), DataObject.class, plane, taskX, taskY, userTaskHeight, userTaskWidth,true);
-
                 List<CookingEvent> events = node.getData().getEvents();
                 if(!isForLayout) {
                     for (CookingEvent event : events) {
@@ -318,16 +321,23 @@ public class ProcessModelerImpl implements ProcessModeler {
                     incXby(150);
 
                 /* Iterate over the Input parameter ( = ingredients) and output parameter ( = products) and add them */
+                int i = 0;
                     for (Ingredient ingredient : node.getData().getIngredients()) {
-                        userTask.builder().camundaInputParameter("Ingredient", ingredient.getName());
+                        //userTask.builder().camundaInputParameter("Ingredient", ingredient.getName());
+                        dataObjects.add(createDataObject(process, createIdOf("dataObject_I"+i+createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getCompleteName(), plane, true));
+                   i++;
                     }
 
                     for (Ingredient product : node.getData().getProducts()) {
-                        userTask.builder().camundaOutputParameter("Product", product.getName());
+                    //    userTask.builder().camundaOutputParameter("Product", product.getName());
+                        dataObjects.add(createDataObject(process, createIdOf("dataObject_P"+createIdOf(product.getCompleteName()) + createIdOf(node.getData().getText())), product.getCompleteName(), plane, true));
+
                     }
                 /* Add tools as input parameter */
                     for (Tool tool : node.getData().getTools()) {
                         userTask.builder().camundaInputParameter("Tool", tool.getName());
+                        dataObjects.add(createDataObject(process, createIdOf("dataObject_T"+createIdOf(tool.getName()) + createIdOf(node.getData().getText())), tool.getName(), plane, true));
+
                     }
 
                 }
@@ -386,6 +396,46 @@ public class ProcessModelerImpl implements ProcessModeler {
         return null;
     }
 
+
+    /*
+    Creates a dataObject.
+     */
+
+    private int doHeight = 60;
+    private int doWidth = 36;
+    private DataObjectReference createDataObject(BpmnModelElementInstance bpmnModelElementInstance, String id, String name, BpmnPlane plane, boolean withLabel) {
+        DataObjectReference dataObject = modelInstance.newInstance(DataObjectReference.class);
+        dataObject.setAttributeValue("id", id, true);
+        dataObject.setAttributeValue("name", name, false);
+        bpmnModelElementInstance.addChildElement(dataObject);
+
+        if (!isForLayout) {
+            BpmnShape bpmnShape = modelInstance.newInstance(BpmnShape.class);
+            bpmnShape.setBpmnElement((BaseElement) dataObject);
+
+
+            Bounds bounds = modelInstance.newInstance(Bounds.class);
+            bounds.setX(taskX);
+            bounds.setY(taskY+200);
+            bounds.setHeight(doHeight);
+            bounds.setWidth(doWidth);
+            bpmnShape.setBounds(bounds);
+
+            if (withLabel) {
+                BpmnLabel bpmnLabel = modelInstance.newInstance(BpmnLabel.class);
+                Bounds labelBounds = modelInstance.newInstance(Bounds.class);
+                labelBounds.setX(taskX);
+                labelBounds.setY(taskY+300);
+                labelBounds.setHeight(21);
+                labelBounds.setWidth(37);
+                bpmnLabel.addChildElement(labelBounds);
+                bpmnShape.addChildElement(bpmnLabel);
+            }
+            plane.addChildElement(bpmnShape);
+        }
+
+        return dataObject;
+    }
     /*
     Creates a BPMN Element
      */
