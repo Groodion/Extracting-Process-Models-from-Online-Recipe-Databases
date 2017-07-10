@@ -107,7 +107,6 @@ public class ProcessModelerImpl implements ProcessModeler {
         createNodeToEndEventConnection(nodes, endEvent, process, plane);
 
 
-        checkIfGatewayIsNeccessary(process);
       /*  Layouter layouter = new Layouter(modelInstance);
         layouter.createLayout(flows);*/
         // validate and write model to file
@@ -124,14 +123,7 @@ public class ProcessModelerImpl implements ProcessModeler {
 
 
 
-    private void checkIfGatewayIsNeccessary(Process process){
-        for(ParallelGateway parallelGateway : gates){
-            Collection<SequenceFlow> incomming = parallelGateway.getIncoming();
-            Collection<SequenceFlow> outgoing = parallelGateway.getOutgoing();
 
-
-        }
-    }
 
     /*
     Connects every "last" node with the endpoint.
@@ -160,7 +152,7 @@ public class ProcessModelerImpl implements ProcessModeler {
     private void createStartEventToConnections(Tree<Step> t, StartEvent startEvent, Process process, BpmnPlane plane) {
         if (t.getRoot().getChildren().size() > 1) {
             // in case the root node has more than one child we use a parallelgateway on the start. this will be initialized here.
-            ParallelGateway startParallel = createElement(process, "parallel_gateway_start", "parallel_gateway_start", ParallelGateway.class, plane, tempX, taskY, 30, 30, false);
+            ParallelGateway startParallel = createElement(process, "parallel_gateway_start", "", ParallelGateway.class, plane, tempX, taskY, 30, 30, false);
             gates.add(startParallel);
             taskX += 150;
 
@@ -221,7 +213,7 @@ public class ProcessModelerImpl implements ProcessModeler {
                     ParallelGateway parallelGateway = null;
                     if (!gateExists("parallel_gateway_" + createIdOf(node.getData().getText()))) {
                       //  System.out.println("Creating a parallel gateway for" + node.getData().getText());
-                        parallelGateway = createElement(process, "parallel_gateway_" + createIdOf(node.getData().getText()), "parallel_gateway_" + node.getData().getText(), ParallelGateway.class, plane, taskX, taskY, 30, 30, false);
+                        parallelGateway = createElement(process, "parallel_gateway_" + createIdOf(node.getData().getText()), "", ParallelGateway.class, plane, taskX, taskY, 30, 30, false);
                         gates.add(parallelGateway);
                        // incXby(150);
                         // First we need to connect the parent to the parallel gateway.

@@ -17,9 +17,9 @@ public class ParserTest {
 /*    static String[] ids = {"1340271238839144", "997991205154456", "185511079703831", "150681066371674", "1726761281857676", "2397571379105119", "982031203667502", "914011196708021",
             "1033741208508759", "965881202287446", "43611014899035"};
 */
-	
+	//15XX not working with tool compare
 	static String[] ids = {
-		"997991205154456"
+		"982031203667502"
 	};
     public static void main(String[] args) throws Exception {
 //    	testParser();

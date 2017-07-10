@@ -3,6 +3,7 @@ package ai4.master.project.process;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
 import ai4.master.project.recipe.object.Ingredient;
+import ai4.master.project.recipe.object.Tool;
 import ai4.master.project.tree.Node;
 import ai4.master.project.tree.Tree;
 import ai4.master.project.tree.TreeTraverser;
@@ -48,7 +49,7 @@ public class RecipeToTreeConverter {
             boolean foundOne = false;
             for (int k = 0; k < usedNodes.size(); k++) {
                 List<Step> foundNodes = new ArrayList<>();
-                if (compare(usedNodes.get(k).getData().getProducts(), currentStep.getIngredients())) {
+                if (compare(usedNodes.get(k).getData().getProducts(), currentStep.getIngredients(), usedNodes.get(k).getData().getTools(), currentStep.getTools())) {
 
 
                     foundOne = true;
@@ -65,6 +66,8 @@ public class RecipeToTreeConverter {
                     //Now we know: Current step needs usedNodes.get(k) as a child (this means it has to be done before!
                     //usedNodes.get(k).addChild(currentStep);
                 }
+
+                // FIx for wrong parallel gateways
                 for(Step s : foundNodes){
                     if(usedNodes.get(k).getChildren().size() == 0){
                         usedNodes.get(k).addChild(s);
@@ -110,7 +113,7 @@ public class RecipeToTreeConverter {
     /*
     Compares the two lists and returns true if at least one thing is equal.
      */
-    private boolean compare(List<Ingredient> inputIngredient, List<Ingredient> outputIngredient) {
+    private boolean compare(List<Ingredient> inputIngredient, List<Ingredient> outputIngredient, List<Tool> inputTool, List<Tool> outputTool) {
         for (Ingredient input :
                 inputIngredient) {
             for (Ingredient output :
@@ -119,6 +122,15 @@ public class RecipeToTreeConverter {
                 if (input.equals(output)) {
                     return true;
 
+                }
+            }
+        }
+        // TODO We need to compare tools somehow?
+        for(Tool input : inputTool ){
+            for(Tool output: outputTool){
+                if(input.equals(output)){
+                    System.out.println("Checking tools, mate");
+                    return true;
                 }
             }
         }
