@@ -54,8 +54,11 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 	private boolean editorInitialized = false;
 
 	private StackPane editorViewsStackPane;
+
 	
     public static final String ICON_SEARCH = "\uf002";
+	private ComboBox<String> selectEditorCB;
+
 	
 	public LibEditor(ObjectProperty<KeyWordDatabase> kwdb) {
 
@@ -212,7 +215,7 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 				new EventIndicatorsEditorView(eventIndicators, kwdb)
 		);
 
-		ComboBox<String> selectEditorCB = new ComboBox<String>(
+		selectEditorCB = new ComboBox<String>(
 				FXCollections.observableArrayList(
 						"Tools", 
 						"Groups", 
@@ -260,17 +263,17 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 	}
 	
 	public void searchAndScroll(String word) {
+		EditorView editorView = null;
 		for(Node node : editorViewsStackPane.getChildren()) {
-			EditorView editorView = (EditorView) node;
-			
+			EditorView eV = (EditorView) node;
 			if(editorView.contains(word)) {
-				editorView.setVisible(true);
-				editorView.scrollTo(word);
-			} else {
-				editorView.setVisible(false);
+				editorView = eV;
 			}
 		}
+		
+		if(editorView != null) {
+			selectEditorCB.getSelectionModel().select(editorViewsStackPane.getChildren().indexOf(editorView));
+			editorView.scrollTo(word);
+		}
 	}
-	
-
 }
