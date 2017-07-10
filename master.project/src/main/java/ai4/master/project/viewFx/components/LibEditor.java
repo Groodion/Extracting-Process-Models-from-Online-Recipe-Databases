@@ -234,7 +234,11 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 		CustomTextField searchField = new CustomTextField();
 		searchField.getStylesheets().add("searchField");
 
-		
+		searchField.textProperty().addListener((b,o,n)-> {
+			if(n != null && n.length() != 0) {
+				searchAndScroll(n);
+			}
+		});
 		Label searchLabel = new Label();
 		searchLabel.getStylesheets().add("searchBoxLabel");
 		searchLabel.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SEARCH));
@@ -248,7 +252,7 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 		mainLayout.getChildren().addAll(
 
 				header,
-				stackPane
+				editorViewsStackPane
 
 		);
 		
