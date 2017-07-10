@@ -19,6 +19,7 @@ import org.camunda.bpm.model.bpmn.instance.di.Waypoint;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -105,6 +106,8 @@ public class ProcessModelerImpl implements ProcessModeler {
         //Every node without children belongs to the endEvent
         createNodeToEndEventConnection(nodes, endEvent, process, plane);
 
+
+        checkIfGatewayIsNeccessary(process);
       /*  Layouter layouter = new Layouter(modelInstance);
         layouter.createLayout(flows);*/
         // validate and write model to file
@@ -120,6 +123,15 @@ public class ProcessModelerImpl implements ProcessModeler {
     }
 
 
+
+    private void checkIfGatewayIsNeccessary(Process process){
+        for(ParallelGateway parallelGateway : gates){
+            Collection<SequenceFlow> incomming = parallelGateway.getIncoming();
+            Collection<SequenceFlow> outgoing = parallelGateway.getOutgoing();
+
+
+        }
+    }
 
     /*
     Connects every "last" node with the endpoint.
@@ -208,22 +220,23 @@ public class ProcessModelerImpl implements ProcessModeler {
                 } else if (node.getChildren().size() > 1) {
                     ParallelGateway parallelGateway = null;
                     if (!gateExists("parallel_gateway_" + createIdOf(node.getData().getText()))) {
-                        System.out.println("Creating a parallel gateway for" + node.getData().getText());
+                      //  System.out.println("Creating a parallel gateway for" + node.getData().getText());
                         parallelGateway = createElement(process, "parallel_gateway_" + createIdOf(node.getData().getText()), "parallel_gateway_" + node.getData().getText(), ParallelGateway.class, plane, taskX, taskY, 30, 30, false);
                         gates.add(parallelGateway);
-                        incXby(150);
+                       // incXby(150);
                         // First we need to connect the parent to the parallel gateway.
                         if (!sequenceExists(createId(from, parallelGateway))) {
                             flows.add(createSequenceFlow(process, from, parallelGateway, plane, LayoutUtils.getCenterCoordinates(from)[0], LayoutUtils.getCenterCoordinates(from)[1],
                                     LayoutUtils.getCenterCoordinates(parallelGateway)[0], LayoutUtils.getCenterCoordinates(parallelGateway)[1]));
                         }
                         //Now we create a connection from the gateway to every child
-                        int i = 1;
                         for (Node<Step> childNode :
                                 node.getChildren()) {
 
                             UserTask to = getUserTaskTo(childNode);
-                            System.out.println("From: " + from.getAttributeValue("name") + " to: " + to.getAttributeValue("name"));
+                            //System.out.println("From: " + from.getAttributeValue("name") + " to: " + to.getAttributeValue("name"));
+                            System.err.println("From: " + node.getData().getText() +  "(Products)" + node.getData().getProducts().toString() + " + \n + (Ingredients) " + node.getData().getIngredients().toString() + "\n" +
+                                    ", to: " + childNode.getData().getText() + " (Products)"  + childNode.getData().getProducts().toString() + "(Ingredients)" + childNode.getData().getIngredients().toString());
                        //     to.getDiagramElement().getBounds().setY(to.getDiagramElement().getBounds().getY()+i*150);
                             i++;
                             if (!sequenceExists(createId(from, to))) {
@@ -256,6 +269,8 @@ public class ProcessModelerImpl implements ProcessModeler {
             if (!idExists(createIdOf(node.getData().getText()))) { //Avoid duplicates by having more than one dependence which creates two parts in the tree.
 
                 UserTask userTask = createElement(process, createIdOf(node.getData().getText()), node.getData().getText(), UserTask.class, plane, taskX, taskY, userTaskHeight, userTaskWidth, false);
+                DataObject dataObject = createElement(process, createIdOf("do-"+node.getData().getText()), node.getData().getIngredients().toString(), DataObject.class, plane, taskX, taskY, userTaskHeight, userTaskWidth,true);
+
                 List<CookingEvent> events = node.getData().getEvents();
                 if(!isForLayout) {
                     for (CookingEvent event : events) {
@@ -426,6 +441,7 @@ public class ProcessModelerImpl implements ProcessModeler {
         s = s.replace(":", "_");
         s = s.replace("(", "_");
         s = s.replace(")", "_");
+        //Comment to make it changed..
         return s.replace(" ", "_");
     }
 

@@ -47,7 +47,10 @@ public class RecipeToTreeConverter {
             Step currentStep = steps.get(i);
             boolean foundOne = false;
             for (int k = 0; k < usedNodes.size(); k++) {
+                List<Step> foundNodes = new ArrayList<>();
                 if (compare(usedNodes.get(k).getData().getProducts(), currentStep.getIngredients())) {
+
+
                     foundOne = true;
 
 
@@ -58,9 +61,16 @@ public class RecipeToTreeConverter {
                     //System.out.println(currentStep.getIngredients());
                     System.out.println(currentStep.getText());
                     System.out.println();
-
+                    foundNodes.add(currentStep);
                     //Now we know: Current step needs usedNodes.get(k) as a child (this means it has to be done before!
-                    usedNodes.get(k).addChild(currentStep);
+                    //usedNodes.get(k).addChild(currentStep);
+                }
+                for(Step s : foundNodes){
+                    if(usedNodes.get(k).getChildren().size() == 0){
+                        usedNodes.get(k).addChild(s);
+                    }else{
+                        //don't add it.. let's see what happens
+                    }
                 }
             }
 
