@@ -1,5 +1,8 @@
 package ai4.master.project.viewFx.components;
 
+import org.controlsfx.control.textfield.CustomTextField;
+import org.controlsfx.glyphfont.FontAwesome;
+
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
@@ -12,6 +15,8 @@ import ai4.master.project.viewFx.components.editorViews.IngredientsEditorView;
 import ai4.master.project.viewFx.components.editorViews.LastSentenceReferencesEditorView;
 import ai4.master.project.viewFx.components.editorViews.PartIndicatorsEditorView;
 import ai4.master.project.viewFx.components.editorViews.ToolsEditorView;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -20,9 +25,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -41,8 +50,11 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 	
 	private boolean editorInitialized = false;
 	
+    public static final String ICON_SEARCH = "\uf002";
 	
 	public LibEditor(ObjectProperty<KeyWordDatabase> kwdb) {
+		this.getDialogPane().getStylesheets().add(
+				   getClass().getResource("/css/style.css").toExternalForm());
 		tools =  FXCollections.observableArrayList();
 		ingredients =  FXCollections.observableArrayList();			
 		ingredientGroups =  FXCollections.observableArrayList();
@@ -208,8 +220,22 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 		});
 		selectEditorCB.getSelectionModel().selectFirst();
 		
+		CustomTextField searchField = new CustomTextField();
+		searchField.getStylesheets().add("searchField");
+
+		
+		Label searchLabel = new Label();
+		searchLabel.getStylesheets().add("searchBoxLabel");
+		searchLabel.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SEARCH));
+		searchField.setLeft(searchLabel);
+		Pane fillPane = new Pane();
+		fillPane.setMaxWidth(Double.MAX_VALUE);
+		HBox.setHgrow(fillPane, Priority.ALWAYS);
+		HBox header = new HBox();
+		
+		header.getChildren().addAll(selectEditorCB, fillPane, searchField);
 		mainLayout.getChildren().addAll(
-				selectEditorCB,
+				header,
 				stackPane
 		);
 		
