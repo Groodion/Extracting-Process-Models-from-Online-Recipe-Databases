@@ -173,6 +173,7 @@ public class ToolsEditorView extends EditorView {
 		scrollTo(kwdb.get().findTool(word));
 	}
 	public void scrollTo(BaseTool tool) {
+		System.out.println(tools.indexOf(tool));
 		toolsTable.scrollTo(tools.indexOf(tool));
 	}
 	

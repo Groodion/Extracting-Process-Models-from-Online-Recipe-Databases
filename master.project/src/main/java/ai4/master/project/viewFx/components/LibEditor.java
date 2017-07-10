@@ -266,7 +266,7 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 		EditorView editorView = null;
 		for(Node node : editorViewsStackPane.getChildren()) {
 			EditorView eV = (EditorView) node;
-			if(editorView.contains(word)) {
+			if(eV.contains(word)) {
 				editorView = eV;
 			}
 		}
