@@ -106,6 +106,9 @@ public class ProcessModelerImpl implements ProcessModeler {
         //Every node without children belongs to the endEvent
         createNodeToEndEventConnection(nodes, endEvent, process, plane);
 
+        // Create a sync gatter at the end
+        createSynchronisationGatter(process, plane);
+
 
       /*  Layouter layouter = new Layouter(modelInstance);
         layouter.createLayout(flows);*/
@@ -122,6 +125,30 @@ public class ProcessModelerImpl implements ProcessModeler {
     }
 
 
+
+    private void createSynchronisationGatter(Process process, BpmnPlane plane){
+
+        for(UserTask userTask : userTasks){
+            Collection<SequenceFlow> incomming = userTask.getIncoming();
+            System.out.println("Incomming size " + incomming.size());
+            if(incomming.size() < 2) {continue;}
+            System.out.println("Needing sync gate");
+            StringBuilder id = new StringBuilder();
+            for(SequenceFlow sequenceFlow : incomming){
+               id.append(createIdOf(sequenceFlow.getAttributeValue("id")));
+            }
+            ParallelGateway parallelGateway = createElement(process, "sync_"+id.toString(), "", ParallelGateway.class, plane, 0,0,0,0,false );
+            gates.add(parallelGateway);
+
+            for(SequenceFlow sequenceFlow : incomming){
+                sequenceFlow.setTarget(parallelGateway);
+            }
+            userTask.getIncoming().clear();
+            SequenceFlow sequenceFlow = createSequenceFlow(process, parallelGateway,userTask,plane,LayoutUtils.getCenterCoordinates(userTask)[0],
+                    LayoutUtils.getCenterCoordinates(userTask)[1],LayoutUtils.getCenterCoordinates(parallelGateway)[0],LayoutUtils.getCenterCoordinates(parallelGateway)[1]);
+            flows.add(sequenceFlow);
+        }
+    }
 
 
 

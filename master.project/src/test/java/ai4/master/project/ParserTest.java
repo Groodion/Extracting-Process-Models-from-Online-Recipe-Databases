@@ -19,7 +19,7 @@ public class ParserTest {
 */
 	//15XX not working with tool compare
 	static String[] ids = {
-		"982031203667502"
+		"43611014899035"
 	};
     public static void main(String[] args) throws Exception {
 //    	testParser();
