@@ -1,5 +1,6 @@
 package ai4.master.project.recipe.object;
 
+import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
 
 import java.util.ArrayList;
@@ -25,4 +26,9 @@ public class IngredientGroup extends Ingredient {
 	public String toString() {
 		return "IngredientGroup [name=" + getName() + ", ingredients=" + ingredients + ", tags=" + getTags() + "]";
 	}
+	
+	@Override
+	public IngredientGroup clone(KeyWordDatabase kwdb) {
+		return new IngredientGroup(getName(), kwdb.findIngredientGroup(getName()));
+	}	
 }

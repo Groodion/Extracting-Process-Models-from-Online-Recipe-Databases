@@ -1,5 +1,6 @@
 package ai4.master.project.recipe.baseObject;
 
+import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.object.Ingredient;
 
 import java.util.ArrayList;
@@ -10,9 +11,17 @@ public class BaseIngredient extends BaseNamedObject<Ingredient, BaseIngredient> 
 
 	private List<BaseIngredientGroup> groups;
 	
-	
 	public BaseIngredient() {
 		groups = new ArrayList<BaseIngredientGroup>();
+	}
+	protected BaseIngredient(BaseIngredient parent, KeyWordDatabase kwdb) {
+		super(parent, kwdb);
+		
+		groups = new ArrayList<BaseIngredientGroup>();
+
+		for(BaseIngredientGroup group : parent.groups) {
+			groups.add(kwdb.findIngredientGroup(group.getFirstName()));
+		}
 	}
 	
 	public List<BaseIngredientGroup> getIngredientGroups() {
@@ -34,11 +43,15 @@ public class BaseIngredient extends BaseNamedObject<Ingredient, BaseIngredient> 
 	public String toXML() {
 		StringBuilder sB = new StringBuilder();
 		
-		sB.append("<Ingredient>");
+		sB.append("<Ingredient name=\"");
+		sB.append(getFirstName());
+		sB.append("\">");
 		for(String name : getNames()) {
-			sB.append("<Name>");
-			sB.append(name);
-			sB.append("</Name>");			
+			if(name != getFirstName()) {
+				sB.append("<Name>");
+				sB.append(name);
+				sB.append("</Name>");
+			}
 		}
 		sB.append("<groups>");
 		for(BaseIngredientGroup group : getIngredientGroups()) {
@@ -51,5 +64,10 @@ public class BaseIngredient extends BaseNamedObject<Ingredient, BaseIngredient> 
 		sB.append("</Ingredient>");
 		
 		return sB.toString();
+	}
+	
+	@Override
+	public BaseIngredient clone(KeyWordDatabase kwdb) {
+		return new BaseIngredient(this, kwdb);
 	}
 }

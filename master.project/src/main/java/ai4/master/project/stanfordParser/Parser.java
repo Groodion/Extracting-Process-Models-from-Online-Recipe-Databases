@@ -14,6 +14,7 @@ import ai4.master.project.stanfordParser.sentence.PunctuationMark;
 import ai4.master.project.stanfordParser.sentence.Sentence;
 import ai4.master.project.stanfordParser.sentence.SentencePart;
 import ai4.master.project.stanfordParser.sentence.Word;
+import ai4.master.project.viewFx.Controller;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.process.DocumentPreprocessor;
@@ -126,6 +127,8 @@ public class Parser {
 	}
 
 	public void parseRecipe(Recipe recipe) {
+		recipe.getSteps().clear();
+		
 		String text = recipe.getPreparation();
 		recipe.setPreparation(text);
 
@@ -144,7 +147,7 @@ public class Parser {
 			if (ingredient != null) {
 				activeIngredients.add(ingredient.toObject());
 			} else {
-				System.err.println("Unknown Ingredient: " + name);
+				Controller.MESSAGES.add("Unknown Ingredient: " + name);
 			}
 		}
 
@@ -153,8 +156,8 @@ public class Parser {
 		for (Sentence s : sentences) {
 			for (SentencePart sP : s.getParts()) {
 				if (sP.getCookingAction() == null) {
-					System.err.println("Can't convert to Step:");
-					System.err.println(sP.getText());
+					Controller.MESSAGES.add("Can't convert to Step:");
+					Controller.MESSAGES.add(sP.getText());
 				} else {
 					Step step = new Step();
 					BaseCookingAction action = sP.getCookingAction();
@@ -185,7 +188,7 @@ public class Parser {
 
 					if (sP.containsLastSentenceProductReference()) {
 						if (lastStep == null) {
-							System.err.println("LastSentenceReference in first sentence!");
+							Controller.MESSAGES.add("LastSentenceReference in first sentence!");
 						} else {
 							step.getIngredients().addAll(lastStep.getProducts());
 						}

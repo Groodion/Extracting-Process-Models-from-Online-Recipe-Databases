@@ -1,5 +1,6 @@
 package ai4.master.project.recipe.object.ingredientTag;
 
+import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.object.Ingredient;
 
 public class QuantifierTag extends IngredientTag {
@@ -11,5 +12,10 @@ public class QuantifierTag extends IngredientTag {
 	@Override
 	public QuantifierTag replace(Ingredient ingredient) {
 		return new QuantifierTag(getName().replace("INGREDIENT", ingredient.getName()));
+	}
+	
+	@Override
+	public QuantifierTag clone(KeyWordDatabase kwdb) {
+		return new QuantifierTag(getName());
 	}
 }

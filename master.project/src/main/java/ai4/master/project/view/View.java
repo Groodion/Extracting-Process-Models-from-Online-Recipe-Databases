@@ -4,6 +4,9 @@ import java.util.Optional;
 
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.apirequests.RecipeGetterChefkoch;
+import ai4.master.project.recipe.Recipe;
+import ai4.master.project.recipe.Step;
+import ai4.master.project.stanfordParser.Parser;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -15,14 +18,17 @@ import javafx.geometry.Orientation;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -44,20 +50,27 @@ public class View extends Application {
 	private GridPane mainView;
 	private TextArea recipeText;
 	private LibEditor editor;
-	private FlowPane parserText;
 	private ObservableList<String> problemsEntry = FXCollections.observableArrayList("Unknown Child Group in groups",
 			"Unknown Child Group in groups", "Unknown Child Group in groups", "Unknown Child Group in groups");
 
 	HBox chefkoch;
 
 	private HBox header;
+	private VBox parserTextLines;
 	private RecipeGetterChefkoch recipeChefkochGetter;
+
+	private Recipe recipe = null;
+	private Parser parser;
 
 	@Override
 	public void start(Stage primaryStage) {
 		primaryStage = new Stage();
 
-		Font test = Font.loadFont(View.class.getResource("/fonts/HelveticaNeue.ttf").toExternalForm(), 20);
+		parser = new Parser("lib/models/german-fast.tagger");
+		parser.setKwdb(KeyWordDatabase.GERMAN_KWDB);
+
+		// Font test =
+		 Font.loadFont(View.class.getResource("/fonts/HelveticaNeue.ttf").toExternalForm(), 20);
 		editor = new LibEditor();
 		recipeText = new TextArea();
 
@@ -87,7 +100,8 @@ public class View extends Application {
 				Optional<String> result = dialog.showAndWait();
 				if (result.isPresent()) {
 					String id = result.get();
-					recipeText.setText(recipeChefkochGetter.getRecipe(id).getPreparation());
+					recipe = recipeChefkochGetter.getRecipe(id);
+					recipeText.setText(recipe.getPreparation());
 				}
 			}
 
@@ -246,10 +260,15 @@ public class View extends Application {
 		localFileChoose.getChildren().addAll(path, load);
 		localFileSource.setContent(localFileChoose);
 
+		TitledPane preferences = new TitledPane();
+		preferences.setText("Edit Library");
+		HBox preferencesActionField = new HBox();
+		preferencesActionField.setSpacing(10);
+		
 		VBox sources = new VBox();
 		sources.setSpacing(10);
 		sources.setMaxHeight(Double.MAX_VALUE);
-		sources.getChildren().addAll(gridTitlePane, localFileSource);
+		sources.getChildren().addAll(gridTitlePane, localFileSource, preferences);
 
 		mainView = new GridPane();
 		ColumnConstraints column2 = new ColumnConstraints();
@@ -395,7 +414,9 @@ public class View extends Application {
 		step2Pane.getColumnConstraints().addAll(problemColumn1, problemColumn2);
 		step2Pane.getRowConstraints().addAll(problemRow1, problemRow2);
 
-		parserText = new FlowPane();
+		VBox parserTextPane = new VBox();
+		parserTextLines = new VBox();
+
 		TitledPane problemsPane = new TitledPane();
 		problemsPane.setText("Problems and Warnings");
 
@@ -405,13 +426,22 @@ public class View extends Application {
 		TitledPane parserPane = new TitledPane();
 		parserPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		parserPane.setText("Parsing");
-		parserPane.setContent(parserText);
-
+		
+		Button parseBtn = new Button("Parse/Reparse");
+		parseBtn.setOnAction(e -> {
+			parser.parseRecipe(recipe);
+			
+			setParsedRecipeText();
+		});
+		
+		parserTextPane.getChildren().add(parserTextLines);
+		parserTextPane.getChildren().add(parseBtn);
+		parserPane.setContent(parserTextPane);
 		step2Pane.add(parserPane, 0, 0);
 		step2Pane.add(legendPane, 1, 0);
 		step2Pane.add(problemsPane, 0, 1);
 		step2Pane.setGridLinesVisible(true);
-		step2Pane.setColumnSpan(problemsPane, 2);
+		GridPane.setColumnSpan(problemsPane, 2);
 
 		ListView<String> problems = new ListView<String>(problemsEntry);
 		problemsPane.setContent(problems);
@@ -421,7 +451,10 @@ public class View extends Application {
 			public void handle(MouseEvent event) {
 				step2Label.getStyleClass().add("process-step-header-active");
 				step2DescriptionLabel.getStyleClass().add("process-step-description-active");
-				setText(recipeText.getText());
+				recipe.setPreparation(recipeText.getText());
+
+				setUnparsedRecipeText();
+
 				border.setCenter(step2Pane);
 			}
 
@@ -443,36 +476,83 @@ public class View extends Application {
 		primaryStage.show();
 	}
 
-	public void setText(String text) {
-		parserText.getChildren().clear();
-		String[] words = text.split(" ");
-		for (String word : words) {
-			String testW = word;
-
-			if (testW.endsWith(",") || testW.endsWith(".")) {
-				testW = testW.substring(0, testW.length() - 1);
-			}
-
-			Label label = new Label(word);
-
+	public void addWordLabel(String word, FlowPane pane) {
+		Label label = new Label(word);
+		if (!word.toLowerCase().equals(word.toUpperCase())) {
 			label.backgroundProperty().bind(Bindings.when(label.hoverProperty())
 					.then(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)))
 					.otherwise(new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY))));
 
-			if (KeyWordDatabase.GERMAN_KWDB.findCookingAction(testW) != null) {
+			if (KeyWordDatabase.GERMAN_KWDB.findCookingAction(word) != null) {
 				label.setTextFill(Color.RED);
-			} else if (KeyWordDatabase.GERMAN_KWDB.findIngredient(testW) != null) {
-				if (KeyWordDatabase.GERMAN_KWDB.findIngredientGroup(testW) != null) {
+			} else if (KeyWordDatabase.GERMAN_KWDB.findIngredient(word) != null) {
+				if (KeyWordDatabase.GERMAN_KWDB.findIngredientGroup(word) != null) {
 					label.setTextFill(Color.GREENYELLOW);
 				} else {
 					label.setTextFill(Color.GREEN);
 				}
-			} else if (KeyWordDatabase.GERMAN_KWDB.findTool(testW) != null) {
+			} else if (KeyWordDatabase.GERMAN_KWDB.findTool(word) != null) {
 				label.setTextFill(Color.BLUE);
-			}
+			} else {
+				ContextMenu cm = new ContextMenu();
 
-			parserText.getChildren().add(label);
+				MenuItem addToTools = new MenuItem("add to Tools");
+				MenuItem addToIngredients = new MenuItem("add to Ingredients");
+				MenuItem addToGroups = new MenuItem("add to Groups");
+				MenuItem addToCookingActions = new MenuItem("add to CookingActions");
+
+				cm.getItems().add(addToTools);
+				cm.getItems().add(addToIngredients);
+				cm.getItems().add(addToGroups);
+				cm.getItems().add(addToCookingActions);
+
+				label.setOnMouseClicked(e -> {
+					if (e.getButton() == MouseButton.SECONDARY) {
+						cm.show(label, e.getScreenX(), e.getScreenY());
+					} else {
+						cm.hide();
+					}
+				});
+			}
+		}
+		pane.getChildren().add(label);
+	}
+
+	public void setUnparsedRecipeText() {
+		String text = recipe.getPreparation();
+		text = text.replaceAll("[!\"§$%&/()=?*+'#,;.:_<>\n]", " $0 ");
+
+		text = text.trim();
+
+		parserTextLines.getChildren().clear();
+		
+		FlowPane parserText = new FlowPane();
+		parserTextLines.getChildren().add(parserText);
+		
+		String[] words = text.split(" ");
+		for (String word : words) {
+			addWordLabel(word, parserText);
 			parserText.getChildren().add(new Label(" "));
+		}
+	}
+
+	public void setParsedRecipeText() {
+		parserTextLines.getChildren().clear();
+		
+		for(Step step : recipe.getSteps()) {
+			String text = step.getText();
+			text = text.replaceAll("[!\"§$%&/()=?*+'#,;.:_<>\n]", " $0 ");
+
+			text = text.trim();
+
+			FlowPane parserText = new FlowPane();
+			parserTextLines.getChildren().add(parserText);
+			
+			String[] words = text.split(" ");
+			for (String word : words) {
+				addWordLabel(word, parserText);
+				parserText.getChildren().add(new Label(" "));
+			}
 		}
 	}
 

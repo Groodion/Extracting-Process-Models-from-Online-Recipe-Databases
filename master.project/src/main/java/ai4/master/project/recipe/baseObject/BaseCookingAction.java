@@ -1,5 +1,6 @@
 package ai4.master.project.recipe.baseObject;
 
+import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.object.CookingAction;
 import ai4.master.project.recipe.object.Ingredient;
 import ai4.master.project.recipe.object.IngredientGroup;
@@ -20,7 +21,24 @@ public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookin
 		regexList = new ArrayList<Regex>();
 		transformations = new ArrayList<Transformation>();
 	}
-
+	private BaseCookingAction(BaseCookingAction parent, KeyWordDatabase kwdb) {
+		super();
+		
+		implicitTools = new ArrayList<BaseTool>();
+		regexList = new ArrayList<Regex>();
+		transformations = new ArrayList<Transformation>();
+		
+		for(BaseTool tool : parent.implicitTools) {
+			implicitTools.add(kwdb.findTool(tool.getFirstName()));
+		}
+		for(Regex regex : parent.regexList) {
+			regexList.add(regex.clone(kwdb));
+		}
+		for(Transformation transformation : parent.transformations) {
+			transformations.add(transformation.clone(kwdb));
+		}
+	}
+	
 	/**
 	 * Liste mit allen Werkzeugen die von der Aktion Impliziert werden 
 	 * und bei der automatischen Step-Erzeugung dem Objekt hinzugef�gt 
@@ -88,11 +106,15 @@ public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookin
 	public String toXML() {
 		StringBuilder sB = new StringBuilder();
 		
-		sB.append("<CookingAction>");
+		sB.append("<CookingAction name=\"");
+		sB.append(getFirstName());
+		sB.append("\">");
 		for(String name : getNames()) {
-			sB.append("<Name>");
-			sB.append(name);
-			sB.append("</Name>");			
+			if(name != getFirstName()) {
+				sB.append("<Name>");
+				sB.append(name);
+				sB.append("</Name>");
+			}
 		}
 		sB.append("<regs>");
 		for(Regex regex : regexList) {
@@ -114,5 +136,10 @@ public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookin
 		sB.append("</CookingAction>");
 		
 		return sB.toString();
+	}
+
+	@Override
+	public BaseCookingAction clone(KeyWordDatabase kwdb) {
+		return new BaseCookingAction(this, kwdb);
 	}
 }

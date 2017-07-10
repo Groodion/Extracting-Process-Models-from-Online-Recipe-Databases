@@ -525,6 +525,9 @@
 		<Group>
 			<Name>Suppe</Name>
 		</Group>
+		<Group>
+			<Name>Wein</Name>
+		</Group>
 	</groups>
 	<ingredients>
 		<Ingredient>
@@ -567,7 +570,7 @@
 			<Name>Schinkenwürfel</Name>
 			<groups>
 				<Group name="Fleisch" />
-				<Group name="Schinken "/>
+				<Group name="Schinken"/>
 			</groups>
 		</Ingredient>
 		<Ingredient>

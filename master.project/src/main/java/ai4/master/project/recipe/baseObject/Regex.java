@@ -1,5 +1,7 @@
 package ai4.master.project.recipe.baseObject;
 
+import ai4.master.project.KeyWordDatabase;
+
 public class Regex {
 	public enum Result {
 		FIRST, LAST, ALL, PREV, NO_RESULT;
@@ -20,6 +22,11 @@ public class Regex {
 	}
 	public Regex(String expression, Result result) {
 		this(expression, Result.FIRST, true, false);
+	}
+	private Regex(Regex parent) {
+		this(parent.expression, parent.result, parent.ingredientsNeeded, parent.referencePreviousProducts);
+		
+		id = parent.id;
 	}
 
 	public String getExpression() {
@@ -60,5 +67,9 @@ public class Regex {
 		sB.append("</Regex>");
 		
 		return sB.toString();
+	}
+	
+	public Regex clone(KeyWordDatabase kwdb) {
+		return new Regex(this);
 	}
 }

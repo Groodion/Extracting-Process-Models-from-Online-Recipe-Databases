@@ -3,6 +3,7 @@ package ai4.master.project;
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
+import ai4.master.project.recipe.baseObject.BaseNamedObject;
 import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.stanfordParser.sentence.Role;
 import ai4.master.project.stanfordParser.sentence.Word;
@@ -85,7 +86,7 @@ public class KeyWordDatabase {
 	}
 	public BaseIngredient findIngredient(String text) {
 		if(text == null) return null;
-
+		
 		for(BaseIngredient ingredient : ingredients) {
 			if(ingredient.getStemmedNames().contains(Word.stem(text))) {
 				return ingredient;
@@ -99,7 +100,6 @@ public class KeyWordDatabase {
 	}
 	public BaseCookingAction findCookingAction(String text, double error) {
 		if(text == null) return null;
-
 		
 		BaseCookingAction bestMatch = null;
 		double e = 1.0;
@@ -130,6 +130,20 @@ public class KeyWordDatabase {
 		return null;
 	}
 
+	public BaseNamedObject<?, ?> find(String word) {
+		BaseNamedObject<?, ?> obj = findTool(word);
+		
+		if(obj == null) {
+			obj = findIngredient(word);
+			
+			if(obj == null) {
+				obj = findCookingAction(word);
+			}
+		}
+		
+		return obj;
+	}
+	
 	public boolean isUnknown(String text, double error) {
 		return findTool(text, error) == null
 				&& findIngredient(text) == null
@@ -213,7 +227,7 @@ public class KeyWordDatabase {
 
 		sB.append("<ingredients>");
 		for(BaseIngredient ingredient : ingredients) {
-		//	sB.append(ingredient.toXML());
+			sB.append(ingredient.toXML());
 		}
 		sB.append("</ingredients>");
 
@@ -248,5 +262,29 @@ public class KeyWordDatabase {
 		sB.append("</root>");
 
 		return sB.toString();
+	}
+
+	@Override
+	public KeyWordDatabase clone() {
+		KeyWordDatabase clone = new KeyWordDatabase();
+		
+		for(BaseTool tool : tools) {
+			clone.getTools().add(tool.clone(this));
+		}
+		for(BaseIngredient ingredient : ingredients) {
+			clone.getIngredients().add(ingredient.clone(this));
+		}
+		for(BaseIngredientGroup group : ingredientGroups) {
+			clone.getIngredientGroups().add(group.clone(this));
+		}
+		for(BaseCookingAction cookingAction : cookingActions) {
+			clone.getCookingActions().add(cookingAction.clone(this));
+		}
+
+		clone.getPartIndicators().addAll(partIndicators);
+		clone.getLastSentenceReferences().addAll(lastSentenceReferences);
+		clone.getEventIndicators().addAll(eventIndicators);
+		
+		return clone;
 	}
 }
