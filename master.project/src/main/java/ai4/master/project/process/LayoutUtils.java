@@ -13,6 +13,7 @@ public class LayoutUtils {
 
 
     public static int[] getCenterCoordinates(Event node) {
+        if(!ProcessModelerImpl.isForLayout){
         double x = node.getDiagramElement().getBounds().getX();
         double y = node.getDiagramElement().getBounds().getY();
 
@@ -23,25 +24,29 @@ public class LayoutUtils {
         center[0] = (int) (x + (height / 2));
         center[1] = (int) (y + (width / 2));
 
-        return center;
+        return center;}
+        return new int[2];
     }
 
 
     public static int[] getCenterCoordinates(Gateway node) {
-        double x = node.getDiagramElement().getBounds().getX();
-        double y = node.getDiagramElement().getBounds().getY();
+        if(!ProcessModelerImpl.isForLayout) {
+            double x = node.getDiagramElement().getBounds().getX();
+            double y = node.getDiagramElement().getBounds().getY();
 
-        double height = node.getDiagramElement().getBounds().getHeight();
-        double width = node.getDiagramElement().getBounds().getWidth();
+            double height = node.getDiagramElement().getBounds().getHeight();
+            double width = node.getDiagramElement().getBounds().getWidth();
 
-        int[] center = new int[2];
-        center[0] = (int) (x + (height / 2));
-        center[1] = (int) (y + (width / 2));
-
-        return center;
+            int[] center = new int[2];
+            center[0] = (int) (x + (height / 2));
+            center[1] = (int) (y + (width / 2));
+            return center;
+        }
+        return new int[2];
     }
 
     public static int[] getCenterCoordinates(UserTask node) {
+        if(!ProcessModelerImpl.isForLayout){
         double x=0,y=0;
              x = node.getDiagramElement().getBounds().getX();
              y = node.getDiagramElement().getBounds().getY();
@@ -53,7 +58,8 @@ public class LayoutUtils {
         center[0] = (int) (x + (height / 2));
         center[1] = (int) (y + (width / 2));
 
-        return center;
+        return center;}
+        return new int[2];
     }
 
 

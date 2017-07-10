@@ -34,7 +34,7 @@ public class ProcessModelerImpl implements ProcessModeler {
 
 
     private String fileName = "test";
-
+    public static boolean isForLayout = false;
     BpmnModelInstance modelInstance;
     List<UserTask> userTasks = new ArrayList<>();
     List<SequenceFlow> flows = new ArrayList<>();
@@ -51,7 +51,19 @@ public class ProcessModelerImpl implements ProcessModeler {
     private int userTaskHeight = 80;
     private int userTaskWidth = 100;
 
-    public BpmnModelInstance convertToProcess(Recipe recipe) {
+    public void createBpmn(Recipe recipe){
+        convertToProcess(recipe);
+        this.setFileName(this.fileName + "_forLayout");
+        userTasks.clear();
+        flows.clear();
+        gates.clear();
+        startEvent = null;
+        endEvent = null;
+        isForLayout = true;
+        convertToProcess(recipe);
+    }
+
+    private BpmnModelInstance convertToProcess(Recipe recipe) {
 
         Tree<Step> t = new RecipeToTreeConverter().createTree(recipe);
         List<Node<Step>> nodes = new TreeTraverser<Step>(t).preOrder();
@@ -70,7 +82,8 @@ public class ProcessModelerImpl implements ProcessModeler {
         BpmnPlane plane = modelInstance.newInstance(BpmnPlane.class);
         plane.setBpmnElement(process);
         diagram.setBpmnPlane(plane);
-        definitions.addChildElement(diagram);
+        if(!isForLayout){
+        definitions.addChildElement(diagram);}
         /** INITIALIZATION END **/
 
         startEvent = createElement(process, "start", "Start", StartEvent.class, plane, taskX, taskY, 50, 50, true);
@@ -94,7 +107,6 @@ public class ProcessModelerImpl implements ProcessModeler {
 
       /*  Layouter layouter = new Layouter(modelInstance);
         layouter.createLayout(flows);*/
-
         // validate and write model to file
         Bpmn.validateModel(modelInstance);
         createXml();
@@ -212,7 +224,7 @@ public class ProcessModelerImpl implements ProcessModeler {
 
                             UserTask to = getUserTaskTo(childNode);
                             System.out.println("From: " + from.getAttributeValue("name") + " to: " + to.getAttributeValue("name"));
-                            to.getDiagramElement().getBounds().setY(to.getDiagramElement().getBounds().getY()+i*150);
+                       //     to.getDiagramElement().getBounds().setY(to.getDiagramElement().getBounds().getY()+i*150);
                             i++;
                             if (!sequenceExists(createId(from, to))) {
                                 flows.add(createSequenceFlow(process, parallelGateway, to, plane, LayoutUtils.getCenterCoordinates(from)[0], LayoutUtils.getCenterCoordinates(from)[1],
@@ -245,27 +257,27 @@ public class ProcessModelerImpl implements ProcessModeler {
 
                 UserTask userTask = createElement(process, createIdOf(node.getData().getText()), node.getData().getText(), UserTask.class, plane, taskX, taskY, userTaskHeight, userTaskWidth, false);
                 List<CookingEvent> events = node.getData().getEvents();
-
-                for (CookingEvent event : events) {
-                    userTask.builder().boundaryEvent().timerWithDuration(event.getText());
-                }
-                System.out.println("Node " + node.getData().getText() + " parent size: " + node.getParent().getChildren().size());
-                incXby(150);
+                if(!isForLayout) {
+                    for (CookingEvent event : events) {
+                        userTask.builder().boundaryEvent().timerWithDuration(event.getText());
+                    }
+                    System.out.println("Node " + node.getData().getText() + " parent size: " + node.getParent().getChildren().size());
+                    incXby(150);
 
                 /* Iterate over the Input parameter ( = ingredients) and output parameter ( = products) and add them */
-                for (Ingredient ingredient : node.getData().getIngredients()) {
-                    userTask.builder().camundaInputParameter("Ingredient", ingredient.getName());
-                }
+                    for (Ingredient ingredient : node.getData().getIngredients()) {
+                        userTask.builder().camundaInputParameter("Ingredient", ingredient.getName());
+                    }
 
-                for (Ingredient product : node.getData().getProducts()) {
-                    userTask.builder().camundaOutputParameter("Product", product.getName());
-                }
+                    for (Ingredient product : node.getData().getProducts()) {
+                        userTask.builder().camundaOutputParameter("Product", product.getName());
+                    }
                 /* Add tools as input parameter */
-                for(Tool tool : node.getData().getTools()){
-                    userTask.builder().camundaInputParameter("Tool",tool.getName());
+                    for (Tool tool : node.getData().getTools()) {
+                        userTask.builder().camundaInputParameter("Tool", tool.getName());
+                    }
+
                 }
-
-
                 userTasks.add(userTask);
             }
 
@@ -331,7 +343,7 @@ public class ProcessModelerImpl implements ProcessModeler {
         element.setAttributeValue("id", id, true);
         element.setAttributeValue("name", name, false);
         parentElement.addChildElement(element);
-
+        if(!isForLayout){
         BpmnShape bpmnShape = modelInstance.newInstance(BpmnShape.class);
         bpmnShape.setBpmnElement((BaseElement) element);
 
@@ -352,7 +364,7 @@ public class ProcessModelerImpl implements ProcessModeler {
             bpmnLabel.addChildElement(labelBounds);
             bpmnShape.addChildElement(bpmnLabel);
         }
-        plane.addChildElement(bpmnShape);
+        plane.addChildElement(bpmnShape);}
 
         return element;
     }
@@ -369,7 +381,9 @@ public class ProcessModelerImpl implements ProcessModeler {
         sequenceFlow.setTarget(to);
         to.getIncoming().add(sequenceFlow);
 
+        if(!isForLayout){
         BpmnEdge bpmnEdge = modelInstance.newInstance(BpmnEdge.class);
+
         bpmnEdge.setBpmnElement(sequenceFlow);
         for (int i = 0; i < waypoints.length / 2; i++) {
             double waypointX = waypoints[i * 2];
@@ -379,8 +393,8 @@ public class ProcessModelerImpl implements ProcessModeler {
             wp.setY(waypointY);
             bpmnEdge.addChildElement(wp);
         }
-        plane.addChildElement(bpmnEdge);
 
+        plane.addChildElement(bpmnEdge);}
         return sequenceFlow;
     }
 

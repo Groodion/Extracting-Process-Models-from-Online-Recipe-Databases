@@ -15,7 +15,7 @@ public interface ProcessModeler {
      * Converts a given process to a bpmn model
      * @param recipe The recipe containing the steps annd other informations for convesion
      */
-    BpmnModelInstance convertToProcess(Recipe recipe);
+    void createBpmn(Recipe recipe);
 
     void setFileName(String name);
 }
