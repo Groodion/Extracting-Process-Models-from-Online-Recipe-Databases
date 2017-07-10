@@ -87,6 +87,7 @@ public class Controller implements Initializable {
 	private ObservableList<BaseCookingAction> identifiedActions;
 	
 	private Parser parser;
+	private boolean kwdbHasChanged = false;
 	
 	
 	public Controller() {
@@ -195,7 +196,7 @@ public class Controller implements Initializable {
 		}
 	}
 	public void loadFileForRecipeImport() {
-
+		
 	}
 
 	public void updateRecipeSteps() {
@@ -303,10 +304,10 @@ public class Controller implements Initializable {
 	
 	public void showLibEditor() {
 		Optional<KeyWordDatabase> kwdb = libEditor.showAndWait();
-		
-		if(kwdb.isPresent()) {
-			this.kwdb.set(kwdb.get());
-		}
+		kwdb.ifPresent(db -> {
+			this.kwdb.set(db);
+			kwdbHasChanged = true;
+		});
 	}
 	
 	public void prevStep() {
@@ -353,5 +354,11 @@ public class Controller implements Initializable {
 				break;
 			}
 		}
+	}
+	public KeyWordDatabase getKeyWordDatabase() {
+		return kwdb.get();
+	}
+	public boolean kwdbHasChanged() {
+		return kwdbHasChanged;
 	}
 }

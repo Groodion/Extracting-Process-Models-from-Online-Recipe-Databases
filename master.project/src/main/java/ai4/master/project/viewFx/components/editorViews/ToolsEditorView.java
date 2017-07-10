@@ -170,11 +170,13 @@ public class ToolsEditorView extends EditorView {
 		return kwdb.get().findTool(word) != null;
 	}
 	public void scrollTo(String word) {
-		scrollTo(kwdb.get().findTool(word));
-	}
-	public void scrollTo(BaseTool tool) {
-		System.out.println(tools.indexOf(tool));
-		toolsTable.scrollTo(tools.indexOf(tool));
+		for(ToolEntry entry : toolsTable.getItems()) {
+			if(entry.getToolName().equals(word) || entry.getSynonyms().contains(word)) {
+				toolsTable.scrollTo(entry);
+				toolsTable.getSelectionModel().select(entry);
+				break;
+			}
+		}
 	}
 	
 	private class SynonymsCell extends TableCell<ToolEntry, ObservableList<String>> { 

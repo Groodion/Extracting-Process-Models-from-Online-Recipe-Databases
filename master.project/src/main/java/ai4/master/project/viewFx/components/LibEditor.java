@@ -1,7 +1,6 @@
 package ai4.master.project.viewFx.components;
 
 import org.controlsfx.control.textfield.CustomTextField;
-import org.controlsfx.glyphfont.FontAwesome;
 
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
@@ -30,7 +29,6 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -71,6 +69,7 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 		eventIndicators =  FXCollections.observableArrayList();
 		lastSentenceReferences =  FXCollections.observableArrayList();
 		partIndicators =  FXCollections.observableArrayList();
+		allIngredients =  FXCollections.observableArrayList();
 
 		
 		ListChangeListener<BaseTool> toolsChanged = change -> {

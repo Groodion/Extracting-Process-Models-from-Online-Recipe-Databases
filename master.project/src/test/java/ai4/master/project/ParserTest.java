@@ -7,6 +7,7 @@ import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
 import ai4.master.project.recipe.TestRecipeFactory;
 import ai4.master.project.stanfordParser.Parser;
+import ai4.master.project.viewFx.Controller;
 
 import java.net.URL;
 
@@ -18,7 +19,7 @@ public class ParserTest {
 */
 	
 	static String[] ids = {
-		"43611014899035"
+		"997991205154456"
 	};
     public static void main(String[] args) throws Exception {
 //    	testParser();
@@ -41,9 +42,10 @@ public class ParserTest {
 		//1340271238839144
 		//997991205154456,185511079703831,150681066371674,1726761281857676,2397571379105119,982031203667502,914011196708021,1033741208508759,965881202287446,43611014899035,
 
-		Recipe recipe = new RecipeGetterChefkoch().getRecipe("982031203667502");
+		Recipe recipe = new RecipeGetterChefkoch().getRecipe("997991205154456");
 		
 		parser.parseRecipe(recipe);
+		System.out.println(Controller.MESSAGES);
 		
 		for(Step step : recipe.getSteps()) {
 			System.out.println(step.toEasyToReadString());
