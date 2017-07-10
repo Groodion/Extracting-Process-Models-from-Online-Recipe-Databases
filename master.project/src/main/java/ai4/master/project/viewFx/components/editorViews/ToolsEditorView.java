@@ -25,7 +25,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-public class ToolsEditorView extends VBox {
+public class ToolsEditorView extends EditorView {
 
 	private ObjectProperty<KeyWordDatabase> kwdb;
 	private ObservableList<BaseTool> tools;

@@ -29,7 +29,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 
-public class CookingActionsEditorView extends VBox {
+public class CookingActionsEditorView extends EditorView {
 	
 	private ObservableList<BaseCookingAction> cookingActions;
 	private ObjectProperty<KeyWordDatabase> kwdb;

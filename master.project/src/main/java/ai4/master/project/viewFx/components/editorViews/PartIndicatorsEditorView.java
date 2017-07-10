@@ -21,7 +21,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-public class PartIndicatorsEditorView extends VBox {
+public class PartIndicatorsEditorView extends EditorView {
 	
 	private ObservableList<String> partIndicators; 
 	private ObjectProperty<KeyWordDatabase> kwdb;

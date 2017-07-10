@@ -27,7 +27,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-public class IngredientsEditorView extends VBox {
+public class IngredientsEditorView extends EditorView {
 	
 	private ObjectProperty<KeyWordDatabase> kwdb;
 	private ObservableList<BaseIngredient> ingredients;
