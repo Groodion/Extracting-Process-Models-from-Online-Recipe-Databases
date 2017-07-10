@@ -21,8 +21,8 @@ public class ParserTest {
 		"43611014899035"
 	};
     public static void main(String[] args) throws Exception {
-    	testParser();
-//   	testProcessModeler();
+//    	testParser();
+   	testProcessModeler();
 //    	testSimpleProcessExample();
     }
 
@@ -31,7 +31,7 @@ public class ParserTest {
             Recipe r = new TestRecipeFactory().create();
             ProcessModeler processModeler = new ProcessModelerImpl();
             processModeler.setFileName("test-layout");
-            processModeler.convertToProcess(r);
+        //    processModeler.convertToProcess(r);
     }
 	public static void testParser() throws Exception {
 		XMLLoader loader = new XMLLoader();
@@ -70,7 +70,7 @@ public class ParserTest {
                 //Now steps are saved in recipe
                 ProcessModeler processModeler = new ProcessModelerImpl();
                 processModeler.setFileName(currentRecipe + "toBpmn");
-                processModeler.convertToProcess(recipe);
+                processModeler.createBpmn(recipe);
             } catch (Exception ex) {
                 System.err.println("Could not parse Recipe with id: " + currentRecipe);
                 System.err.println("Following error occured: ");

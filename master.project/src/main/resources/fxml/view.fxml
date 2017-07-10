@@ -124,7 +124,11 @@
 										</TitledPane>
 										<TitledPane maxHeight="Infinity" text="Steps" collapsible="false" VBox.vgrow="ALWAYS">
 											<content>
-												<VBox fx:id="stepsPane" maxWidth="Infinity" maxHeight="Infinity" />
+												<ScrollPane maxWidth="Infinity" maxHeight="Infinity">
+													<content>
+														<VBox fx:id="stepsPane" maxWidth="Infinity" maxHeight="Infinity" />
+													</content>
+												</ScrollPane>
 											</content>
 										</TitledPane>
 									</children>

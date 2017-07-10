@@ -25,10 +25,18 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-public class ToolsEditorView extends VBox {
+public class ToolsEditorView extends EditorView {
 
+	private ObjectProperty<KeyWordDatabase> kwdb;
+	private ObservableList<BaseTool> tools;
+	private TableView<ToolEntry> toolsTable;
+
+	
 	@SuppressWarnings("unchecked")
 	public ToolsEditorView(ObservableList<BaseTool> tools, ObjectProperty<KeyWordDatabase> kwdb) {
+		this.kwdb = kwdb;
+		this.tools = tools;
+		
 		setSpacing(10);
 		
 		/*
@@ -58,7 +66,7 @@ public class ToolsEditorView extends VBox {
 		 * Edit Tools
 		 */
 		
-		TableView<ToolEntry> toolsTable = new TableView<ToolEntry>();
+		toolsTable = new TableView<ToolEntry>();
 		toolsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		toolsTable.setEditable(true);
 		VBox.setVgrow(toolsTable, Priority.ALWAYS);
@@ -156,6 +164,16 @@ public class ToolsEditorView extends VBox {
 		synonymsColumn.setCellFactory(column -> new SynonymsCell());
 		
 		return synonymsColumn;
+	}
+
+	public boolean contains(String word) {
+		return kwdb.get().findTool(word) != null;
+	}
+	public void scrollTo(String word) {
+		scrollTo(kwdb.get().findTool(word));
+	}
+	public void scrollTo(BaseTool tool) {
+		toolsTable.scrollTo(tools.indexOf(tool));
 	}
 	
 	private class SynonymsCell extends TableCell<ToolEntry, ObservableList<String>> { 

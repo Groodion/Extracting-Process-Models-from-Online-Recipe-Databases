@@ -21,9 +21,18 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-public class EventIndicatorsEditorView extends VBox {
+public class EventIndicatorsEditorView extends EditorView {
+
+	private ObservableList<String> eventIndicators; 
+	private ObjectProperty<KeyWordDatabase> kwdb;
+	private TableView<EventIndicatorEntry> eventIndicatorsTable;
+
+	
 	@SuppressWarnings("unchecked")
 	public EventIndicatorsEditorView(ObservableList<String> eventIndicators, ObjectProperty<KeyWordDatabase> kwdb) {
+		this.eventIndicators = eventIndicators;
+		this.kwdb = kwdb;
+		
 		setSpacing(10);
 		
 		/*
@@ -48,7 +57,7 @@ public class EventIndicatorsEditorView extends VBox {
 		 * Edit EventIndicators
 		 */
 		
-		TableView<EventIndicatorEntry> eventIndicatorsTable = new TableView<EventIndicatorEntry>();
+		eventIndicatorsTable = new TableView<EventIndicatorEntry>();
 		eventIndicatorsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		eventIndicatorsTable.setEditable(true);
 		VBox.setVgrow(eventIndicatorsTable, Priority.ALWAYS);
@@ -132,5 +141,12 @@ public class EventIndicatorsEditorView extends VBox {
 		nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 		
 		return nameColumn;
+	}
+
+	public boolean contains(String word) {
+		return kwdb.get().isPartIndicator(word);
+	}
+	public void scrollTo(String word) {
+		eventIndicatorsTable.scrollTo(eventIndicators.indexOf(word));
 	}
 }

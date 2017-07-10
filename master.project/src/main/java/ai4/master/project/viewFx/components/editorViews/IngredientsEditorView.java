@@ -27,11 +27,20 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-public class IngredientsEditorView extends VBox {
+public class IngredientsEditorView extends EditorView {
+	
+	private ObjectProperty<KeyWordDatabase> kwdb;
+	private ObservableList<BaseIngredient> ingredients;
+	private TableView<IngredientEntry> ingredientsTable;
+
+	
 	@SuppressWarnings("unchecked")
 	public IngredientsEditorView(ObservableList<BaseIngredient> ingredients,
 			ObservableList<BaseIngredientGroup> ingredientGroups,
 			ObjectProperty<KeyWordDatabase> kwdb) {
+		this.ingredients = ingredients;
+		this.kwdb = kwdb;
+		
 		setSpacing(10);
 		
 		/*
@@ -66,7 +75,7 @@ public class IngredientsEditorView extends VBox {
 		 * Edit Ingredients
 		 */
 		
-		TableView<IngredientEntry> ingredientsTable = new TableView<IngredientEntry>();
+		ingredientsTable = new TableView<IngredientEntry>();
 		ingredientsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		ingredientsTable.setEditable(true);
 		VBox.setVgrow(ingredientsTable, Priority.ALWAYS);
@@ -175,7 +184,17 @@ public class IngredientsEditorView extends VBox {
 		
 		return groupsColumn;
 	}
-	
+
+	public boolean contains(String word) {
+		return kwdb.get().findIngredient(word) != null;
+	}
+	public void scrollTo(String word) {
+		scrollTo(kwdb.get().findIngredient(word));
+	}
+	public void scrollTo(BaseIngredient ingredient) {
+		ingredientsTable.scrollTo(ingredients.indexOf(ingredient));
+	}
+
 	private class SynonymsCell extends TableCell<IngredientEntry, ObservableList<String>> { 
 		@Override
 		public void updateItem(ObservableList<String> synonyms, boolean empty) {

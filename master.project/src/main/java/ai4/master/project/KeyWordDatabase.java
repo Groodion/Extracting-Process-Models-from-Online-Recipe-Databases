@@ -171,6 +171,15 @@ public class KeyWordDatabase {
 		
 		return false;
 	}
+	public boolean isPartIndicator(String text) {
+		for(String i : partIndicators) {
+			if(Word.stem(i.toLowerCase()).equals(Word.stem(text.toLowerCase()))) {
+				return true;
+			}
+		}
+		
+		return false;	
+	}
 	
 	private static int stringDiff(String a, String b) {
 		int dif = Math.abs(a.length() - b.length());

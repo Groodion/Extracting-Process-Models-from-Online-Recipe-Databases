@@ -21,9 +21,18 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-public class PartIndicatorsEditorView extends VBox {
+public class PartIndicatorsEditorView extends EditorView {
+	
+	private ObservableList<String> partIndicators; 
+	private ObjectProperty<KeyWordDatabase> kwdb;
+	TableView<PartIndicatorEntry> partIndicatorsTable;
+	
+	
 	@SuppressWarnings("unchecked")
 	public PartIndicatorsEditorView(ObservableList<String> partIndicators, ObjectProperty<KeyWordDatabase> kwdb) {
+		this.partIndicators = partIndicators;
+		this.kwdb = kwdb;
+		
 		setSpacing(10);
 		
 		/*
@@ -48,7 +57,7 @@ public class PartIndicatorsEditorView extends VBox {
 		 * Edit PartIndicators
 		 */
 		
-		TableView<PartIndicatorEntry> partIndicatorsTable = new TableView<PartIndicatorEntry>();
+		partIndicatorsTable = new TableView<PartIndicatorEntry>();
 		partIndicatorsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		partIndicatorsTable.setEditable(true);
 		VBox.setVgrow(partIndicatorsTable, Priority.ALWAYS);
@@ -124,7 +133,7 @@ public class PartIndicatorsEditorView extends VBox {
 				partIndicatorsTable
 		);
 	}
-	
+
 	private TableColumn<PartIndicatorEntry, String> nameColumn() {
 		TableColumn<PartIndicatorEntry, String> nameColumn = new TableColumn<PartIndicatorEntry, String>("Event Indicator");
 		
@@ -132,5 +141,12 @@ public class PartIndicatorsEditorView extends VBox {
 		nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 		
 		return nameColumn;
+	}
+
+	public boolean contains(String word) {
+		return kwdb.get().isPartIndicator(word);
+	}
+	public void scrollTo(String word) {
+		partIndicatorsTable.scrollTo(partIndicators.indexOf(word));
 	}
 }

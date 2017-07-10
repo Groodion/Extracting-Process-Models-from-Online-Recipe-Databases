@@ -9,6 +9,7 @@ import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
 import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.viewFx.components.editorViews.CookingActionsEditorView;
+import ai4.master.project.viewFx.components.editorViews.EditorView;
 import ai4.master.project.viewFx.components.editorViews.EventIndicatorsEditorView;
 import ai4.master.project.viewFx.components.editorViews.IngredientGroupsEditorView;
 import ai4.master.project.viewFx.components.editorViews.IngredientsEditorView;
@@ -21,6 +22,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -47,12 +49,16 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 	private ObservableList<String> eventIndicators;
 	private ObservableList<String> lastSentenceReferences;
 	private ObservableList<String> partIndicators;
+	private ObservableList<BaseIngredient> allIngredients;
 	
 	private boolean editorInitialized = false;
+
+	private StackPane editorViewsStackPane;
 	
     public static final String ICON_SEARCH = "\uf002";
 	
 	public LibEditor(ObjectProperty<KeyWordDatabase> kwdb) {
+
 		this.getDialogPane().getStylesheets().add(
 				   getClass().getResource("/css/style.css").toExternalForm());
 		tools =  FXCollections.observableArrayList();
@@ -62,6 +68,7 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 		eventIndicators =  FXCollections.observableArrayList();
 		lastSentenceReferences =  FXCollections.observableArrayList();
 		partIndicators =  FXCollections.observableArrayList();
+
 		
 		ListChangeListener<BaseTool> toolsChanged = change -> {
 			if(editorInitialized && this.kwdb != null) {
@@ -76,6 +83,8 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 				while(change.next()) {
 					this.kwdb.getIngredients().removeAll(change.getRemoved());
 					this.kwdb.getIngredients().addAll(change.getAddedSubList());
+					allIngredients.removeAll(change.getRemoved());
+					allIngredients.addAll(change.getAddedSubList());
 				}
 			}
 		};
@@ -84,6 +93,8 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 				while(change.next()) {
 					this.kwdb.getIngredientGroups().removeAll(change.getRemoved());
 					this.kwdb.getIngredientGroups().addAll(change.getAddedSubList());
+					allIngredients.removeAll(change.getRemoved());
+					allIngredients.addAll(change.getAddedSubList());
 				}
 			}
 		};
@@ -163,7 +174,7 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 		initDialog();
 		initMainLayout(kwdb);
 	}
-	
+
 	private void initDialog() {
 		setTitle("Library Editor");
 		setHeaderText("Library Editor");
@@ -189,13 +200,13 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 		VBox mainLayout = new VBox();
 		mainLayout.setSpacing(10);
 		
-		StackPane stackPane = new StackPane();
-		VBox.setVgrow(stackPane, Priority.ALWAYS);
-		stackPane.getChildren().addAll(
+		editorViewsStackPane = new StackPane();
+		VBox.setVgrow(editorViewsStackPane, Priority.ALWAYS);
+		editorViewsStackPane.getChildren().addAll(
 				new ToolsEditorView(tools, kwdb), 
 				new IngredientGroupsEditorView(ingredientGroups, kwdb), 
 				new IngredientsEditorView(ingredients, ingredientGroups, kwdb), 
-				new CookingActionsEditorView(cookingActions, kwdb), 
+				new CookingActionsEditorView(cookingActions, allIngredients, tools, kwdb), 
 				new PartIndicatorsEditorView(partIndicators, kwdb),
 				new LastSentenceReferencesEditorView(lastSentenceReferences, kwdb), 
 				new EventIndicatorsEditorView(eventIndicators, kwdb)
@@ -214,8 +225,8 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 		);
 		selectEditorCB.setTooltip(new Tooltip("Select a type you want to edit"));
 		selectEditorCB.getSelectionModel().selectedIndexProperty().addListener((b, o, n) -> {
-			for(int i = 0; i < stackPane.getChildren().size(); i++) {
-				stackPane.getChildren().get(i).setVisible(i == (int) n);
+			for(int i = 0; i < editorViewsStackPane.getChildren().size(); i++) {
+				editorViewsStackPane.getChildren().get(i).setVisible(i == (int) n);
 			}
 		});
 		selectEditorCB.getSelectionModel().selectFirst();
@@ -235,10 +246,27 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 		
 		header.getChildren().addAll(selectEditorCB, fillPane, searchField);
 		mainLayout.getChildren().addAll(
+
 				header,
 				stackPane
+
 		);
 		
 		this.getDialogPane().setContent(mainLayout);
 	}
+	
+	public void searchAndScroll(String word) {
+		for(Node node : editorViewsStackPane.getChildren()) {
+			EditorView editorView = (EditorView) node;
+			
+			if(editorView.contains(word)) {
+				editorView.setVisible(true);
+				editorView.scrollTo(word);
+			} else {
+				editorView.setVisible(false);
+			}
+		}
+	}
+	
+
 }

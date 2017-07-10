@@ -65,8 +65,10 @@ public class OnlineDatabaseButton extends HBox {
 		layout.add(new Label("Link:"), 0, 2);
 		layout.add(new Label(link), 1, 2);
 
-		getChildren().add(seperator);
-		getChildren().add(logo);
-		getChildren().add(layout);
+		getChildren().addAll(
+				seperator,
+				logo,
+				layout
+		);
 	}
 }
