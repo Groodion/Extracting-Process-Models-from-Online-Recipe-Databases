@@ -26,9 +26,18 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 public class IngredientGroupsEditorView extends VBox {
+	
+	private ObservableList<BaseIngredientGroup> ingredientGroups;
+	private ObjectProperty<KeyWordDatabase> kwdb;
+	private TableView<IngredientGroupEntry> ingredientGroupsTable;
+	
+	
 	@SuppressWarnings("unchecked")
 	public IngredientGroupsEditorView(ObservableList<BaseIngredientGroup> ingredientGroups,
 			ObjectProperty<KeyWordDatabase> kwdb) {
+		this.ingredientGroups = ingredientGroups;
+		this.kwdb = kwdb;
+		
 		setSpacing(10);
 		
 		/*
@@ -58,7 +67,7 @@ public class IngredientGroupsEditorView extends VBox {
 		 * Edit IngredientGroups
 		 */
 		
-		TableView<IngredientGroupEntry> ingredientGroupsTable = new TableView<IngredientGroupEntry>();
+		ingredientGroupsTable = new TableView<IngredientGroupEntry>();
 		ingredientGroupsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		ingredientGroupsTable.setEditable(true);
 		VBox.setVgrow(ingredientGroupsTable, Priority.ALWAYS);
@@ -157,7 +166,17 @@ public class IngredientGroupsEditorView extends VBox {
 		
 		return synonymsColumn;
 	}
-	
+
+	public boolean contains(String word) {
+		return kwdb.get().findIngredientGroup(word) != null;
+	}
+	public void scrollTo(String word) {
+		scrollTo(kwdb.get().findIngredientGroup(word));
+	}
+	public void scrollTo(BaseIngredientGroup ingredientGroup) {
+		ingredientGroupsTable.scrollTo(ingredientGroups.indexOf(ingredientGroup));
+	}
+
 	private class SynonymsCell extends TableCell<IngredientGroupEntry, ObservableList<String>> { 
 		@Override
 		public void updateItem(ObservableList<String> synonyms, boolean empty) {

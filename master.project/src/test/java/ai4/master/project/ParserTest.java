@@ -21,8 +21,8 @@ public class ParserTest {
 		"43611014899035"
 	};
     public static void main(String[] args) throws Exception {
-    	testParser();
-//   	testProcessModeler();
+//    	testParser();
+    	testProcessModeler();
 //    	testSimpleProcessExample();
     }
 

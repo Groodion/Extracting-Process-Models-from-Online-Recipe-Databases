@@ -32,14 +32,27 @@ public class Regex {
 	public String getExpression() {
 		return expression;
 	}
+	public void setExpression(String expression) {
+		this.expression = expression;
+	}
+
 	public Result getResult() {
 		return result;
+	}
+	public void setResult(Result result) {
+		this.result = result;
 	}
 	public boolean isIngredientsNeeded() {
 		return ingredientsNeeded;
 	}
+	public void setIngredientsNeeded(boolean ingredientsNeeded) {
+		this.ingredientsNeeded = ingredientsNeeded;
+	}
 	public boolean isReferencePreviousProducts() {
 		return referencePreviousProducts;
+	}
+	public void setReferencePreviousProducts(boolean referencePreviousProducts) {
+		this.referencePreviousProducts = referencePreviousProducts;
 	}
 
 	public String getId() {

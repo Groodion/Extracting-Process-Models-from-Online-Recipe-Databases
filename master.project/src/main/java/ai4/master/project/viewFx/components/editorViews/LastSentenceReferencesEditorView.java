@@ -22,8 +22,15 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 public class LastSentenceReferencesEditorView extends VBox {
+	private ObservableList<String> lastSentenceReferences;
+	private ObjectProperty<KeyWordDatabase> kwdb;
+	private TableView<LastSentenceReferenceEntry> lastSentenceReferencesTable;
+	
 	@SuppressWarnings("unchecked")
 	public LastSentenceReferencesEditorView(ObservableList<String> lastSentenceReferences, ObjectProperty<KeyWordDatabase> kwdb) {
+		this.lastSentenceReferences = lastSentenceReferences;
+		this.kwdb = kwdb;
+		
 		setSpacing(10);
 		
 		/*
@@ -48,7 +55,7 @@ public class LastSentenceReferencesEditorView extends VBox {
 		 * Edit LastSentenceReferences
 		 */
 		
-		TableView<LastSentenceReferenceEntry> lastSentenceReferencesTable = new TableView<LastSentenceReferenceEntry>();
+		lastSentenceReferencesTable = new TableView<LastSentenceReferenceEntry>();
 		lastSentenceReferencesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		lastSentenceReferencesTable.setEditable(true);
 		VBox.setVgrow(lastSentenceReferencesTable, Priority.ALWAYS);
@@ -132,5 +139,12 @@ public class LastSentenceReferencesEditorView extends VBox {
 		nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 		
 		return nameColumn;
+	}
+
+	public boolean contains(String word) {
+		return kwdb.get().isPartIndicator(word);
+	}
+	public void scrollTo(String word) {
+		lastSentenceReferencesTable.scrollTo(lastSentenceReferences.indexOf(word));
 	}
 }

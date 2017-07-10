@@ -38,18 +38,20 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 	private ObservableList<String> eventIndicators;
 	private ObservableList<String> lastSentenceReferences;
 	private ObservableList<String> partIndicators;
+	private ObservableList<BaseIngredient> allIngredients;
 	
 	private boolean editorInitialized = false;
 	
 	
 	public LibEditor(ObjectProperty<KeyWordDatabase> kwdb) {
-		tools =  FXCollections.observableArrayList();
-		ingredients =  FXCollections.observableArrayList();			
-		ingredientGroups =  FXCollections.observableArrayList();
-		cookingActions =  FXCollections.observableArrayList();
-		eventIndicators =  FXCollections.observableArrayList();
-		lastSentenceReferences =  FXCollections.observableArrayList();
-		partIndicators =  FXCollections.observableArrayList();
+		tools = FXCollections.observableArrayList();
+		ingredients = FXCollections.observableArrayList();			
+		ingredientGroups = FXCollections.observableArrayList();
+		cookingActions = FXCollections.observableArrayList();
+		eventIndicators = FXCollections.observableArrayList();
+		lastSentenceReferences = FXCollections.observableArrayList();
+		partIndicators = FXCollections.observableArrayList();
+		allIngredients = FXCollections.observableArrayList();
 		
 		ListChangeListener<BaseTool> toolsChanged = change -> {
 			if(editorInitialized && this.kwdb != null) {
@@ -64,6 +66,8 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 				while(change.next()) {
 					this.kwdb.getIngredients().removeAll(change.getRemoved());
 					this.kwdb.getIngredients().addAll(change.getAddedSubList());
+					allIngredients.removeAll(change.getRemoved());
+					allIngredients.addAll(change.getAddedSubList());
 				}
 			}
 		};
@@ -72,6 +76,8 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 				while(change.next()) {
 					this.kwdb.getIngredientGroups().removeAll(change.getRemoved());
 					this.kwdb.getIngredientGroups().addAll(change.getAddedSubList());
+					allIngredients.removeAll(change.getRemoved());
+					allIngredients.addAll(change.getAddedSubList());
 				}
 			}
 		};
@@ -183,7 +189,7 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 				new ToolsEditorView(tools, kwdb), 
 				new IngredientGroupsEditorView(ingredientGroups, kwdb), 
 				new IngredientsEditorView(ingredients, ingredientGroups, kwdb), 
-				new CookingActionsEditorView(cookingActions, kwdb), 
+				new CookingActionsEditorView(cookingActions, allIngredients, tools, kwdb), 
 				new PartIndicatorsEditorView(partIndicators, kwdb),
 				new LastSentenceReferencesEditorView(lastSentenceReferences, kwdb), 
 				new EventIndicatorsEditorView(eventIndicators, kwdb)
