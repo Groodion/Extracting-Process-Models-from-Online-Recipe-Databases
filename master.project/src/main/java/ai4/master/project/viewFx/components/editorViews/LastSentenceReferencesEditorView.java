@@ -21,7 +21,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-public class LastSentenceReferencesEditorView extends VBox {
+public class LastSentenceReferencesEditorView extends EditorView {
 	private ObservableList<String> lastSentenceReferences;
 	private ObjectProperty<KeyWordDatabase> kwdb;
 	private TableView<LastSentenceReferenceEntry> lastSentenceReferencesTable;

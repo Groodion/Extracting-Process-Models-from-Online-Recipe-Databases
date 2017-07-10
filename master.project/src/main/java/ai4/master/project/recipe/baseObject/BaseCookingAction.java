@@ -128,7 +128,8 @@ public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookin
 		sB.append("</transformations>");
 		sB.append("<tools>");
 		for(BaseTool tool : implicitTools) {
-			sB.append(tool.getNames().iterator().next());
+			sB.append("<Tool name=\"");
+				sB.append(tool.getNames().iterator().next());
 			sB.append("\" />");
 		}
 		sB.append("</tools>");

@@ -25,7 +25,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-public class ToolsEditorView extends VBox {
+public class ToolsEditorView extends EditorView {
 
 	private ObjectProperty<KeyWordDatabase> kwdb;
 	private ObservableList<BaseTool> tools;
@@ -170,10 +170,13 @@ public class ToolsEditorView extends VBox {
 		return kwdb.get().findTool(word) != null;
 	}
 	public void scrollTo(String word) {
-		scrollTo(kwdb.get().findTool(word));
-	}
-	public void scrollTo(BaseTool tool) {
-		toolsTable.scrollTo(tools.indexOf(tool));
+		for(ToolEntry entry : toolsTable.getItems()) {
+			if(entry.getToolName().equals(word) || entry.getSynonyms().contains(word)) {
+				toolsTable.scrollTo(entry);
+				toolsTable.getSelectionModel().select(entry);
+				break;
+			}
+		}
 	}
 	
 	private class SynonymsCell extends TableCell<ToolEntry, ObservableList<String>> { 

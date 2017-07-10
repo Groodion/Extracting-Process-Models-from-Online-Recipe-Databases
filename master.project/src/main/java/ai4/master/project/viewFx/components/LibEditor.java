@@ -1,28 +1,37 @@
 package ai4.master.project.viewFx.components;
 
+import org.controlsfx.control.textfield.CustomTextField;
+
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
 import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.viewFx.components.editorViews.CookingActionsEditorView;
+import ai4.master.project.viewFx.components.editorViews.EditorView;
 import ai4.master.project.viewFx.components.editorViews.EventIndicatorsEditorView;
 import ai4.master.project.viewFx.components.editorViews.IngredientGroupsEditorView;
 import ai4.master.project.viewFx.components.editorViews.IngredientsEditorView;
 import ai4.master.project.viewFx.components.editorViews.LastSentenceReferencesEditorView;
 import ai4.master.project.viewFx.components.editorViews.PartIndicatorsEditorView;
 import ai4.master.project.viewFx.components.editorViews.ToolsEditorView;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -41,17 +50,27 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 	private ObservableList<BaseIngredient> allIngredients;
 	
 	private boolean editorInitialized = false;
+
+	private StackPane editorViewsStackPane;
+
 	
+    public static final String ICON_SEARCH = "\uf002";
+	private ComboBox<String> selectEditorCB;
+
 	
 	public LibEditor(ObjectProperty<KeyWordDatabase> kwdb) {
-		tools = FXCollections.observableArrayList();
-		ingredients = FXCollections.observableArrayList();			
-		ingredientGroups = FXCollections.observableArrayList();
-		cookingActions = FXCollections.observableArrayList();
-		eventIndicators = FXCollections.observableArrayList();
-		lastSentenceReferences = FXCollections.observableArrayList();
-		partIndicators = FXCollections.observableArrayList();
-		allIngredients = FXCollections.observableArrayList();
+
+		this.getDialogPane().getStylesheets().add(
+				   getClass().getResource("/css/style.css").toExternalForm());
+		tools =  FXCollections.observableArrayList();
+		ingredients =  FXCollections.observableArrayList();			
+		ingredientGroups =  FXCollections.observableArrayList();
+		cookingActions =  FXCollections.observableArrayList();
+		eventIndicators =  FXCollections.observableArrayList();
+		lastSentenceReferences =  FXCollections.observableArrayList();
+		partIndicators =  FXCollections.observableArrayList();
+		allIngredients =  FXCollections.observableArrayList();
+
 		
 		ListChangeListener<BaseTool> toolsChanged = change -> {
 			if(editorInitialized && this.kwdb != null) {
@@ -157,7 +176,7 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 		initDialog();
 		initMainLayout(kwdb);
 	}
-	
+
 	private void initDialog() {
 		setTitle("Library Editor");
 		setHeaderText("Library Editor");
@@ -183,9 +202,9 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 		VBox mainLayout = new VBox();
 		mainLayout.setSpacing(10);
 		
-		StackPane stackPane = new StackPane();
-		VBox.setVgrow(stackPane, Priority.ALWAYS);
-		stackPane.getChildren().addAll(
+		editorViewsStackPane = new StackPane();
+		VBox.setVgrow(editorViewsStackPane, Priority.ALWAYS);
+		editorViewsStackPane.getChildren().addAll(
 				new ToolsEditorView(tools, kwdb), 
 				new IngredientGroupsEditorView(ingredientGroups, kwdb), 
 				new IngredientsEditorView(ingredients, ingredientGroups, kwdb), 
@@ -195,7 +214,7 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 				new EventIndicatorsEditorView(eventIndicators, kwdb)
 		);
 
-		ComboBox<String> selectEditorCB = new ComboBox<String>(
+		selectEditorCB = new ComboBox<String>(
 				FXCollections.observableArrayList(
 						"Tools", 
 						"Groups", 
@@ -208,17 +227,52 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 		);
 		selectEditorCB.setTooltip(new Tooltip("Select a type you want to edit"));
 		selectEditorCB.getSelectionModel().selectedIndexProperty().addListener((b, o, n) -> {
-			for(int i = 0; i < stackPane.getChildren().size(); i++) {
-				stackPane.getChildren().get(i).setVisible(i == (int) n);
+			for(int i = 0; i < editorViewsStackPane.getChildren().size(); i++) {
+				editorViewsStackPane.getChildren().get(i).setVisible(i == (int) n);
 			}
 		});
 		selectEditorCB.getSelectionModel().selectFirst();
 		
+		CustomTextField searchField = new CustomTextField();
+		searchField.getStylesheets().add("searchField");
+
+		searchField.textProperty().addListener((b,o,n)-> {
+			if(n != null && n.length() != 0) {
+				searchAndScroll(n);
+			}
+		});
+		Label searchLabel = new Label();
+		searchLabel.getStylesheets().add("searchBoxLabel");
+		searchLabel.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SEARCH));
+		searchField.setLeft(searchLabel);
+		Pane fillPane = new Pane();
+		fillPane.setMaxWidth(Double.MAX_VALUE);
+		HBox.setHgrow(fillPane, Priority.ALWAYS);
+		HBox header = new HBox();
+		
+		header.getChildren().addAll(selectEditorCB, fillPane, searchField);
 		mainLayout.getChildren().addAll(
-				selectEditorCB,
-				stackPane
+
+				header,
+				editorViewsStackPane
+
 		);
 		
 		this.getDialogPane().setContent(mainLayout);
+	}
+	
+	public void searchAndScroll(String word) {
+		EditorView editorView = null;
+		for(Node node : editorViewsStackPane.getChildren()) {
+			EditorView eV = (EditorView) node;
+			if(eV.contains(word)) {
+				editorView = eV;
+			}
+		}
+		
+		if(editorView != null) {
+			selectEditorCB.getSelectionModel().select(editorViewsStackPane.getChildren().indexOf(editorView));
+			editorView.scrollTo(word);
+		}
 	}
 }
