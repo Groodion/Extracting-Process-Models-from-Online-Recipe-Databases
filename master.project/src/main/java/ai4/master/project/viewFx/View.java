@@ -117,7 +117,7 @@ public class View extends Application {
         	primaryStage.initStyle(StageStyle.DECORATED);
     		primaryStage.setOnCloseRequest(r -> {
     			if (controller.kwdbHasChanged()) {
-    				Alert alert = new Alert(AlertType.CONFIRMATION);
+    				Alert alert = new Alert(AlertType.CONFIRMATION, null, ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
     				alert.setTitle("Save Changes");
     				alert.setHeaderText("The database has been changed!");
     				alert.setContentText("Do you want to save the changes?");
@@ -147,6 +147,8 @@ public class View extends Application {
     								fileNotFoundOrCorruptedAlert.showAndWait();
     							}
     						}
+    					} else if(button == ButtonType.CANCEL) {
+    						r.consume();
     					}
     				});
     			}

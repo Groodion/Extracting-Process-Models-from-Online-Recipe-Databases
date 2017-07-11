@@ -2,7 +2,6 @@ package ai4.master.project.viewFx.components.editorViews;
 
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
-import ai4.master.project.viewFx.components.editorViews.entries.IngredientEntry;
 import ai4.master.project.viewFx.components.editorViews.entries.IngredientGroupEntry;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
@@ -28,7 +27,6 @@ import javafx.scene.layout.VBox;
 
 public class IngredientGroupsEditorView extends EditorView {
 	
-	private ObservableList<BaseIngredientGroup> ingredientGroups;
 	private ObjectProperty<KeyWordDatabase> kwdb;
 	private TableView<IngredientGroupEntry> ingredientGroupsTable;
 	
@@ -36,7 +34,6 @@ public class IngredientGroupsEditorView extends EditorView {
 	@SuppressWarnings("unchecked")
 	public IngredientGroupsEditorView(ObservableList<BaseIngredientGroup> ingredientGroups,
 			ObjectProperty<KeyWordDatabase> kwdb) {
-		this.ingredientGroups = ingredientGroups;
 		this.kwdb = kwdb;
 		
 		setSpacing(10);

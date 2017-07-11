@@ -9,9 +9,10 @@ import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.recipe.baseObject.Regex;
 import ai4.master.project.recipe.baseObject.Regex.Result;
+import ai4.master.project.recipe.baseObject.Transformation;
 import ai4.master.project.viewFx.components.editorViews.entries.CookingActionEntry;
-import ai4.master.project.viewFx.components.editorViews.entries.IngredientGroupEntry;
 import ai4.master.project.viewFx.components.editorViews.entries.RegexEntry;
+import ai4.master.project.viewFx.components.editorViews.entries.TransformationEntry;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -24,15 +25,15 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ChoiceBoxTableCell;
+import javafx.scene.control.cell.ComboBoxListCell;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.VBox;
 
 public class CookingActionsEditorView extends EditorView {
 	
-	private ObservableList<BaseCookingAction> cookingActions;
 	private ObjectProperty<KeyWordDatabase> kwdb;
 	private TableView<CookingActionEntry> tableView;
 	
@@ -44,7 +45,6 @@ public class CookingActionsEditorView extends EditorView {
 			ObjectProperty<KeyWordDatabase> kwdb) {
 		Map<Object, ObservableList<String>> regexIdMap = new HashMap<Object, ObservableList<String>>();
 		
-		this.cookingActions = cookingActions;
 		this.kwdb = kwdb;
 		
 		setSpacing(10);
@@ -58,7 +58,9 @@ public class CookingActionsEditorView extends EditorView {
 		tableView.getColumns().addAll(
 				nameColumn(),
 				synoymsColumn(),
-				regexColumn(regexIdMap)
+				regexColumn(regexIdMap),
+				transformationsColumn(regexIdMap, ingredients),
+				toolsColumn(tools)
 		);
 		
 		/*
@@ -120,6 +122,18 @@ public class CookingActionsEditorView extends EditorView {
 		regexColumn.setCellFactory(column -> new RegexCell(regexIdMap));
 		
 		return regexColumn;
+	}
+	private TableColumn<CookingActionEntry, ObservableList<Transformation>> transformationsColumn(Map<Object, ObservableList<String>> regexIdMap, ObservableList<BaseIngredient> ingredients) {
+		TableColumn<CookingActionEntry, ObservableList<Transformation>> transformationsColumn = new TableColumn<CookingActionEntry, ObservableList<Transformation>>("Transformations");
+		transformationsColumn.setCellValueFactory(new PropertyValueFactory<CookingActionEntry, ObservableList<Transformation>>("transformations"));
+		transformationsColumn.setCellFactory(column -> new TransformationCell(regexIdMap, ingredients));
+		return transformationsColumn;
+	}
+	private TableColumn<CookingActionEntry, ObservableList<BaseTool>> toolsColumn(ObservableList<BaseTool> tools) {
+		TableColumn<CookingActionEntry, ObservableList<BaseTool>> toolsColumn = new TableColumn<CookingActionEntry, ObservableList<BaseTool>>("Implied Tools");
+		toolsColumn.setCellValueFactory(new PropertyValueFactory<CookingActionEntry, ObservableList<BaseTool>>("tools"));
+		toolsColumn.setCellFactory(column -> new ImpliedToolsCell(tools));
+		return toolsColumn;
 	}
 	
 	public boolean contains(String word) {
@@ -201,7 +215,8 @@ public class CookingActionsEditorView extends EditorView {
 					expressionColumn(),
 					resultColumn(),
 					ingredientsNeededColumn(),
-					referencePreviousProductsColumn()
+					referencePreviousProductsColumn(),
+					chargeToolsColumn()
 			);
 	
 			ContextMenu regexTableCM = new ContextMenu();
@@ -269,15 +284,25 @@ public class CookingActionsEditorView extends EditorView {
 			referencePreviousProductsColumn.setCellFactory(CheckBoxTableCell.forTableColumn(referencePreviousProductsColumn));
 			return referencePreviousProductsColumn;
 		}
+		private TableColumn<RegexEntry, Boolean> chargeToolsColumn() {
+			TableColumn<RegexEntry, Boolean> chargeToolsColumn = new TableColumn<RegexEntry, Boolean>("ChargeTools");
+			chargeToolsColumn.setCellValueFactory(new PropertyValueFactory<RegexEntry, Boolean>("chargeTools"));
+			chargeToolsColumn.setCellFactory(CheckBoxTableCell.forTableColumn(chargeToolsColumn));
+			return chargeToolsColumn;
+		}
 	}
-}
+	private class TransformationCell extends TableCell<CookingActionEntry, ObservableList<Transformation>> {
+		
+		private Map<Object, ObservableList<String>> regexIdMap;
+		private ObservableList<BaseIngredient> ingredients;
 
-/*
-
-TableColumn<CookingActionEntry, ObservableList<Transformation>> transformationsColumn = new TableColumn<CookingActionEntry, ObservableList<Transformation>>(
-	"Transformations");transformationsColumn.setCellValueFactory(new PropertyValueFactory<CookingActionEntry,ObservableList<Transformation>>("transformations"));transformationsColumn.setCellFactory(column->
-{
-	TableCell<CookingActionEntry, ObservableList<Transformation>> cell = new TableCell<CookingActionEntry, ObservableList<Transformation>>() {
+		
+		public TransformationCell(Map<Object, ObservableList<String>> regexIdMap, ObservableList<BaseIngredient> ingredients) {
+			this.regexIdMap = regexIdMap;
+			this.ingredients = ingredients;
+		}
+		
+		@SuppressWarnings("unchecked")
 		@Override
 		public void updateItem(ObservableList<Transformation> transformations, boolean empty) {
 			super.updateItem(transformations, empty);
@@ -292,19 +317,12 @@ TableColumn<CookingActionEntry, ObservableList<Transformation>> transformationsC
 			addTransformation.setOnAction(e -> {
 				Transformation transformation = new Transformation();
 				transformations.add(transformation);
-				new TransformationEntry(transformation, transformationsTable.getItems(), transformations,
-						regexIdMap.get(transformation));
 				transformationsTable.requestFocus();
 			});
 			transformationsTableCM.getItems().add(addTransformation);
 			MenuItem removeTransformation = new MenuItem("Remove Transformation");
-			removeTransformation.disableProperty()
-					.bind(transformationsTable.getSelectionModel().selectedItemProperty().isNull());
-			removeTransformation.setOnAction(e -> {
-				int index = transformationsTable.getSelectionModel().getSelectedIndex();
-				transformations.remove(index);
-				System.out.println(index + " " + transformations);
-			});
+			removeTransformation.disableProperty().bind(transformationsTable.getSelectionModel().selectedItemProperty().isNull());
+			removeTransformation.setOnAction(e -> transformations.remove(transformationsTable.getSelectionModel().getSelectedIndex()));
 			transformationsTableCM.getItems().add(removeTransformation);
 			transformationsTable.setOnMouseClicked(e -> {
 				if (e.getButton() == MouseButton.SECONDARY) {
@@ -314,147 +332,168 @@ TableColumn<CookingActionEntry, ObservableList<Transformation>> transformationsC
 				}
 			});
 
-			TableColumn<TransformationEntry, ObservableList<String>> refIdColumn = new TableColumn<TransformationEntry, ObservableList<String>>(
-					"RefRegexIds");
-			refIdColumn.setCellValueFactory(
-					new PropertyValueFactory<TransformationEntry, ObservableList<String>>("refRegexIds"));
-			refIdColumn.setCellFactory(column -> {
-				TableCell<TransformationEntry, ObservableList<String>> cell = new TableCell<TransformationEntry, ObservableList<String>>() {
-					@Override
-					public void updateItem(ObservableList<String> refIds, boolean empty) {
-						super.updateItem(refIds, empty);
+			transformationsTable.getColumns().addAll(
+					regexIdsColumn(transformations != null && !transformations.isEmpty() ? regexIdMap.get(transformations.get(0)) : null),
+					ingredientsColumn(),
+					ingredientTagColumn(),
+					quantifierTagColumn(),
+					productColumn()
+			);
+
+			if(transformations != null)
+			{
+				transformations.forEach(transformation -> transformationsTable.getItems().add(new TransformationEntry(transformation, transformations)));
+			}
+
+			setGraphic(transformationsTable);
+		}
+		
+		private TableColumn<TransformationEntry, ObservableList<String>> regexIdsColumn(ObservableList<String> regexIds) {
+			TableColumn<TransformationEntry, ObservableList<String>> regexIdsColumn = new TableColumn<TransformationEntry, ObservableList<String>>("RefRegexIds");
+			regexIdsColumn.setCellValueFactory(new PropertyValueFactory<TransformationEntry, ObservableList<String>>("regexIds"));
+			regexIdsColumn.setCellFactory(column -> new RegexIdsCell(regexIds));
+			return regexIdsColumn;
+		}
+		private TableColumn<TransformationEntry, ObservableList<BaseIngredient>> ingredientsColumn() {
+			TableColumn<TransformationEntry, ObservableList<BaseIngredient>> ingredientsColumn = new TableColumn<TransformationEntry, ObservableList<BaseIngredient>>("Mandatory Ingredients");
+			ingredientsColumn.setCellValueFactory(new PropertyValueFactory<TransformationEntry, ObservableList<BaseIngredient>>("mandatoryIngredients"));
+			ingredientsColumn.setCellFactory(column -> new IngredientsCell(ingredients));
+			return ingredientsColumn;
+		}
+		private TableColumn<TransformationEntry, String> ingredientTagColumn() {
+			TableColumn<TransformationEntry, String> ingredientTagColumn = new TableColumn<TransformationEntry, String>("IngredientTag");
+			ingredientTagColumn.setCellValueFactory(new PropertyValueFactory<TransformationEntry,String>("ingredientTag"));
+			ingredientTagColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+			return ingredientTagColumn;
+		}
+		private TableColumn<TransformationEntry, String> quantifierTagColumn() {
+			TableColumn<TransformationEntry, String> quantifierTagColumn = new TableColumn<TransformationEntry, String>("QuantifierTag");
+			quantifierTagColumn.setCellValueFactory(new PropertyValueFactory<TransformationEntry,String>("quantifierTag"));
+			quantifierTagColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+			return quantifierTagColumn;
+		}
+		private TableColumn<TransformationEntry, BaseIngredient> productColumn() {
+			TableColumn<TransformationEntry, BaseIngredient> productColumn = new TableColumn<TransformationEntry, BaseIngredient>("Product");
+			productColumn.setCellValueFactory(new PropertyValueFactory<TransformationEntry,BaseIngredient>("product"));
+			productColumn.setCellFactory(ComboBoxTableCell.forTableColumn(ingredients));
+			return productColumn;
+		}
+		
+		private class RegexIdsCell extends TableCell<TransformationEntry, ObservableList<String>> {
+			
+			private ObservableList<String> regexIds;
+
+			
+			public RegexIdsCell(ObservableList<String> regexIds) {
+				this.regexIds = regexIds;
+			}
 						
-						ListView<String> refIdsView = new ListView<String>();
-						if (transformations.size() != 0)
-							refIdsView.setCellFactory(
-									ComboBoxListCell.forListView(regexIdMap.get(transformations.get(0))));
-						refIdsView.setMinHeight(0);
-						refIdsView.setPrefHeight(50);
-						refIdsView.setEditable(true);
+			@Override
+			public void updateItem(ObservableList<String> refIds, boolean empty) {
+				super.updateItem(refIds, empty);
+				
+				ListView<String> refIdsView = new ListView<String>();
+				
+				refIdsView.setCellFactory(ComboBoxListCell.forListView(regexIds));
+				refIdsView.setMinHeight(0);
+				refIdsView.setPrefHeight(50);
+				refIdsView.setEditable(true);
 
-						ContextMenu transformationsTableCM = new ContextMenu();
-						MenuItem addTransformation = new MenuItem("Add RegexId");
-						addTransformation.setOnAction(e -> {
-							refIds.add(null);
-							refIdsView.requestFocus();
-						});
-						transformationsTableCM.getItems().add(addTransformation);
-						MenuItem removeTransformation = new MenuItem("Remove RegexId");
-						removeTransformation.disableProperty()
-								.bind(refIdsView.getSelectionModel().selectedItemProperty().isNull());
-						removeTransformation.setOnAction(e -> {
-							refIds.remove(refIdsView.getSelectionModel().getSelectedItem());
-							refIdsView.requestFocus();
-						});
-						transformationsTableCM.getItems().add(removeTransformation);
-						refIdsView.setOnMouseClicked(e -> {
-							if (e.getButton() == MouseButton.SECONDARY) {
-								transformationsTableCM.show(refIdsView, e.getScreenX(), e.getScreenY());
-							} else {
-								transformationsTableCM.hide();
-							}
-						});
-
-						if (refIds != null) {
-							refIdsView.setItems(refIds);
-						}
-
-						setGraphic(refIdsView);
+				ContextMenu transformationsTableCM = new ContextMenu();
+				MenuItem addTransformation = new MenuItem("Add RegexId");
+				addTransformation.setOnAction(e -> {
+					refIds.add(null);
+					refIdsView.requestFocus();
+				});
+				transformationsTableCM.getItems().add(addTransformation);
+				MenuItem removeTransformation = new MenuItem("Remove RegexId");
+				removeTransformation.disableProperty().bind(refIdsView.getSelectionModel().selectedItemProperty().isNull());
+				removeTransformation.setOnAction(e -> {
+					refIds.remove(refIdsView.getSelectionModel().getSelectedItem());
+					refIdsView.requestFocus();
+				});
+				transformationsTableCM.getItems().add(removeTransformation);
+				refIdsView.setOnMouseClicked(e -> {
+					if (e.getButton() == MouseButton.SECONDARY) {
+						transformationsTableCM.show(refIdsView, e.getScreenX(), e.getScreenY());
+					} else {
+						transformationsTableCM.hide();
 					}
-				};
-				return cell;
-			});
-			TableColumn<TransformationEntry, ObservableList<BaseIngredient>> ingredientsColumn = new TableColumn<TransformationEntry, ObservableList<BaseIngredient>>(
-					"ingredients");
-			ingredientsColumn.setCellValueFactory(
-					new PropertyValueFactory<TransformationEntry, ObservableList<BaseIngredient>>(
-							"ingredients"));
-			ingredientsColumn.setCellFactory(column -> {
-				TableCell<TransformationEntry, ObservableList<BaseIngredient>> cell = new TableCell<TransformationEntry, ObservableList<BaseIngredient>>() {
-					@Override
-					public void updateItem(ObservableList<BaseIngredient> ingredients, boolean empty) {
-						super.updateItem(ingredients, empty);
+				});
 
-						ListView<BaseIngredient> ingredientsView = new ListView<BaseIngredient>();
-						ingredientsView.setCellFactory(ComboBoxListCell.forListView(realIngredientsList));
-						ingredientsView.setMinHeight(0);
-						ingredientsView.setPrefHeight(50);
-						ingredientsView.setEditable(true);
+				if (refIds != null) {
+					refIdsView.setItems(refIds);
+				}
 
-						ContextMenu transformationsTableCM = new ContextMenu();
-						MenuItem addTransformation = new MenuItem("Add RegexId");
-						addTransformation.setOnAction(e -> {
-							ingredients.add(null);
-							ingredientsView.requestFocus();
-						});
-						transformationsTableCM.getItems().add(addTransformation);
-						MenuItem removeTransformation = new MenuItem("Remove RegexId");
-						removeTransformation.disableProperty()
-								.bind(ingredientsView.getSelectionModel().selectedItemProperty().isNull());
-						removeTransformation.setOnAction(e -> {
-							ingredients.remove(ingredientsView.getSelectionModel().getSelectedItem());
-						});
-						transformationsTableCM.getItems().add(removeTransformation);
-						ingredientsView.setOnMouseClicked(e -> {
-							if (e.getButton() == MouseButton.SECONDARY) {
-								transformationsTableCM.show(ingredientsView, e.getScreenX(), e.getScreenY());
-							} else {
-								transformationsTableCM.hide();
-							}
-						});
-						
-						if (ingredients != null) {
-							ingredientsView.setItems(ingredients);
-						}
+				setGraphic(refIdsView);
+			}
+		}
+		private class IngredientsCell extends TableCell<TransformationEntry, ObservableList<BaseIngredient>> {
+			
+			private ObservableList<BaseIngredient> ingredients;
+			
+			public IngredientsCell(ObservableList<BaseIngredient> ingredients) {
+				this.ingredients = ingredients;
+			}
+			
+			
+			@Override
+			public void updateItem(ObservableList<BaseIngredient> ingredients, boolean empty) {
+				super.updateItem(ingredients, empty);
 
-						setGraphic(ingredientsView);
+				ListView<BaseIngredient> ingredientsView = new ListView<BaseIngredient>();
+				ingredientsView.setCellFactory(ComboBoxListCell.forListView(this.ingredients));
+				ingredientsView.setMinHeight(0);
+				ingredientsView.setPrefHeight(50);
+				ingredientsView.setEditable(true);
+
+				ContextMenu transformationsTableCM = new ContextMenu();
+				MenuItem addTransformation = new MenuItem("Add RegexId");
+				addTransformation.setOnAction(e -> {
+					ingredients.add(null);
+					ingredientsView.requestFocus();
+				});
+				transformationsTableCM.getItems().add(addTransformation);
+				MenuItem removeTransformation = new MenuItem("Remove RegexId");
+				removeTransformation.disableProperty().bind(ingredientsView.getSelectionModel().selectedItemProperty().isNull());
+				removeTransformation.setOnAction(e -> ingredients.remove(ingredientsView.getSelectionModel().getSelectedItem()));
+				transformationsTableCM.getItems().add(removeTransformation);
+				ingredientsView.setOnMouseClicked(e -> {
+					if (e.getButton() == MouseButton.SECONDARY) {
+						transformationsTableCM.show(ingredientsView, e.getScreenX(), e.getScreenY());
+					} else {
+						transformationsTableCM.hide();
 					}
-				};
-				return cell;
-			});
+				});
+				
+				if (ingredients != null) {
+					ingredientsView.setItems(ingredients);
+				}
 
-TableColumn<TransformationEntry, String> ingredientTagColumn = new TableColumn<TransformationEntry, String>(
-	"IngredientTag");ingredientTagColumn.setCellValueFactory(new PropertyValueFactory<TransformationEntry,String>("ingredientTag"));ingredientTagColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+				setGraphic(ingredientsView);
+			}
+		}
+	}
+	private class ImpliedToolsCell extends TableCell<CookingActionEntry, ObservableList<BaseTool>> {
 
-TableColumn<TransformationEntry, String> quantifierTagColumn = new TableColumn<TransformationEntry, String>(
-	"QuantifierTag");quantifierTagColumn.setCellValueFactory(new PropertyValueFactory<TransformationEntry,String>("quantifierTag"));quantifierTagColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-
-TableColumn<TransformationEntry, BaseIngredient> productColumn = new TableColumn<TransformationEntry, BaseIngredient>(
-	"Product");productColumn.setCellValueFactory(new PropertyValueFactory<TransformationEntry,BaseIngredient>("product"));productColumn.setCellFactory(ComboBoxTableCell.forTableColumn(realIngredientsList));
-
-transformationsTable.getColumns().add(refIdColumn);transformationsTable.getColumns().add(ingredientsColumn);transformationsTable.getColumns().add(ingredientTagColumn);transformationsTable.getColumns().add(quantifierTagColumn);transformationsTable.getColumns().add(productColumn);
-
-if(transformations!=null)
-{
-for (Transformation transformation : transformations) {
-	new TransformationEntry(transformation, transformationsTable.getItems(), transformations,
-			regexIdMap.get(transformation));
-}
-}
-
-setGraphic(transformationsTable);
-		}};return cell;});
-
-TableColumn<CookingActionEntry, ObservableList<BaseTool>> toolsColumn = new TableColumn<CookingActionEntry, ObservableList<BaseTool>>(
-	"Implied Tools");toolsColumn.setCellValueFactory(new PropertyValueFactory<CookingActionEntry,ObservableList<BaseTool>>("tools"));toolsColumn.setCellFactory(column->
-{
-	TableCell<CookingActionEntry, ObservableList<BaseTool>> cell = new TableCell<CookingActionEntry, ObservableList<BaseTool>>() {
+		ObservableList<BaseTool> tools;
+		
+		public ImpliedToolsCell(ObservableList<BaseTool> tools) {
+			this.tools = tools;
+		}
+		
 		@Override
 		public void updateItem(ObservableList<BaseTool> tools, boolean empty) {
 			super.updateItem(tools, empty);
 			ListView<BaseTool> toolsView = new ListView<BaseTool>();
-			toolsView.setCellFactory(ComboBoxListCell.forListView(realToolsList));
+			toolsView.setCellFactory(ComboBoxListCell.forListView(this.tools));
 			toolsView.setMinHeight(0);
 			toolsView.setPrefHeight(50);
 			toolsView.setEditable(true);
 
-
-			addToolBtn.setOnAction(e -> {
-
 			ContextMenu toolsViewCM = new ContextMenu();
 			MenuItem addTool = new MenuItem("Add new Tool");
 			addTool.setOnAction(e -> {
-
 				tools.add(null);
 				toolsView.requestFocus();
 				toolsView.edit(tools.size() - 1);
@@ -467,8 +506,6 @@ TableColumn<CookingActionEntry, ObservableList<BaseTool>> toolsColumn = new Tabl
 				toolsView.requestFocus();
 			});
 
-
-			removeToolBtn.disableProperty().bind(toolsView.getSelectionModel().selectedItemProperty().isNull());
 			toolsViewCM.getItems().add(removeTool);
 			toolsView.setOnMouseClicked(e -> {
 				if (e.getButton() == MouseButton.SECONDARY) {
@@ -478,38 +515,11 @@ TableColumn<CookingActionEntry, ObservableList<BaseTool>> toolsColumn = new Tabl
 				}
 			});
 
-
 			if (tools != null) {
 				toolsView.setItems(tools);
 			}
 
-
-			addToolBtn.visibleProperty().bind(toolsView.focusedProperty().or(addToolBtn.focusedProperty()));
-			removeToolBtn.visibleProperty()
-					.bind(toolsView.focusedProperty().or(removeToolBtn.focusedProperty()));
-
-			layout.getChildren().add(toolsView);
-			btns.getChildren().add(addToolBtn);
-			btns.getChildren().add(removeToolBtn);
-			layout.getChildren().add(btns);
-
-			setGraphic(layout);
-
+			setGraphic(toolsView);
 		}
-	};
-	return cell;
-});
-
-tableView.getColumns().add(nameColumn);
-tableView.getColumns().add(synoymsColumn);
-tableView.getColumns().add(regexColumn);
-tableView.getColumns().add(transformationsColumn);
-tableView.getColumns().add(toolsColumn);
-
-for (BaseCookingAction cookingAction : KeyWordDatabase.GERMAN_KWDB.getCookingActions()) {
-	new CookingActionEntry(cookingAction, tableView.getItems(), KeyWordDatabase.GERMAN_KWDB, regexIdMap);
+	}
 }
-
-cookingActionsView.getChildren().add(tableView);
-
-*/

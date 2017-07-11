@@ -23,10 +23,11 @@ public class CookingActionEntry {
 
 	public CookingActionEntry(BaseCookingAction cookingAction, ObservableList<BaseCookingAction> cookingActions, Map<Object, ObservableList<String>> regexIdMap) {
 		ObservableList<String> regexIds = FXCollections.observableArrayList();
-		
+				
 		name = new SimpleStringProperty(cookingAction.getFirstName());
 				
 		synonyms = FXCollections.observableArrayList(cookingAction.getNames());
+		synonyms.remove(cookingAction.getFirstName());
 		
 		regex = FXCollections.observableArrayList(cookingAction.getRegexList());
 		transformations = FXCollections.observableArrayList(cookingAction.getTransformations());

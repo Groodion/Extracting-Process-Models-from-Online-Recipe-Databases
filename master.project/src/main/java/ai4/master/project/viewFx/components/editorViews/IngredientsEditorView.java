@@ -4,7 +4,6 @@ import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
 import ai4.master.project.viewFx.components.editorViews.entries.IngredientEntry;
-import ai4.master.project.viewFx.components.editorViews.entries.ToolEntry;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -31,7 +30,6 @@ import javafx.scene.layout.VBox;
 public class IngredientsEditorView extends EditorView {
 	
 	private ObjectProperty<KeyWordDatabase> kwdb;
-	private ObservableList<BaseIngredient> ingredients;
 	private TableView<IngredientEntry> ingredientsTable;
 
 	
@@ -39,7 +37,6 @@ public class IngredientsEditorView extends EditorView {
 	public IngredientsEditorView(ObservableList<BaseIngredient> ingredients,
 			ObservableList<BaseIngredientGroup> ingredientGroups,
 			ObjectProperty<KeyWordDatabase> kwdb) {
-		this.ingredients = ingredients;
 		this.kwdb = kwdb;
 		
 		setSpacing(10);

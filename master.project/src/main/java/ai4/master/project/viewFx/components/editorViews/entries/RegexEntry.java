@@ -15,6 +15,7 @@ public class RegexEntry {
 	private StringProperty id;
 	private BooleanProperty ingredientsNeeded;
 	private BooleanProperty referencePreviousProducts;
+	private BooleanProperty chargeTools;
 	private ObjectProperty<Regex.Result> result;
 	
 	public RegexEntry(Regex regex, ObservableList<Regex> regexList, ObservableList<String> regexIdList) {
@@ -38,13 +39,19 @@ public class RegexEntry {
 			regex.setId(n);
 		});
 		
+		expression.addListener((b, o, n) -> {
+			regex.setExpression(n);
+		});
+		
 		ingredientsNeeded = new SimpleBooleanProperty(regex.isIngredientsNeeded());
 		referencePreviousProducts = new SimpleBooleanProperty(regex.isReferencePreviousProducts());
+		chargeTools = new SimpleBooleanProperty(regex.isChargingTools());
 		
 		result = new SimpleObjectProperty<Regex.Result>(regex.getResult());
 		
 		ingredientsNeeded.addListener((b, o, n) -> regex.setIngredientsNeeded(n));
 		referencePreviousProducts.addListener((b, o, n) -> regex.setReferencePreviousProducts(n));
+		chargeTools.addListener((b, o, n) -> regex.setChargingTools(n));
 		result.addListener((b, o, n) -> regex.setResult(n));
 		
 		if(regex.getId() != null && regex.getId().trim().length() != 0) {
@@ -55,7 +62,7 @@ public class RegexEntry {
 		}
 	}
 
-	public String getExpresstion() {
+	public String getExpression() {
 		return expression.get();
 	}
 	public void setExpression(String expression) {
@@ -91,8 +98,18 @@ public class RegexEntry {
 	public void setReferencePreviousProducts(boolean referencePreviousProducts) {
 		this.referencePreviousProducts.set(referencePreviousProducts);
 	}
-	public BooleanProperty eferencePreviousProductsProperty() {
+	public BooleanProperty referencePreviousProductsProperty() {
 		return referencePreviousProducts;
+	}
+	
+	public boolean isChargeTools() {
+		return chargeTools.get();
+	}
+	public void setChargeTools(boolean chargeTools) {
+		this.chargeTools.set(chargeTools);
+	}
+	public BooleanProperty chargeToolsProperty() {
+		return chargeTools;
 	}
 
 	public Regex.Result getResult() {

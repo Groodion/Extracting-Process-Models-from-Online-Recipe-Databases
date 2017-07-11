@@ -28,6 +28,7 @@ public class Regex {
 		this(parent.expression, parent.result, parent.ingredientsNeeded, parent.referencePreviousProducts);
 		
 		id = parent.id;
+		chargingTools = parent.chargingTools;
 	}
 
 	public String getExpression() {

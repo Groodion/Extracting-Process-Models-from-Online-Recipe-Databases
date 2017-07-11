@@ -22,7 +22,7 @@ public class BaseCookingAction extends BaseNamedObject<CookingAction, BaseCookin
 		transformations = new ArrayList<Transformation>();
 	}
 	private BaseCookingAction(BaseCookingAction parent, KeyWordDatabase kwdb) {
-		super();
+		super(parent, kwdb);
 		
 		implicitTools = new ArrayList<BaseTool>();
 		regexList = new ArrayList<Regex>();
