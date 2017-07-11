@@ -1,1534 +1,188 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE root SYSTEM "rezept.dtd">
-<root>
-	<tools>
-		<Tool>
-			<Name>Ofen</Name>
-			<Name>Backofen</Name>
-			<Name>Backroehre</Name>
-			<Name>Roehre</Name>
-			<Name>Backrohr</Name>
-		</Tool>
-		<Tool>
-			<Name>Backblech</Name>
-			<Name>Blech</Name>
-			<Name>Kuchenblech</Name>
-		</Tool>
-		<Tool>
-			<Name>Backpapier</Name>
-		</Tool>
-		<Tool>
-			<Name>Pfanne</Name>
-			<Name>Bratpfanne</Name>
-		</Tool>
-		<Tool>
-			<Name>Schale</Name>
-			<Name>Gefäß</Name>
-			<Name>Schüssel</Name>
-		</Tool>
-		<Tool>
-			<Name>Topf</Name>
-		</Tool>
-		<Tool>
-			<Name>Kanne</Name>
-		</Tool>
-		<Tool>
-			<Name>Form</Name>
-		</Tool>
-		<Tool>
-			<Name>Backpinsel</Name>
-			<Name>Pinsel</Name>
-		</Tool>
-		<Tool>
-			<Name>Backschaufel</Name>
-		</Tool>
-		<Tool>
-			<Name>Esslöffel</Name>
-			<Name>Löffel</Name>
-		</Tool>
-		<Tool>
-			<Name>Drahtlöffel</Name>
-		</Tool>
-		<Tool>
-			<Name>Eisportionierer</Name>
-		</Tool>
-		<Tool>
-			<Name>Fischentschupper</Name>
-		</Tool>
-		<Tool>
-			<Name>Fleischgabel</Name>
-		</Tool>
-		<Tool>
-			<Name>Fleischhammer</Name>
-		</Tool>
-		<Tool>
-			<Name>Grillzange</Name>
-		</Tool>
-		<Tool>
-			<Name>Kochlöffel</Name>
-		</Tool>
-		<Tool>
-			<Name>Messer</Name>
-		</Tool>
-		<Tool>
-			<Name>Nudelholz</Name>
-			<Name>Teigrolle</Name>
-		</Tool>
-		<Tool>
-			<Name>Pfannenwender</Name>
-		</Tool>
-		<Tool>
-			<Name>Palette</Name>
-			<Name>Spachtel</Name>
-			<Name>Schaber</Name>
-		</Tool>
-		<Tool>
-			<Name>Quirl</Name>
-		</Tool>
-		<Tool>
-			<Name>Gabel</Name>
-		</Tool>
-		<Tool>
-			<Name>Schaumkelle</Name>
-		</Tool>
-		<Tool>
-			<Name>Schneebesen</Name>
-		</Tool>
-		<Tool>
-			<Name>Schöpfkelle</Name>
-		</Tool>
-		<Tool>
-			<Name>Spagettiheber</Name>
-		</Tool>
-		<Tool>
-			<Name>Spagehttizange</Name>
-		</Tool>
-		<Tool>
-			<Name>Teigschaber</Name>
-		</Tool>
-		<Tool>
-			<Name>Tortenhber</Name>
-		</Tool>
-		<Tool>
-			<Name>Schneibrett</Name>
-		</Tool>
-		<Tool>
-			<Name>Salatschleuder</Name>
-		</Tool>
-		<Tool>
-			<Name>Spritzbeutel</Name>
-			<Name>Dressiersack</Name>
-		</Tool>
-		<Tool>
-			<Name>Trichter</Name>
-		</Tool>
-		<Tool>
-			<Name>Sieb</Name>
-			<Name>Abtropfsieb</Name>
-			<Name>Küchensieb</Name>
-		</Tool>
-		<Tool>
-			<Name>Apfelentkerner</Name>
-		</Tool>
-		<Tool>
-			<Name>Apfelteiler</Name>
-		</Tool>
-		<Tool>
-			<Name>Käseraspel</Name>
-			<Name>Käsehobel</Name>
-		</Tool>
-		<Tool>
-			<Name>Pizzaschneider</Name>
-		</Tool>
-		<Tool>
-			<Name>Ananasschneider</Name>
-		</Tool>
-		<Tool>
-			<Name>Eierschneider</Name>
-		</Tool>
-		<Tool>
-			<Name>Gemüseschneider</Name>
-		</Tool>
-		<Tool>
-			<Name>Gemüsehobel</Name>
-		</Tool>
-		<Tool>
-			<Name>Entsteiner</Name>
-		</Tool>
-		<Tool>
-			<Name>Nussknacker</Name>
-		</Tool>
-		<Tool>
-			<Name>Kugelausstecher</Name>
-		</Tool>
-		<Tool>
-			<Name>Schere</Name>
-			<Name>Küchenschere</Name>
-		</Tool>
-		<Tool>
-			<Name>Holzspieß</Name>
-		</Tool>
-		<Tool>
-			<Name>Metallspieß</Name>
-		</Tool>
-		<Tool>
-			<Name>Rouladenklammer</Name>
-		</Tool>
-		<Tool>
-			<Name>Getreidemühle</Name>
-		</Tool>
-		<Tool>
-			<Name>Gewürzmühle</Name>
-		</Tool>
-		<Tool>
-			<Name>Gemüsemühle</Name>
-		</Tool>
-		<Tool>
-			<Name>Kaffeemühle</Name>
-		</Tool>
-		<Tool>
-			<Name>Kräutermühle</Name>
-		</Tool>
-		<Tool>
-			<Name>Küchenreibe</Name>
-		</Tool>
-		<Tool>
-			<Name>Küchenmaschine</Name>
-			<Name>Spülmaschine</Name>
-			<Name>Minna</Name>
-		</Tool>
-		<Tool>
-			<Name>Pfeffermühle</Name>
-		</Tool>
-		<Tool>
-			<Name>Trommelreibe</Name>
-		</Tool>
-		<Tool>
-			<Name>Eiscrusher</Name>
-		</Tool>
-		<Tool>
-			<Name>Entenpresse</Name>
-		</Tool>
-		<Tool>
-			<Name>Fleischhammer</Name>
-		</Tool>
-		<Tool>
-			<Name>Fleischklopfer</Name>
-		</Tool>
-		<Tool>
-			<Name>Fleischwolf</Name>
-		</Tool>
-		<Tool>
-			<Name>Flocker</Name>
-		</Tool>
-		<Tool>
-			<Name>Kartoffelstampfer</Name>
-		</Tool>
-		<Tool>
-			<Name>Kartoffelpresse</Name>
-		</Tool>
-		<Tool>
-			<Name>Knoblauchpresse</Name>
-		</Tool>
-		<Tool>
-			<Name>Mörser</Name>
-		</Tool>
-		<Tool>
-			<Name>Passierwiege</Name>
-		</Tool>
-		<Tool>
-			<Name>Semmelreibe</Name>
-		</Tool>
-		<Tool>
-			<Name>Spätzlepresse</Name>
-		</Tool>
-		<Tool>
-			<Name>Tomatenpresse</Name>
-		</Tool>
-		<Tool>
-			<Name>Zitronenpresse</Name>
-		</Tool>
-		<Tool>
-			<Name>Zwiebelhacker</Name>
-		</Tool>
-		<Tool>
-			<Name>Champagnersäbel</Name>
-		</Tool>
-		<Tool>
-			<Name>Dosenöffner</Name>
-		</Tool>
-		<Tool>
-			<Name>Dostenstecher</Name>
-		</Tool>
-		<Tool>
-			<Name>Eierstecher</Name>
-		</Tool>
-		<Tool>
-			<Name>Kapselheber</Name>
-			<Name>Flaschenöffner</Name>
-		</Tool>
-		<Tool>
-			<Name>Korkenzieher</Name>
-		</Tool>
-		<Tool>
-			<Name>Universalöffner</Name>
-		</Tool>
-		<Tool>
-			<Name>Backoffenthermometer</Name>
-		</Tool>
-		<Tool>
-			<Name>Bratenthermometer</Name>
-		</Tool>
-		<Tool>
-			<Name>Waage</Name>
-			<Name>Küchenwaage</Name>
-		</Tool>
-		<Tool>
-			<Name>Messbecher</Name>
-		</Tool>
-		<Tool>
-			<Name>Küchenwecker</Name>
-			<Name>Eieruhr</Name>
-			<Name>Kurzzeitwecker</Name>
-			<Name>Uhr</Name>
-		</Tool>
-		<Tool>
-			<Name>Kaffeemaß</Name>
-			<Name>Kaffeelot</Name>
-		</Tool>
-		<Tool>
-			<Name>Kaffeefilter</Name>
-		</Tool>
-		<Tool>
-			<Name>Passiertuch</Name>
-		</Tool>
-		<Tool>
-			<Name>Pressack</Name>
-		</Tool>
-		<Tool>
-			<Name>Schaumlöffel</Name>
-		</Tool>
-		<Tool>
-			<Name>Sieb</Name>
-		</Tool>
-		<Tool>
-			<Name>Quirl</Name>
-		</Tool>
-		<Tool>
-			<Name>Standmixer</Name>
-			<Name>Stabmixer</Name>
-			<Name>Pürierstab</Name>
-		</Tool>
-		<Tool>
-			<Name>Standrührgerät</Name>
-			<Name>Handrührgerät</Name>
-			<Name>Rührgerät</Name>
-		</Tool>
-		<Tool>
-			<Name>Knethaken</Name>
-		</Tool>
-		<Tool>
-			<Name>Rührbesen</Name>
-		</Tool>
-		<Tool>
-			<Name>Teigknetmaschine</Name>
-		</Tool>
-		<Tool>
-			<Name>Cocktail-Shaker</Name>
-		</Tool>
-		<Tool>
-			<Name>Bain-Marie</Name>
-			<Name>Wasserbad</Name>
-		</Tool>
-		<Tool>
-			<Name>Bierwärmer</Name>
-		</Tool>
-		<Tool>
-			<Name>Dampfgarer</Name>
-		</Tool>
-		<Tool>
-			<Name>Eierkocher</Name>
-		</Tool>
-		<Tool>
-			<Name>Grill</Name>
-		</Tool>
-		<Tool>
-			<Name>Elektrogrill</Name>
-		</Tool>
-		<Tool>
-			<Name>Herd</Name>
-			<Name>Elektroherd</Name>
-		</Tool>
-		<Tool>
-			<Name>Espressomaschine</Name>
-		</Tool>
-		<Tool>
-			<Name>Fritteuse</Name>
-			<Name>Fritte</Name>
-		</Tool>
-		<Tool>
-			<Name>Gasherd</Name>
-		</Tool>
-		<Tool>
-			<Name>Geschirrwärmer</Name>
-		</Tool>
-		<Tool>
-			<Name>Induktionskochfeld</Name>
-		</Tool>
-		<Tool>
-			<Name>Kaffeemaschine</Name>
-		</Tool>
-		<Tool>
-			<Name>Mikro</Name>
-			<Name>Mikrowelle</Name>
-			<Name>Mikrowellenherd</Name>
-		</Tool>
-		<Tool>
-			<Name>Toaster</Name>
-		</Tool>
-		<Tool>
-			<Name>Waffeleisen</Name>
-		</Tool>
-		<Tool>
-			<Name>Wasserkocher</Name>
-		</Tool>
-		<Tool>
-			<Name>Abkühlgitter</Name>
-		</Tool>
-		<Tool>
-			<Name>Gefriertruhe</Name>
-		</Tool>
-		<Tool>
-			<Name>Kühlschrank</Name>
-		</Tool>
-		<Tool>
-			<Name>Schockkühler</Name>
-		</Tool>
-		<Tool>
-			<Name>Eismaschine</Name>
-		</Tool>
-		<Tool>
-			<Name>Spülbürste</Name>
-		</Tool>
-		<Tool>
-			<Name>Topfkratzer</Name>
-		</Tool>
-		<Tool>
-			<Name>Schneidemaschine</Name>
-		</Tool>
-		<Tool>
-			<Name>Entsafter</Name>
-		</Tool>
-		<Tool>
-			<Name>Nudelmaschine</Name>
-		</Tool>
-		<Tool>
-			<Name>Tuch</Name>
-			<Name>Geschirrtuch</Name>
-			<Name>Handtuch</Name>
-		</Tool>
-		<Tool>
-			<Name>Schürze</Name>
-		</Tool>
-		<Tool>
-			<Name>Topflappen</Name>
-			<Name>Lappen</Name>
-		</Tool>
-		<Tool>
-			<Name>Topfhandschuh</Name>
-		</Tool>
-		<Tool>
-			<Name>Tarteform</Name>
-			<Name>Tarte-Form</Name>
-		</Tool>
-		<Tool>
-			<Name>Deckel</Name>
-		</Tool>
-		<Tool>
-			<Name>Presse</Name>
-		</Tool>
-	</tools>
-	<groups>
-		<Group>
-			<Name>Gemüse</Name>
-		</Group>
-		<Group>
-			<Name>Käsewürfel</Name>
-			<Name>Käseraspel</Name>
-			<Name>Käse</Name>
-		</Group>
-		<Group>
-			<Name>Öl</Name>
-		</Group>
-		<Group>
-			<Name>Flüssigkeit</Name>
-		</Group>
-		<Group>
-			<Name>Teig</Name>
-			<Name>Teigdreieck</Name>
-			<Name>Teigblatt</Name>
-		</Group>
-		<Group>
-			<Name>Fisch</Name>
-		</Group>
-		<Group>
-			<Name>Fleisch</Name>
-		</Group>
-		<Group>
-			<Name>Schinken</Name>
-		</Group>
-		<Group>
-			<Name>Wurst</Name>
-		</Group>
-		<Group>
-			<Name>Milch</Name>
-		</Group>
-		<Group>
-			<Name>Mehl</Name>
-		</Group>
-		<Group>
-			<Name>Gewürz</Name>
-		</Group>
-		<Group>
-			<Name>Sahne</Name>
-		</Group>
-		<Group>
-			<Name>Brot</Name>
-		</Group>
-		<Group>
-			<Name>Butter</Name>
-		</Group>
-		<Group>
-			<Name>Sauce</Name>
-			<Name>Sosse</Name>
-			<Name>Soße</Name>
-		</Group>
-		<Group>
-			<Name>Kraut</Name>
-			<Name>Kräuter</Name>
-		</Group>
-		<Group>
-			<Name>Obst</Name>
-			<Name>Frucht</Name>
-		</Group>
-		<Group>
-			<Name>Brühe</Name>
-		</Group>
-		<Group>
-			<Name>Reis</Name>
-		</Group>
-		<Group>
-			<Name>Pilz</Name>
-		</Group>
-		<Group>
-			<Name>Nudel</Name>
-		</Group>
-		<Group>
-			<Name>Suppe</Name>
-		</Group>
-		<Group>
-			<Name>Wein</Name>
-		</Group>
-	</groups>
-	<ingredients>
-		<Ingredient>
-			<Name>Brühwürfel</Name>
-		</Ingredient>
-		<Ingredient>
-			<Name>Weizenmehl</Name>
-			<groups>
-				<Group name="Mehl"/>
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>saure Sahne</Name>
-			<groups>
-				<Group name="Sahne"/>
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Blätterteig</Name>
-			<groups>
-				<Group name="Teig" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Schmand</Name>
-			<groups></groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Fett</Name>
-			<groups></groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Paniermehl</Name>
-			<groups>
-				<Group name="Mehl" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Vorderschinken</Name>
-			<Name>Schinkenwürfel</Name>
-			<groups>
-				<Group name="Fleisch" />
-				<Group name="Schinken"/>
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Kartoffel</Name>
-			<groups>
-				<Group name="Gemüse" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Wasser</Name>
-			<groups>
-				<Group name="Flüssigkeit"/>
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Salzwasser</Name>
-			<groups>
-				<Group name="Flüssigkeit"/>
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Fleischbrühe</Name>
-			<groups>
-				<Group name="Brühe" />
-				<Group name="Flüssigkeit" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Salz</Name>
-			<groups>
-				<Group name="Gewürz" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Pfeffer</Name>
-			<groups>
-				<Group name="Gewürz"/>
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Rosmarin</Name>
-			<groups>
-				<Group name="Kraut" />
-				<Group name="Gewürz" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Zucker</Name>
-			<groups>
-				<Group name="Gewürz" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Kuhmilch</Name>
-			<groups>
-				<Group name="Milch"/>
-				<Group name="Flüssigkeit"/>
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Hefemilch</Name>
-			<groups>
-				<Group name="Milch"/>
-				<Group name="Flüssigkeit"/>
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Hefeteig</Name>
-			<Name>Hefe</Name>
-			<groups></groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Langos</Name>
-			<groups></groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Pflaumen</Name>
-			<groups>
-				<Group name="Obst" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Zwiebackbrösel</Name>
-			<Name>Zwieback</Name>
-			<groups></groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Eier</Name>
-			<Name>Ei</Name>
-			<groups></groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Zimt</Name>
-			<groups>
-				<Group name="Gewürz" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Erdnussöl</Name>
-			<groups>
-				<Group name="Öl" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Olivenöl</Name>
-			<groups>
-				<Group name="Öl" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Lachs</Name>
-			<Name>Lachsfilet</Name>
-			<groups>
-				<Group name="Fisch" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Thunfisch</Name>
-			<groups>
-				<Group name="Fisch" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Speck</Name>
-			<Name>Bacon</Name>
-			<groups>
-				<Group name="Schinken" />
-				<Group name="Fleisch" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Brokkoli</Name>
-			<groups>
-				<Group name="Gemüse" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Champignon</Name>
-			<Name>Champignons</Name>
-			<groups>
-				<Group name="Pilz" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Zwiebel</Name>
-			<groups>
-				<Group name="Gemüse" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Zucchini</Name>
-			<groups>
-				<Group name="Gemüse" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Chili</Name>
-			<Name>Chili-Flocken</Name>
-			<Name>Chiliflocken</Name>
-			<Name>Chilipulver</Name>
-			<groups>
-				<Group name="Gewürz" />
-				<Group name="Gemüse" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Paprika</Name>
-			<Name>Paprikapulver</Name>
-			<groups>
-				<Group name="Gemüse" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Feta-Käse</Name>
-			<Name>Feta</Name>
-			<Name>Schafskäse</Name>
-			<groups>
-				<Group name="Käsewürfel" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Parmesan</Name>
-			<groups>
-				<Group name="Käsewürfel" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Maggi</Name>
-			<groups>
-				<Group name="Gewürz" />
-				<Group name="Kraut" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Tomate</Name>
-			<Name>Pizzatomaten</Name>
-			<groups>
-				<Group name="Gemüse" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Schmelzkäse</Name>
-			<groups>
-				<Group name="Käse" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Basilikum</Name>
-			<groups>
-				<Group name="Gewürz" />
-				<Group name="Kraut" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Knoblauch</Name>
-			<Name>Knoblauchzehe</Name>
-			<groups>
-				<Group name="Gewürz" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Oregano</Name>
-			<groups>
-				<Group name="Gewürz" />
-				<Group name="Kraut" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Weißwein</Name>
-			<groups>
-				<Group name="Wein" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Gemüsebrühe</Name>
-			<groups>
-				<Group name="Brühe" />
-				<Group name="Flüssigkeit" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Mischung</Name>
-			<groups></groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Zitronensaft</Name>
-			<groups>
-				<Group name="Flüssigkeit" />
-			</groups>	
-		</Ingredient>
-		<Ingredient>
-			<Name>Kirschtomate</Name>
-			<groups>
-				<Group name="Gemüse" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Pitabrot</Name>
-			
-			<groups>
-				<Group name="Brot" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Tomatensoße</Name>
-			<Name>Tomatensosse</Name>
-			<Name>Tomatensauce</Name>
-			<groups>
-				<Group name="Sauce" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Tomatenmark</Name>
-		</Ingredient>
-		<Ingredient>
-			<Name>Petersilie</Name>
-			
-			<groups>
-				<Group name="Kraut" />
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Yufka-Teigblätter</Name>
-			<Name>Yufka-Blätter</Name>
-			<Name>Börek</Name>
-			<groups>
-				<Group name="Teig"/>
-			</groups>
-		</Ingredient>
-		<Ingredient>
-			<Name>Lauch</Name>
-		</Ingredient>
-		<Ingredient>
-			<Name>Crème fraîche</Name>
-			<Name>Crème-fraîche</Name>
-			<Name>Crèmefraîche</Name>
-			<Name>Crème</Name>
-		</Ingredient>
-		<Ingredient>
-			<Name>Baguette</Name>
-		</Ingredient>
-		<Ingredient>
-			<Name>Muskat</Name>
-		</Ingredient>
-		<Ingredient>
-			<Name>Knoblauchpulver</Name>
-		</Ingredient>
-		<Ingredient>
-			<Name>Zwiebelpulver</Name>
-		</Ingredient>
-		<Ingredient>
-			<Name>Hackfleisch</Name>
-		</Ingredient>
-	</ingredients>
-	<cookingActions>
-		<CookingAction>
-			<Name>rollen</Name>
-			<Name>aufrollen</Name>
-			<regs>
-				<Regex result="first" ingredientsNeeded="true">.*~INGREDIENT.*~ACTION.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>aufgerollt</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>bestreichen</Name>
-			<Name>streichen</Name>
-			<Name>bepinseln</Name>
-			<regs>
-				<Regex result="first" ingredientsNeeded="true">.*~INGREDIENT.*mit.*~INGREDIENT.*~ACTION.*</Regex>
-				<Regex result="prev" ingredientsNeeded="true">.*mit.*~INGREDIENT.*~ACTION.*</Regex>
-				<Regex result="last" ingredientsNeeded="true">.*~INGREDIENT.*auf.*~INGREDIENT.*~ACTION.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>bestrichen</AddIngredientTag>
-				</Transformation>
-			</transformations>
-			<tools>
-				<Tool name="Pinsel"/>
-			</tools>
-		</CookingAction>
-		<CookingAction>
-			<Name>klappen</Name>
-			<regs>
-				<Regex result="all">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>geklappt</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>geben</Name>
-			<Name>hinzugeben</Name>
-			<Name>hineingeben</Name>
-			<Name>zugeben</Name>
-			<Name>dazugeben</Name>
-			<Name>zugießen</Name>
-			<Name>gießen</Name>
-			<Name>setzen</Name>
-			<regs>
-				<Regex id="noChange" result="all" ingredientsNeeded="true">.* in .*</Regex>
-				<Regex result="prev" ingredientsNeeded="true">.*((zugießen)|(hineingeben)).*</Regex>
-				<Regex result="first" ingredientsNeeded="true" referencePreviousProducts="true">.*dieser.*</Regex>
-				<Regex result="last" ingredientsNeeded="true">.*~INGREDIENT.*zu(r|m)?.*~INGREDIENT.*~ACTION</Regex>
-				<Regex result="first" ingredientsNeeded="true" referencePreviousProducts="true">.*((darauf)|(zu(r|m)?)).*</Regex>
-				<Regex result="prev" ingredientsNeeded="true">.*~INGREDIENT.*~ACTION</Regex>
-			</regs>
-			<transformations>
-				<Transformation regexRefIds="noChange" />
-				<Transformation>
-					<ingredients>
-						<Ingredient name="Brühwürfel" />
-					</ingredients>
-					<Ingredient name="Suppe" />
-				</Transformation>
-				<Transformation>
-					<ingredients>
-						<Ingredient name="Hefe" />
-						<Ingredient name="Milch" />
-						<Ingredient name="Zucker" />
-					</ingredients>
-					<Ingredient name="Hefemilch" />
-				</Transformation>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>mit INGREDIENT</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>erwärmen</Name>
-			<regs>
-				<Regex result="all">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<AddIngredientTag>warm</AddIngredientTag>
-				</Transformation>
-			</transformations>
-			<tools>
-				<Tool name="Herd" />
-				<Tool name="Mikrowelle" />
-			</tools>
-		</CookingAction>
-		<CookingAction>
-			<Name>bröckeln</Name>
-			<Name>bröseln</Name>
-			<regs>
-				<Regex result="all">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<AddIngredientTag>zerbröselt</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>schneiden</Name>
-			<Name>durchschneiden</Name>
-			<regs>
-				<Regex result="all" ingredientsNeeded="true">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>geschnitten</AddIngredientTag>
-				</Transformation>
-			</transformations>
-			<tools>
-				<Tool name="Messer" />
-			</tools>
-		</CookingAction>
-		<CookingAction>
-			<Name>befeuchten</Name>
-			<regs>
-				<Regex result="first">.*mit.*</Regex>
-				<Regex result="all">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<AddIngredientTag>befeuchtet</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>drehen</Name>
-			<regs></regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>gedreht</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>legen</Name>
-			<Name>auflegen</Name>
-			<regs>
-				<Regex result="first">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation></Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>backen</Name>
-			<regs>
-				<Regex result="all">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<AddIngredientTag>gebacken</AddIngredientTag>
-				</Transformation>
-			</transformations>
-			<tools>
-				<Tool name="Backofen" />
-			</tools>
-		</CookingAction>
-		<CookingAction>
-			<Name>verteilen</Name>
-			<regs>
-				<Regex result="last">.*auf.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>mit INGREDIENT</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>einrühren</Name>
-			
-			<regs>
-				<Regex result="prev">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<AddIngredientTag>INGREDIENT eingerührt</AddIngredientTag>
-				</Transformation>
-			</transformations>
-			<tools>
-				<Tool name="Schneebesen" />
-				<Tool name="Löffel" />
-			</tools>
-		</CookingAction>
-		<CookingAction>
-			<Name>rühren</Name>
-			<regs>
-				<Regex result="all">.*glatt.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<AddIngredientTag>glatt gerührt</AddIngredientTag>
-				</Transformation>
-			</transformations>
-			<tools>
-				<Tool name="Schneebesen" />
-				<Tool name="Löffel" />
-			</tools>
-		</CookingAction>
-		<CookingAction>
-			<Name>verrühren</Name>
-			<regs>
-				<Regex result="first">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<AddIngredientTag>verrührt mit INGREDIENT</AddIngredientTag>
-				</Transformation>
-			</transformations>
-			<tools>
-				<Tool name="Schneebesen" />
-				<Tool name="Löffel" />
-			</tools>
-		</CookingAction>
-		<CookingAction>
-			<Name>einkochen</Name>
-			<regs></regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>eingekocht</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>abschmecken</Name>
-			<regs>
-				<Regex result="first">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>mit INGREDIENT abgeschmeckt</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>herstellen</Name>
-			<regs></regs>
-			<transformations></transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>hochziehen</Name>
-			<regs></regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>hochgezogen</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>untermischen</Name>
-			<regs></regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>mit INGREDIENT</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>abwaschen</Name>
-			<Name>waschen</Name>
-			<Name>säubern</Name>
-			<regs>
-				<Regex result="all" ingredientsNeeded="true">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>sauber</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>tupfen</Name>
-			<regs></regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>trocken</AddIngredientTag>
-				</Transformation>
-			</transformations>
-			<tools>
-				<Tool name="Tuch" />
-			</tools>
-		</CookingAction>
-		<CookingAction>
-			<Name>einwickeln</Name>
-			<Name>wickeln</Name>
-			<Name>umwickeln</Name>
-			<regs>
-				<Regex result="first" ingredientsNeeded="true">~INGREDIENT.*mit.*~INGREDIENT.*wickeln</Regex>
-				<Regex result="last" ingredientsNeeded="true">~INGREDIENT.*um.*~INGREDIENT.*wickeln</Regex>
-				<Regex result="first" ingredientsNeeded="true">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>umwickelt mit INGREDIENT</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>stellen</Name>
-			<regs>
-				<Regex result="all" ingredientsNeeded="true">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation></Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>drücken</Name>
-			<Name>andrücken</Name>
-			<regs>
-				<Regex result="all">.*Presse.*</Regex>
-				<Regex id="spAndr" result="all">Spitze.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<AddIngredientTag>gepresst</AddIngredientTag>
-				</Transformation>
-				<Transformation regexRefIds="spAndr">
-					<AddIngredientTag>Spitze angedrückt</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>würzen</Name>
-			<Name>pressen</Name>
-			<regs>
-				<Regex result="first" ingredientsNeeded="true">.*~INGREDIENT.*mit.*(~INGREDIENT.*)+~ACTION</Regex>
-				<Regex result="prev" ingredientsNeeded="true">.*mit.*</Regex>
-				<Regex result="prev" ingredientsNeeded="true">.*dazu.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>gewürzt mit INGREDIENT</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>frittieren</Name>
-			<regs>
-				<Regex result="first">.*((in)|(mit)).*</Regex>
-				<Regex result="prev">((In)|(Mit)).*</Regex>
-				<Regex result="all">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<AddIngredientTag>frittiert</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>garnieren</Name>
-			<regs>
-				<Regex result="first" ingredientsNeeded="true">.*~INGREDIENT.*mit.*(~INGREDIENT.*)+~ACTION</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>garniert mit INGREDIENT</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>würfeln</Name>
-			<regs>
-				<Regex result="all" ingredientsNeeded="true">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>gewürfelt</AddIngredientTag>
-				</Transformation>
-			</transformations>
-			<tools>
-				<Tool name="Messer" />
-			</tools>
-		</CookingAction>
-		<CookingAction>
-			<Name>mischen</Name>
-			<Name>vermischen</Name>
-			<Name>durchmischen</Name>
-			<regs>
-				<Regex result="first" ingredientsNeeded="true">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<Ingredient name="Mischung" />
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>aufkochen</Name>
-			<regs>
-				<Regex result="all" ingredientsNeeded="true">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<AddIngredientTag>aufgekocht</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>köcheln</Name>
-			<regs>
-				<Regex result="all" ingredientsNeeded="true">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<AddIngredientTag>gekocht</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>schmelzen</Name>
-			<regs>
-				<Regex result="all" ingredientsNeeded="true">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<AddIngredientTag>geschmolzen</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>		
-		<CookingAction>
-			<Name>durchziehen</Name>
-			<regs>
-				<Regex result="all" ingredientsNeeded="true">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>durchgezogen</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>abtrocknen</Name>
-			<regs>
-				<Regex result="all" ingredientsNeeded="true">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>trocken</AddIngredientTag>
-				</Transformation>
-			</transformations>
-			<tools>
-				<Tool name="Tuch" />
-			</tools>		
-		</CookingAction>
-		<CookingAction>
-			<Name>halbieren</Name>
-			<regs>
-				<Regex result="all" ingredientsNeeded="true">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<ingredients></ingredients>
-					<AddIngredientTag>halbiert</AddIngredientTag>
-				</Transformation>
-			</transformations>
-			<tools>
-				<Tool name="Messer" />
-			</tools>
-		</CookingAction>
-		<CookingAction>
-			<Name>hacken</Name>
-			<regs>
-				<Regex result="all">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<AddIngredientTag>gehackt</AddIngredientTag>
-				</Transformation>
-			</transformations>
-			<tools>
-				<Tool name="Messer" />
-			</tools>
-		</CookingAction>
-		<CookingAction>
-			<Name>einölen</Name>
-			<regs>
-				<Regex result="no_result">.*</Regex>
-			</regs>
-		</CookingAction>
-		<CookingAction>
-			<Name>kneten</Name>
-			<regs>
-				<Regex result="first">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<AddIngredientTag>gekentet</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>verkneten</Name>
-			<regs>
-				<Regex result="first" referencePreviousProducts="true">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<AddIngredientTag>verkentet mit INGREDIENT</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>träufeln</Name>
-			<regs>
-				<Regex result="first" referencePreviousProducts="true">(und )?über.*</Regex>
-				<Regex result="last">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<AddIngredientTag>INGREDIENT darauf geträufelt</AddIngredientTag>
-				</Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>wenden</Name>
-			<regs>
-				<Regex result="all">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation><AddIngredientTag>gewendet</AddIngredientTag></Transformation>
-			</transformations>
-			<tools>
-				<Tool name="Pfannenwender" />
-				<Tool name="Gabel" />
-			</tools>
-		</CookingAction>
-		<CookingAction>
-			<Name>hobeln</Name>
-			<regs>
-				<Regex result="all">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation><AddIngredientTag>gehobelt</AddIngredientTag></Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>stecken</Name>
-			<regs>
-				<Regex result="all">.*Spieß.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation><AddIngredientTag>auf einen Spieß gesteckt</AddIngredientTag></Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>abschließen</Name>
-			<regs>
-				<Regex result="prev">(und )?mit.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation><AddIngredientTag>abgeschlossen mit INGREDIENT</AddIngredientTag></Transformation>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>grillen</Name>
-			<regs>
-				<Regex result="all">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation><AddIngredientTag>gegrillt</AddIngredientTag></Transformation>
-			</transformations>
-			<tools>
-				<Tool name="Grill"/>
-			</tools>
-		</CookingAction>
-			<CookingAction>
-			<Name>vorheizen</Name>
-			<regs>
-			</regs>
-			<transformations>
-			</transformations>
-		</CookingAction>
-		<CookingAction>
-			<Name>servieren</Name>
-			<Name>reichen</Name>
-			<regs>
-				<Regex result="no_result" referencePreviousProducts="true">(und )?(((M|m)it)|((Z|z)u)).*</Regex>
-				<Regex result="no_result">.*</Regex>
-			</regs>
-		</CookingAction>
-		<CookingAction>
-			<Name>anbraten</Name>
-			<regs>
-				<Regex result="all" ingredientsNeeded="true">.*</Regex>
-			</regs>
-			<transformations>
-				<Transformation>
-					<AddIngredientTag>gebraten</AddIngredientTag>
-				</Transformation>
-			</transformations>
-			<tools>
-				<Tool name="Pfanne" />
-			</tools>
-		</CookingAction>
-	</cookingActions>
-	<partIndicators>
-		<PartIndicator>Teil</PartIndicator>
-		<PartIndicator>Hälfte</PartIndicator>
-		<PartIndicator>Drittel</PartIndicator>
-		<PartIndicator>Rest</PartIndicator>
-	</partIndicators>
-	<lastSentenceReferences>
-		<LastSentenceReference>diese</LastSentenceReference>
-		<LastSentenceReference>darauf</LastSentenceReference>
-		<LastSentenceReference>damit</LastSentenceReference>
-		<LastSentenceReference>dazu</LastSentenceReference>
-		<LastSentenceReference>beides</LastSentenceReference>
-	</lastSentenceReferences>
-	<eventIndicators>
-		<EventIndicator>solange</EventIndicator>
-		<EventIndicator>bis</EventIndicator>
-		<EventIndicator>Stunde</EventIndicator>
-		<EventIndicator>Sekunden</EventIndicator>
-		<EventIndicator>Minuten</EventIndicator>
-	</eventIndicators>
-</root>
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import ai4.master.project.viewFx.Controller?>
+<?import ai4.master.project.viewFx.components.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ai4.master.project.viewFx.Controller">
+	<children>
+		<BorderPane styleClass="background" stylesheets="@../css/style.css">
+			<top>
+				<HBox styleClass="hbackground" spacing="10" BorderPane.alignment="CENTER">
+					<padding>
+						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+					</padding>
+					<children>
+						<ImageView fitHeight="59.0" fitWidth="192.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="NEVER">
+							<image>
+								<Image url="@../img/logo.png" />
+							</image>
+						</ImageView>
+						<Pane maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+						<Button styleClass="button-type-1" HBox.hgrow="NEVER" onAction="#showLibEditor">
+							<graphic>
+								<ImageView fitHeight="50" fitWidth="50" >
+									<image>
+										<Image url="@../img/language.png" />
+									</image>
+								</ImageView>
+							</graphic>
+						</Button>
+						<Button text="Info" styleClass="button-type-1" HBox.hgrow="NEVER">
+							<graphic>
+								<ImageView fitHeight="50" fitWidth="50" >
+									<image>
+										<Image url="@../img/information.png" />
+									</image>
+								</ImageView>
+							</graphic>
+						</Button>
+					</children>
+				</HBox>
+			</top>
+			<bottom>
+				<ProcessTracker fx:id="processTracker" />
+			</bottom>
+			<center>
+				<VBox>
+					<children>
+						<StackPane fx:id="contentStack" VBox.vgrow="ALWAYS" maxHeight="Infinity" BorderPane.alignment="CENTER">
+							<children>
+								<GridPane maxHeight="Infinity" hgap="10.0" vgap="10.0">
+									<columnConstraints>
+										<ColumnConstraints hgrow="NEVER" prefWidth="400.0" />
+										<ColumnConstraints hgrow="ALWAYS" />
+									</columnConstraints>
+									<rowConstraints>
+										<RowConstraints vgrow="ALWAYS" />
+									</rowConstraints>
+									<padding>
+										<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+									</padding>
+									<children>
+										<VBox spacing="10.0">
+											<children>
+												<TitledPane maxHeight="Infinity" text="Import recipe from online database" VBox.vgrow="SOMETIMES">
+													<content>
+														<VBox fx:id="recipeDatabasesPane" maxHeight="Infinity" />
+													</content>
+												</TitledPane>
+												<TitledPane maxHeight="Infinity" text="Import recipe from file" VBox.vgrow="SOMETIMES">
+													<content>
+														<HBox maxHeight="Infinity" spacing="10.0">
+															<children>
+																<TextField fx:id="recipeImportFilePathTF" onMouseClicked="#selectFileForRecipeImport" promptText="Path" HBox.hgrow="ALWAYS" />
+																<Button disable="${recipeImportFilePathTF.text == ''}" mnemonicParsing="false" onAction="#loadFileForRecipeImport" text="Import" />
+															</children>
+														</HBox>
+													</content>
+												</TitledPane>
+												<TitledPane maxHeight="Infinity" text="Library settings" VBox.vgrow="ALWAYS">
+													<content>
+														<HBox maxHeight="Infinity" spacing="10.0" />
+													</content>
+												</TitledPane>
+											</children>
+										</VBox>
+										<VBox spacing="10.0" GridPane.columnIndex="1">
+											<children>
+												<TitledPane collapsible="false" text="Ingredients" VBox.vgrow="ALWAYS">
+													<content>
+														<TextArea fx:id="ingredientsTA" maxHeight="Infinity" prefHeight="100.0" wrapText="true" />
+													</content>
+												</TitledPane>
+												<TitledPane collapsible="false" maxHeight="Infinity" text="Recipe" VBox.vgrow="ALWAYS">
+													<content>
+														<TextArea fx:id="preparationTA" maxHeight="Infinity" wrapText="true" />
+													</content>
+												</TitledPane>
+											</children>
+										</VBox>
+									</children>
+								</GridPane>
+								<GridPane maxHeight="Infinity" hgap="10.0" vgap="10.0" visible="false">
+									<columnConstraints>
+										<ColumnConstraints hgrow="ALWAYS" />
+										<ColumnConstraints hgrow="NEVER" />
+									</columnConstraints>
+									<rowConstraints>
+										<RowConstraints vgrow="ALWAYS" />
+										<RowConstraints vgrow="NEVER" />
+									</rowConstraints>
+									<padding>
+										<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+									</padding>
+									<children>
+										<VBox spacing="10" maxHeight="Infinity">
+											<children>
+												<TitledPane text="Ingredients">
+													<content>
+														<FlowPane fx:id="ingredientsPane" />
+													</content>
+												</TitledPane>
+												<TitledPane maxHeight="Infinity" text="Steps" collapsible="false" VBox.vgrow="ALWAYS">
+													<content>
+														<ScrollPane maxWidth="Infinity" maxHeight="Infinity">
+															<content>
+																<VBox fx:id="stepsPane" maxWidth="Infinity" maxHeight="Infinity" />
+															</content>
+														</ScrollPane>
+													</content>
+												</TitledPane>
+											</children>
+										</VBox>
+										<VBox maxHeight="Infinity" GridPane.columnIndex="1" spacing="10">
+											<children>
+												<TitledPane maxHeight="Infinity" text="Tools" VBox.vgrow="ALWAYS">
+													<content>
+														<ListView fx:id="toolsListView" maxHeight="Infinity" />
+													</content>
+												</TitledPane>
+												<TitledPane maxHeight="Infinity" text="Ingredients" VBox.vgrow="ALWAYS">
+													<content>
+														<ListView fx:id="ingredientsListView" maxHeight="Infinity" />
+													</content>
+												</TitledPane>
+												<TitledPane maxHeight="Infinity" text="Actions" VBox.vgrow="ALWAYS">
+													<content>
+														<ListView fx:id="actionsListView" maxHeight="Infinity" />
+													</content>
+												</TitledPane>
+											</children>
+										</VBox>
+										<TitledPane text="Messages" GridPane.rowIndex="1">
+											<content>
+												<ListView fx:id="messagesListView" minHeight="50" maxHeight="50" />
+											</content>
+										</TitledPane>
+										<StackPane GridPane.rowIndex="1" GridPane.columnIndex="1">
+											<children>
+												<Button minHeight="40" text="Parse / Reparse" onAction="#parseRecipe" />
+											</children>
+										</StackPane>
+									</children>
+								</GridPane>
+								<!--  -->
+							</children>
+						</StackPane>
+					</children>
+					<HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+						<padding>
+							<Insets bottom="10.0" left="10.0" right="10.0" />
+						</padding>
+						<children>
+							<Pane HBox.hgrow="ALWAYS" />
+							<Button visible="${processTracker.activeStep != 0}" managed="${processTracker.activeStep != 0}" disable="${preparationTA.text == ''}" mnemonicParsing="false" text="&lt; Prev" AnchorPane.rightAnchor="0.0" onAction="#prevStep" />
+							<Button visible="${processTracker.activeStep != 3}" managed="${processTracker.activeStep != 3}" disable="${(processTracker.activeStep == 0 &amp;&amp; preparationTA.text == '') || (processTracker.activeStep == 1 &amp;&amp; !controller.recipeParsed)}" mnemonicParsing="false" text="Next &gt;" AnchorPane.rightAnchor="0.0" onAction="#nextStep" />
+						</children>
+					</HBox>
+				</VBox>
+			</center>
+		</BorderPane>
+		<Pane maxWidth="Infinity" maxHeight="Infinity" style="-fx-background-color: rgba(0.8, 0.8, 0.8, 0.5)" visible="false" fx:id="blockingPane" />
+	</children>
+</StackPane>

@@ -2,6 +2,7 @@ package ai4.master.project.viewFx.components.editorViews;
 
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
+import ai4.master.project.viewFx.components.editorViews.entries.IngredientEntry;
 import ai4.master.project.viewFx.components.editorViews.entries.IngredientGroupEntry;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
@@ -171,12 +172,14 @@ public class IngredientGroupsEditorView extends EditorView {
 		return kwdb.get().findIngredientGroup(word) != null;
 	}
 	public void scrollTo(String word) {
-		scrollTo(kwdb.get().findIngredientGroup(word));
+		for(IngredientGroupEntry entry : ingredientGroupsTable.getItems()) {
+			if(entry.getName().equals(word) || entry.getSynonyms().contains(word)) {
+				ingredientGroupsTable.scrollTo(entry);
+				ingredientGroupsTable.getSelectionModel().select(entry);
+				break;
+			}
+		}
 	}
-	public void scrollTo(BaseIngredientGroup ingredientGroup) {
-		ingredientGroupsTable.scrollTo(ingredientGroups.indexOf(ingredientGroup));
-	}
-
 	private class SynonymsCell extends TableCell<IngredientGroupEntry, ObservableList<String>> { 
 		@Override
 		public void updateItem(ObservableList<String> synonyms, boolean empty) {

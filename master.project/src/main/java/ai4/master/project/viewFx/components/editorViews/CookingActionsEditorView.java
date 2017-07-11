@@ -10,6 +10,7 @@ import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.recipe.baseObject.Regex;
 import ai4.master.project.recipe.baseObject.Regex.Result;
 import ai4.master.project.viewFx.components.editorViews.entries.CookingActionEntry;
+import ai4.master.project.viewFx.components.editorViews.entries.IngredientGroupEntry;
 import ai4.master.project.viewFx.components.editorViews.entries.RegexEntry;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
@@ -125,12 +126,14 @@ public class CookingActionsEditorView extends EditorView {
 		return kwdb.get().findCookingAction(word) != null;
 	}
 	public void scrollTo(String word) {
-		scrollTo(kwdb.get().findCookingAction(word));
+		for(CookingActionEntry entry : tableView.getItems()) {
+			if(entry.getName().equals(word) || entry.getSynonyms().contains(word)) {
+				tableView.scrollTo(entry);
+				tableView.getSelectionModel().select(entry);
+				break;
+			}
+		}
 	}
-	public void scrollTo(BaseCookingAction cookingAction) {
-		tableView.scrollTo(cookingActions.indexOf(cookingAction));
-	}
-
 	
 	private class SynonymsCell extends TableCell<CookingActionEntry, ObservableList<String>> {
 		@Override

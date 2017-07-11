@@ -4,6 +4,7 @@ import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
 import ai4.master.project.viewFx.components.editorViews.entries.IngredientEntry;
+import ai4.master.project.viewFx.components.editorViews.entries.ToolEntry;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -189,10 +190,13 @@ public class IngredientsEditorView extends EditorView {
 		return kwdb.get().findIngredient(word) != null;
 	}
 	public void scrollTo(String word) {
-		scrollTo(kwdb.get().findIngredient(word));
-	}
-	public void scrollTo(BaseIngredient ingredient) {
-		ingredientsTable.scrollTo(ingredients.indexOf(ingredient));
+		for(IngredientEntry entry : ingredientsTable.getItems()) {
+			if(entry.getName().equals(word) || entry.getSynonyms().contains(word)) {
+				ingredientsTable.scrollTo(entry);
+				ingredientsTable.getSelectionModel().select(entry);
+				break;
+			}
+		}
 	}
 
 	private class SynonymsCell extends TableCell<IngredientEntry, ObservableList<String>> { 
