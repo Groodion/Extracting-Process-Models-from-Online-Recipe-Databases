@@ -159,6 +159,7 @@
 								</StackPane>
 							</children>
 						</GridPane>
+
 					</children>
 				</StackPane>
 			</children>
@@ -175,3 +176,4 @@
 		</VBox>
 	</center>
 </BorderPane>
+
