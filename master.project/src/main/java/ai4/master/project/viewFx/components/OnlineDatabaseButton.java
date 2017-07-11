@@ -37,6 +37,10 @@ public class OnlineDatabaseButton extends HBox {
 			}
 		});
 
+		if(recipeGetter == null) {
+			this.setDisable(true);
+		}
+		
 		ImageView logo = new ImageView(this.getClass().getResource(logoPath).toString());
 		logo.setFitHeight(LOGO_HEIGHT);
 		logo.setFitWidth(LOGO_WIDTH);

@@ -1,6 +1,9 @@
 package ai4.master.project.viewFx;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -96,9 +99,6 @@ public class Controller implements Initializable {
 		kwdb = new SimpleObjectProperty<KeyWordDatabase>(KeyWordDatabase.GERMAN_KWDB);
 		selectedObject = new SimpleObjectProperty<BaseNamedObject<?, ?>>();
 		recipeParsed = new SimpleBooleanProperty(false);
-
-		libEditor = new LibEditor(kwdb);
-		
 		parser.setKwdb(kwdb.get());
 
 		identifiedTools = FXCollections.observableArrayList();
@@ -110,7 +110,6 @@ public class Controller implements Initializable {
 		/*
 		 * Logik
 		 */
-
 		kwdb.addListener((b, o, n) -> {
 			parser.setKwdb(n);
 		});
@@ -195,7 +194,18 @@ public class Controller implements Initializable {
 			recipeImportFilePathTF.setText(file.getAbsolutePath());
 		}
 	}
-	public void loadFileForRecipeImport() {
+	public void loadFileForRecipeImport() throws IOException {
+		 FileReader fr = new FileReader(recipeImportFilePathTF.getText());
+		 BufferedReader br = new BufferedReader(fr);
+
+		    String line = "";
+		    String text = "";
+		    while( (line = br.readLine()) != null )
+		    {
+		      text = text+line;
+		    }
+		    preparationTA.setText(text);
+		    br.close();
 		
 	}
 
@@ -303,6 +313,10 @@ public class Controller implements Initializable {
 	}
 	
 	public void showLibEditor() {
+		if(libEditor == null) {
+			libEditor = new LibEditor(kwdb);
+		}
+		
 		Optional<KeyWordDatabase> kwdb = libEditor.showAndWait();
 		kwdb.ifPresent(db -> {
 			this.kwdb.set(db);
