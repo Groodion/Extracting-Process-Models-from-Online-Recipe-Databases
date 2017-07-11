@@ -81,11 +81,6 @@
 														</HBox>
 													</content>
 												</TitledPane>
-												<TitledPane maxHeight="Infinity" text="Library settings" VBox.vgrow="ALWAYS">
-													<content>
-														<HBox maxHeight="Infinity" spacing="10.0" />
-													</content>
-												</TitledPane>
 											</children>
 										</VBox>
 										<VBox spacing="10.0" GridPane.columnIndex="1">

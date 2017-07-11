@@ -18,6 +18,7 @@ import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
 import org.camunda.bpm.model.bpmn.instance.di.Waypoint;
 import org.jetbrains.annotations.NotNull;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -40,6 +41,7 @@ public class ProcessModelerImpl implements ProcessModeler {
     List<UserTask> userTasks = new ArrayList<>();
     List<SequenceFlow> flows = new ArrayList<>();
     List<ParallelGateway> gates = new ArrayList<>();
+    List<DataObjectReference> dataObjects = new ArrayList<>();
     StartEvent startEvent = null;
     EndEvent endEvent = null;
     private int taskX = 100;
@@ -106,8 +108,10 @@ public class ProcessModelerImpl implements ProcessModeler {
         //Every node without children belongs to the endEvent
         createNodeToEndEventConnection(nodes, endEvent, process, plane);
 
+        // Create a sync gatter at the end
+        createSynchronisationGatter(process, plane);
 
-        checkIfGatewayIsNeccessary(process);
+
       /*  Layouter layouter = new Layouter(modelInstance);
         layouter.createLayout(flows);*/
         // validate and write model to file
@@ -124,14 +128,53 @@ public class ProcessModelerImpl implements ProcessModeler {
 
 
 
-    private void checkIfGatewayIsNeccessary(Process process){
-        for(ParallelGateway parallelGateway : gates){
-            Collection<SequenceFlow> incomming = parallelGateway.getIncoming();
-            Collection<SequenceFlow> outgoing = parallelGateway.getOutgoing();
+    /*
+    Creates synchronisation gatter for the parallel gateways.
+     */
+    private void createSynchronisationGatter(Process process, BpmnPlane plane){
+
+        for(UserTask userTask : userTasks){
+            Collection<SequenceFlow> incomming = userTask.getIncoming();
+            System.out.println("Incomming size " + incomming.size());
+            if(incomming.size() < 2) {continue;}
+            System.out.println("Needing sync gate");
+            StringBuilder id = new StringBuilder();
+            for(SequenceFlow sequenceFlow : incomming){
+               id.append(createIdOf(sequenceFlow.getAttributeValue("id")));
+            }
+            ParallelGateway parallelGateway = createElement(process, "sync_"+id.toString(), "", ParallelGateway.class, plane, 0,0,0,0,false );
+            gates.add(parallelGateway);
+
+            for(SequenceFlow sequenceFlow : incomming){
+                sequenceFlow.setTarget(parallelGateway);
+            }
+            userTask.getIncoming().clear();
+            SequenceFlow sequenceFlow = createSequenceFlow(process, parallelGateway,userTask,plane,LayoutUtils.getCenterCoordinates(userTask)[0],
+                    LayoutUtils.getCenterCoordinates(userTask)[1],LayoutUtils.getCenterCoordinates(parallelGateway)[0],LayoutUtils.getCenterCoordinates(parallelGateway)[1]);
+            flows.add(sequenceFlow);
+        }
 
 
+        if(endEvent.getIncoming().size() > 1){
+            Collection<SequenceFlow> incomming = endEvent.getIncoming();
+            StringBuilder id = new StringBuilder();
+            for(SequenceFlow sequenceFlow : incomming){
+                id.append(sequenceFlow.getAttributeValue("id"));
+            }
+            ParallelGateway parallelGateway = createElement(process, "sync_"+id.toString(), "", ParallelGateway.class, plane,0,0,0,0,false);
+            gates.add(parallelGateway);
+
+            for(SequenceFlow sequenceFlow : incomming){
+                sequenceFlow.setTarget(parallelGateway);
+            }
+            endEvent.getIncoming().clear();
+            SequenceFlow sequenceFlow = createSequenceFlow(process, parallelGateway,endEvent,plane,LayoutUtils.getCenterCoordinates(endEvent)[0],
+                    LayoutUtils.getCenterCoordinates(endEvent)[1],LayoutUtils.getCenterCoordinates(parallelGateway)[0],LayoutUtils.getCenterCoordinates(parallelGateway)[1]);
+            flows.add(sequenceFlow);
         }
     }
+
+
 
     /*
     Connects every "last" node with the endpoint.
@@ -160,7 +203,7 @@ public class ProcessModelerImpl implements ProcessModeler {
     private void createStartEventToConnections(Tree<Step> t, StartEvent startEvent, Process process, BpmnPlane plane) {
         if (t.getRoot().getChildren().size() > 1) {
             // in case the root node has more than one child we use a parallelgateway on the start. this will be initialized here.
-            ParallelGateway startParallel = createElement(process, "parallel_gateway_start", "parallel_gateway_start", ParallelGateway.class, plane, tempX, taskY, 30, 30, false);
+            ParallelGateway startParallel = createElement(process, "parallel_gateway_start", "", ParallelGateway.class, plane, tempX, taskY, 30, 30, false);
             gates.add(startParallel);
             taskX += 150;
 
@@ -221,7 +264,7 @@ public class ProcessModelerImpl implements ProcessModeler {
                     ParallelGateway parallelGateway = null;
                     if (!gateExists("parallel_gateway_" + createIdOf(node.getData().getText()))) {
                       //  System.out.println("Creating a parallel gateway for" + node.getData().getText());
-                        parallelGateway = createElement(process, "parallel_gateway_" + createIdOf(node.getData().getText()), "parallel_gateway_" + node.getData().getText(), ParallelGateway.class, plane, taskX, taskY, 30, 30, false);
+                        parallelGateway = createElement(process, "parallel_gateway_" + createIdOf(node.getData().getText()), "", ParallelGateway.class, plane, taskX, taskY, 30, 30, false);
                         gates.add(parallelGateway);
                        // incXby(150);
                         // First we need to connect the parent to the parallel gateway.
@@ -269,8 +312,6 @@ public class ProcessModelerImpl implements ProcessModeler {
             if (!idExists(createIdOf(node.getData().getText()))) { //Avoid duplicates by having more than one dependence which creates two parts in the tree.
 
                 UserTask userTask = createElement(process, createIdOf(node.getData().getText()), node.getData().getText(), UserTask.class, plane, taskX, taskY, userTaskHeight, userTaskWidth, false);
-                DataObject dataObject = createElement(process, createIdOf("do-"+node.getData().getText()), node.getData().getIngredients().toString(), DataObject.class, plane, taskX, taskY, userTaskHeight, userTaskWidth,true);
-
                 List<CookingEvent> events = node.getData().getEvents();
                 if(!isForLayout) {
                     for (CookingEvent event : events) {
@@ -280,16 +321,23 @@ public class ProcessModelerImpl implements ProcessModeler {
                     incXby(150);
 
                 /* Iterate over the Input parameter ( = ingredients) and output parameter ( = products) and add them */
+                int i = 0;
                     for (Ingredient ingredient : node.getData().getIngredients()) {
-                        userTask.builder().camundaInputParameter("Ingredient", ingredient.getName());
+                        //userTask.builder().camundaInputParameter("Ingredient", ingredient.getName());
+                        dataObjects.add(createDataObject(process, createIdOf("dataObject_I"+i+createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getCompleteName(), plane, true));
+                   i++;
                     }
 
                     for (Ingredient product : node.getData().getProducts()) {
-                        userTask.builder().camundaOutputParameter("Product", product.getName());
+                    //    userTask.builder().camundaOutputParameter("Product", product.getName());
+                        dataObjects.add(createDataObject(process, createIdOf("dataObject_P"+createIdOf(product.getCompleteName()) + createIdOf(node.getData().getText())), product.getCompleteName(), plane, true));
+
                     }
                 /* Add tools as input parameter */
                     for (Tool tool : node.getData().getTools()) {
                         userTask.builder().camundaInputParameter("Tool", tool.getName());
+                        dataObjects.add(createDataObject(process, createIdOf("dataObject_T"+createIdOf(tool.getName()) + createIdOf(node.getData().getText())), tool.getName(), plane, true));
+
                     }
 
                 }
@@ -348,6 +396,46 @@ public class ProcessModelerImpl implements ProcessModeler {
         return null;
     }
 
+
+    /*
+    Creates a dataObject.
+     */
+
+    private int doHeight = 60;
+    private int doWidth = 36;
+    private DataObjectReference createDataObject(BpmnModelElementInstance bpmnModelElementInstance, String id, String name, BpmnPlane plane, boolean withLabel) {
+        DataObjectReference dataObject = modelInstance.newInstance(DataObjectReference.class);
+        dataObject.setAttributeValue("id", id, true);
+        dataObject.setAttributeValue("name", name, false);
+        bpmnModelElementInstance.addChildElement(dataObject);
+
+        if (!isForLayout) {
+            BpmnShape bpmnShape = modelInstance.newInstance(BpmnShape.class);
+            bpmnShape.setBpmnElement((BaseElement) dataObject);
+
+
+            Bounds bounds = modelInstance.newInstance(Bounds.class);
+            bounds.setX(taskX);
+            bounds.setY(taskY+200);
+            bounds.setHeight(doHeight);
+            bounds.setWidth(doWidth);
+            bpmnShape.setBounds(bounds);
+
+            if (withLabel) {
+                BpmnLabel bpmnLabel = modelInstance.newInstance(BpmnLabel.class);
+                Bounds labelBounds = modelInstance.newInstance(Bounds.class);
+                labelBounds.setX(taskX);
+                labelBounds.setY(taskY+300);
+                labelBounds.setHeight(21);
+                labelBounds.setWidth(37);
+                bpmnLabel.addChildElement(labelBounds);
+                bpmnShape.addChildElement(bpmnLabel);
+            }
+            plane.addChildElement(bpmnShape);
+        }
+
+        return dataObject;
+    }
     /*
     Creates a BPMN Element
      */

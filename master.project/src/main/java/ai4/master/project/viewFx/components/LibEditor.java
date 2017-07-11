@@ -54,12 +54,10 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 	private StackPane editorViewsStackPane;
 
 	
-    public static final String ICON_SEARCH = "\uf002";
 	private ComboBox<String> selectEditorCB;
 
 	
 	public LibEditor(ObjectProperty<KeyWordDatabase> kwdb) {
-
 		this.getDialogPane().getStylesheets().add(
 				   getClass().getResource("/css/style.css").toExternalForm());
 		tools =  FXCollections.observableArrayList();
