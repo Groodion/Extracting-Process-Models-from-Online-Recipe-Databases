@@ -9,6 +9,8 @@ import org.camunda.bpm.model.bpmn.instance.UserTask;
     This class delievers values for the layout design of the bpmn model.
 
  */
+
+@Deprecated
 public class LayoutUtils {
 
 

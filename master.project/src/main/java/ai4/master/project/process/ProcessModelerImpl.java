@@ -9,6 +9,8 @@ import ai4.master.project.recipe.object.Tool;
 import ai4.master.project.tree.Node;
 import ai4.master.project.tree.Tree;
 import ai4.master.project.tree.TreeTraverser;
+import org.activiti.bpmn.BpmnAutoLayout;
+import org.activiti.bpmn.model.BpmnModel;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.*;
@@ -30,11 +32,7 @@ import java.util.List;
 public class ProcessModelerImpl implements ProcessModeler {
 
 
-    // TODO Add Tools
     // TODO Maybe a simple algorithm to design layout to be at least a bit visible..
-    // TODO Add a possibility to use a parallel or a XOR gateway using nodes isXor
-
-
     private String fileName = "test";
     public static boolean isForLayout = false;
     BpmnModelInstance modelInstance;
@@ -44,6 +42,7 @@ public class ProcessModelerImpl implements ProcessModeler {
     List<DataObjectReference> dataObjects = new ArrayList<>();
     StartEvent startEvent = null;
     EndEvent endEvent = null;
+    Process process = null;
     private int taskX = 100;
     /*
     If a node has more than one children we need a parallel gate. So maybe we could call a method that creates everything starting from there (the gate) on?
@@ -51,8 +50,8 @@ public class ProcessModelerImpl implements ProcessModeler {
      */
     private int taskY = 50;
     private int tempX = 0; //for the position of the start node
-    private int userTaskHeight = 80;
-    private int userTaskWidth = 100;
+    int userTaskHeight = 80;
+    int userTaskWidth = 100;
 
     public void createBpmn(Recipe recipe){
         convertToProcess(recipe);
@@ -77,7 +76,7 @@ public class ProcessModelerImpl implements ProcessModeler {
         modelInstance.setDefinitions(definitions);
 
         // create the process
-        Process process = modelInstance.newInstance(Process.class);
+        process = modelInstance.newInstance(Process.class);
         process.setAttributeValue("id", "process-one-task", true);
         definitions.addChildElement(process);
 
@@ -111,9 +110,12 @@ public class ProcessModelerImpl implements ProcessModeler {
         // Create a sync gatter at the end
         createSynchronisationGatter(process, plane);
 
+        if(!isForLayout){
+            BPMNLayouter layouter = new BPMNLayouter(this, modelInstance);
+            layouter.layout();
+        }
 
-      /*  Layouter layouter = new Layouter(modelInstance);
-        layouter.createLayout(flows);*/
+
         // validate and write model to file
         Bpmn.validateModel(modelInstance);
         createXml();
@@ -313,6 +315,7 @@ public class ProcessModelerImpl implements ProcessModeler {
 
                 UserTask userTask = createElement(process, createIdOf(node.getData().getText()), node.getData().getText(), UserTask.class, plane, taskX, taskY, userTaskHeight, userTaskWidth, false);
                 List<CookingEvent> events = node.getData().getEvents();
+
                 if(!isForLayout) {
                     for (CookingEvent event : events) {
                         userTask.builder().boundaryEvent().timerWithDuration(event.getText());
@@ -324,19 +327,19 @@ public class ProcessModelerImpl implements ProcessModeler {
                 int i = 0;
                     for (Ingredient ingredient : node.getData().getIngredients()) {
                         //userTask.builder().camundaInputParameter("Ingredient", ingredient.getName());
-                        dataObjects.add(createDataObject(process, createIdOf("dataObject_I"+i+createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getCompleteName(), plane, true));
+                        //dataObjects.add(createDataObject(process, createIdOf("dataObject_I"+i+createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getCompleteName(), plane, true));
                    i++;
                     }
 
                     for (Ingredient product : node.getData().getProducts()) {
                     //    userTask.builder().camundaOutputParameter("Product", product.getName());
-                        dataObjects.add(createDataObject(process, createIdOf("dataObject_P"+createIdOf(product.getCompleteName()) + createIdOf(node.getData().getText())), product.getCompleteName(), plane, true));
+                       // dataObjects.add(createDataObject(process, createIdOf("dataObject_P"+createIdOf(product.getCompleteName()) + createIdOf(node.getData().getText())), product.getCompleteName(), plane, true));
 
                     }
                 /* Add tools as input parameter */
                     for (Tool tool : node.getData().getTools()) {
                         userTask.builder().camundaInputParameter("Tool", tool.getName());
-                        dataObjects.add(createDataObject(process, createIdOf("dataObject_T"+createIdOf(tool.getName()) + createIdOf(node.getData().getText())), tool.getName(), plane, true));
+                      //  dataObjects.add(createDataObject(process, createIdOf("dataObject_T"+createIdOf(tool.getName()) + createIdOf(node.getData().getText())), tool.getName(), plane, true));
 
                     }
 
