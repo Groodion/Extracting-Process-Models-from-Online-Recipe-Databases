@@ -35,6 +35,7 @@
 	result (first|last|all|prev|no_result) "first"
 	ingredientsNeeded (true|false) "true"
 	referencePreviousProducts (true|false) "false"
+	chargeTools (true|false) "false"
 >
 <!ELEMENT Name (#PCDATA)>
 <!ELEMENT partIndicators (PartIndicator)*>

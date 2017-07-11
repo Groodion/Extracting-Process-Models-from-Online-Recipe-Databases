@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.apirequests.RecipeGetterChefkoch;
+import ai4.master.project.apirequests.RecipeGetterKochbar;
 import ai4.master.project.recipe.LANG_FLAG;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
@@ -187,7 +188,7 @@ public class Controller implements Initializable {
 		recipeDatabasesPane.getChildren().addAll(
 				new OnlineDatabaseButton("Chefkoch", "www.chefkoch.de", "German", "/img/chefkoch.png",
 						new RecipeGetterChefkoch(), recipe),
-				new OnlineDatabaseButton("Kochbar", "www.kochbar.de", "German", "/img/kochbar.jpg", null, recipe),
+				new OnlineDatabaseButton("Kochbar", "www.kochbar.de", "German", "/img/kochbar.jpg", new RecipeGetterKochbar(), recipe),
 				new OnlineDatabaseButton("Food2Fork", "www.food2fork.com", "English", "/img/food2fork.jpg", null,
 						recipe));
 	}
@@ -327,6 +328,7 @@ public class Controller implements Initializable {
 					kwdb.get().getTools().add(tool);
 					objectAdded.showAndWait();
 					updateRecipeSteps();
+					kwdbHasChanged = true;
 				});
 				addToIngredients.setOnAction(e -> {
 					BaseIngredient ingredient = new BaseIngredient();
@@ -334,6 +336,7 @@ public class Controller implements Initializable {
 					kwdb.get().getIngredients().add(ingredient);
 					objectAdded.showAndWait();
 					updateRecipeSteps();
+					kwdbHasChanged = true;
 				});
 				addToGroups.setOnAction(e -> {
 					BaseIngredientGroup group = new BaseIngredientGroup();
@@ -341,6 +344,7 @@ public class Controller implements Initializable {
 					kwdb.get().getIngredientGroups().add(group);
 					objectAdded.showAndWait();
 					updateRecipeSteps();
+					kwdbHasChanged = true;
 				});
 				addToCookingActions.setOnAction(e -> {
 					BaseCookingAction action = new BaseCookingAction();
@@ -349,6 +353,7 @@ public class Controller implements Initializable {
 					kwdb.get().getCookingActions().add(action);
 					objectAdded.showAndWait();
 					updateRecipeSteps();
+					kwdbHasChanged = true;
 				});
 				
 				cm.getItems().add(addToTools);

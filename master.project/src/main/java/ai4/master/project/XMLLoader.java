@@ -44,6 +44,7 @@ public class XMLLoader {
 	public static final String ELEMENT_ADD_QUANTIFIER_TAG = "AddQuantifierTag";
 	public static final String ATTRIBUTE_ID = "id";
 	public static final String ATTRIBUTE_REGEX_REF_IDS = "regexRefIds";
+	public static final String ATTRIBUTE_CHARGE_TOOLS = "chargeTools";
 
 	
 	public static KeyWordDatabase load(String path) {
@@ -350,7 +351,11 @@ public class XMLLoader {
 		} catch(Exception e) { }
 		Regex regex = new Regex(expression, result, iN, rPP);
 		
-		regex.setId(element.getAttributeValue("ATTRIBUTE_ID"));
+		regex.setId(element.getAttributeValue(ATTRIBUTE_ID));
+		
+		try {
+			regex.setChargingTools(element.getAttribute(ATTRIBUTE_CHARGE_TOOLS).getBooleanValue());
+		} catch(Exception e) {}			
 		
 		cA.getRegexList().add(regex);
 	}

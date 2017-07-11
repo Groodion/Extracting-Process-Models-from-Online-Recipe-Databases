@@ -1484,6 +1484,7 @@
 			<CookingAction>
 			<Name>vorheizen</Name>
 			<regs>
+				<Regex result="no_result" chargeTools="true">.*</Regex>
 			</regs>
 			<transformations>
 			</transformations>
@@ -1499,7 +1500,7 @@
 		<CookingAction>
 			<Name>anbraten</Name>
 			<regs>
-				<Regex result="all" ingredientsNeeded="true">.*</Regex>
+				<Regex result="first" ingredientsNeeded="true" referencePreviousProducts="true">.*</Regex>
 			</regs>
 			<transformations>
 				<Transformation>

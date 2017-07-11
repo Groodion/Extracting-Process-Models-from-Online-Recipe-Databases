@@ -12,6 +12,7 @@ public class Regex {
 	private boolean ingredientsNeeded;
 	private boolean referencePreviousProducts;
 	private String id = null;
+	private boolean chargingTools;
 	
 	
 	public Regex(String expression, Result result, boolean ingredientsNeeded, boolean referencePreviousProducts) {
@@ -54,6 +55,12 @@ public class Regex {
 	public void setReferencePreviousProducts(boolean referencePreviousProducts) {
 		this.referencePreviousProducts = referencePreviousProducts;
 	}
+	public boolean isChargingTools() {
+		return chargingTools;
+	}
+	public void setChargingTools(boolean chargingTools) {
+		this.chargingTools = chargingTools;
+	}
 
 	public String getId() {
 		return id;
@@ -75,6 +82,8 @@ public class Regex {
 		sB.append(ingredientsNeeded);
 		sB.append("\" referencePreviousProducts=\"");
 		sB.append(referencePreviousProducts);
+		sB.append("\" chargeTools=\"");
+		sB.append(chargingTools);
 		sB.append("\">");
 		sB.append(expression);
 		sB.append("</Regex>");

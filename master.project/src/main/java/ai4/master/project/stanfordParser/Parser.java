@@ -4,6 +4,7 @@ import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.*;
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
+import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.recipe.baseObject.Regex;
 import ai4.master.project.recipe.baseObject.Regex.Result;
 import ai4.master.project.recipe.object.CookingAction;
@@ -26,8 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Parser {
-
-	public static final double ERROR = .20;
 
 	private MaxentTagger tagger;
 	private KeyWordDatabase kwdb;
@@ -100,7 +99,6 @@ public class Parser {
 
 		return sentences;
 	}
-
 	private List<List<HasWord>> getSplittedSentencesFromString(String text) {
 		StringReader reader = new StringReader(text);
 
@@ -121,7 +119,6 @@ public class Parser {
 	public KeyWordDatabase getKwdb() {
 		return kwdb;
 	}
-
 	public void setKwdb(KeyWordDatabase kwdb) {
 		this.kwdb = kwdb;
 	}
@@ -132,6 +129,7 @@ public class Parser {
 		String text = recipe.getPreparation();
 		recipe.setPreparation(text);
 
+		
 		List<Sentence> sentences = analyzeText(text);
 
 		for (Sentence sentence : sentences) {
@@ -139,6 +137,7 @@ public class Parser {
 		}
 
 		IngredientList activeIngredients = new IngredientList();
+		List<BaseTool> chargedTools = new ArrayList<BaseTool>();
 
 		for (String s : recipe.getIngredients()) {
 			String name = s.split("\\(")[0];
@@ -217,6 +216,13 @@ public class Parser {
 							}
 						}
 					}
+					
+					for(Tool tool : step.getTools()) {
+						if(chargedTools.contains(tool.getBaseObject())) {
+							tool.setCharged(true);
+						}
+					}
+					
 					for (Regex regex : action.getRegexList()) {
 						if (sP.matches(regex.getExpression(), false)) {
 							ingredientsNeeded = regex.isIngredientsNeeded();
@@ -256,11 +262,12 @@ public class Parser {
 							default:
 								break;
 							}
+							
 							break;
 						}
 					}
 					sP.clearMemory();
-					
+										
 					if (lastStep != null && ingredientsNeeded) {
 						if (step.getIngredients().isEmpty()) {
 							step.getIngredients().addAll(lastStep.getProducts());
@@ -295,6 +302,14 @@ public class Parser {
 						step.getEvents().add(new CookingEvent(sP.getText(), EventType.TIMER, Position.AFTER));
 					}
 
+					if(mRegex.isChargingTools() || step.getIngredients().isEmpty()) {
+						for(Tool tool : step.getTools()) {
+							if(!tool.isCharged()) {
+								chargedTools.add(tool.getBaseObject());
+							}
+						}
+					}
+					
 					recipe.getSteps().add(step);
 					
 					lastStep = step;
