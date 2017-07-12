@@ -1,6 +1,5 @@
 package ai4.master.project.process;
 
-import org.activiti.engine.identity.User;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.ProcessType;
@@ -8,6 +7,7 @@ import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
 import org.camunda.bpm.model.bpmn.instance.*;
 import org.camunda.bpm.model.bpmn.instance.Process;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnDiagram;
+import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnLabel;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.camunda.bpm.model.bpmn.instance.di.DiagramElement;
 import org.camunda.bpm.model.bpmn.instance.di.Waypoint;
@@ -32,6 +32,9 @@ public class BPMNLayouter {
     private int currentX = 0;
     private int currentY = 250;
 
+    private int baseY = 250;
+    private int baseX = 0;
+
     public BPMNLayouter(ProcessModelerImpl processModeler, BpmnModelInstance modelInstance){
         this.processModeler = processModeler;
         this.modelInstance = modelInstance;
@@ -41,11 +44,34 @@ public class BPMNLayouter {
 
     public void layout(){
         clearBoundaries();
+        setDataObjects();
         parse();
+        layoutBoundaryEvents();
     }
 
 
 
+    private void layoutBoundaryEvents(){
+        // TODO
+    }
+    private void setDataObjects(){
+        int oldX = currentX;
+        for(DataObjectReference dataObjectReference : processModeler.dataObjects){
+            BpmnShape bpmnShape = (BpmnShape) dataObjectReference.getDiagramElement();
+            bpmnShape.getBounds().setX(currentX);
+            bpmnShape.getBounds().setY(0);
+
+            BpmnLabel label = bpmnShape.getBpmnLabel();
+            label.getBounds().setX(currentX);
+            label.getBounds().setY(bpmnShape.getBounds().getHeight()+20);
+
+
+            currentX += 200;
+
+        }
+
+        currentX = oldX;
+    }
     private void parse(){
             processModeler.startEvent.getDiagramElement().getBounds().setX(currentX);
             processModeler.startEvent.getDiagramElement().getBounds().setY(currentY);
@@ -97,7 +123,7 @@ public class BPMNLayouter {
             currentY += 200;
             flow.getDiagramElement().getWaypoints().add(createWaypoint(target, FlowDirection.Target));
         }
-        currentY = 250;
+        currentY = baseY;
         currentX += 200;
         for(List<SequenceFlow> l : commingFlows){
             if(l.size() > 1){

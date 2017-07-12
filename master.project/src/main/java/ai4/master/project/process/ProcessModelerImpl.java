@@ -2,6 +2,7 @@ package ai4.master.project.process;
 
 import ai4.master.project.output.XMLWriter;
 import ai4.master.project.recipe.CookingEvent;
+import ai4.master.project.recipe.Position;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
 import ai4.master.project.recipe.object.Ingredient;
@@ -18,9 +19,7 @@ import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
 import org.camunda.bpm.model.bpmn.instance.di.Waypoint;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -29,20 +28,18 @@ import java.util.List;
 public class ProcessModelerImpl implements ProcessModeler {
 
 
+    // TODO Maybe a simple algorithm to design layout to be at least a bit visible..
+    private String fileName = "test";
     public static boolean isForLayout = false;
     BpmnModelInstance modelInstance;
     List<UserTask> userTasks = new ArrayList<>();
     List<SequenceFlow> flows = new ArrayList<>();
     List<ParallelGateway> gates = new ArrayList<>();
     List<DataObjectReference> dataObjects = new ArrayList<>();
+    Map<CookingEvent, BoundaryEvent> boundaryEvents = new HashMap<>();
     StartEvent startEvent = null;
     EndEvent endEvent = null;
     Process process = null;
-    int userTaskHeight = 80;
-    int userTaskWidth = 100;
-    int i = 0;
-    // TODO Maybe a simple algorithm to design layout to be at least a bit visible..
-    private String fileName = "test";
     private int taskX = 100;
     /*
     If a node has more than one children we need a parallel gate. So maybe we could call a method that creates everything starting from there (the gate) on?
@@ -50,8 +47,8 @@ public class ProcessModelerImpl implements ProcessModeler {
      */
     private int taskY = 50;
     private int tempX = 0; //for the position of the start node
-    private int doHeight = 60;
-    private int doWidth = 36;
+    int userTaskHeight = 80;
+    int userTaskWidth = 100;
 
     public void createBpmn(Recipe recipe){
         convertToProcess(recipe);
@@ -88,7 +85,7 @@ public class ProcessModelerImpl implements ProcessModeler {
         definitions.addChildElement(diagram);}
         /** INITIALIZATION END **/
 
-        startEvent = createElement(process, "start", "Start", StartEvent.class, plane, taskX, taskY, 50, 50, true);
+        startEvent = createElement(process, "start", "Start", StartEvent.class, plane, taskX, taskY, 50, 50, false);
         tempX = taskX + 150; //tempX is used in case we generate a parallel gateway
         incXby(300);
 
@@ -127,6 +124,9 @@ public class ProcessModelerImpl implements ProcessModeler {
         return modelInstance;
 
     }
+
+
+
 
     /*
     Creates synchronisation gatter for the parallel gateways.
@@ -175,6 +175,8 @@ public class ProcessModelerImpl implements ProcessModeler {
         }
     }
 
+
+
     /*
     Connects every "last" node with the endpoint.
      */
@@ -194,6 +196,7 @@ public class ProcessModelerImpl implements ProcessModeler {
             }
         }
     }
+
 
     /*
     Creates connection from startevent to starting nodes.
@@ -232,6 +235,8 @@ public class ProcessModelerImpl implements ProcessModeler {
         }
 
     }
+
+    int i = 0;
 
     /*
     Creates connection to children. Every parent is connected to every children. If there are more than one children we need a gateway in between.
@@ -294,6 +299,7 @@ public class ProcessModelerImpl implements ProcessModeler {
 
     }
 
+
     /*
     Create all user tasks.
      */
@@ -311,8 +317,16 @@ public class ProcessModelerImpl implements ProcessModeler {
 
                 if(!isForLayout) {
                     for (CookingEvent event : events) {
-                        userTask.builder().boundaryEvent().timerWithDuration(event.getText());
+                        //userTask.builder().boundaryEvent().timerWithDuration(event.getText());
+                        BoundaryEvent boundaryEvent = createElement(process, createIdOf("boundary_"+event.getText()), event.getText(), BoundaryEvent.class, plane,500,500,0,0,true);
+                        boundaryEvent.builder().timerWithDuration(event.getText());
+                        boundaryEvent.setAttachedTo(userTask);
+                        BpmnShape userTaskShape = (BpmnShape) userTask.getDiagramElement();
+                        BpmnShape boundaryShape = (BpmnShape) boundaryEvent.getDiagramElement();
+
+                        boundaryEvents.put(event, boundaryEvent);
                     }
+
                     System.out.println("Node " + node.getData().getText() + " parent size: " + node.getParent().getChildren().size());
                     incXby(150);
 
@@ -358,6 +372,7 @@ public class ProcessModelerImpl implements ProcessModeler {
         return  from.getId() + "-" + to.getId();
     }
 
+
     /*
     Returns true, if a given id of a gateway already exists. False otherwise
      */
@@ -370,11 +385,6 @@ public class ProcessModelerImpl implements ProcessModeler {
         }
         return false;
     }
-
-
-    /*
-    Creates a dataObject.
-     */
 
     /*
     Returns true if a given userTaskID exists already.
@@ -402,6 +412,15 @@ public class ProcessModelerImpl implements ProcessModeler {
         }
         return null;
     }
+
+
+    /*
+    Creates a dataObject.
+     */
+
+    private int doHeight = 60;
+    private int doWidth = 36;
+
 
     private DataObjectReference createDataObject(BpmnModelElementInstance bpmnModelElementInstance, String id, String name, BpmnPlane plane, boolean withLabel) {
         DataObjectReference dataObject = modelInstance.newInstance(DataObjectReference.class);
