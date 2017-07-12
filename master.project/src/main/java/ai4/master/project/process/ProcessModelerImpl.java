@@ -29,8 +29,6 @@ import java.util.List;
 public class ProcessModelerImpl implements ProcessModeler {
 
 
-    // TODO Maybe a simple algorithm to design layout to be at least a bit visible..
-    private String fileName = "test";
     public static boolean isForLayout = false;
     BpmnModelInstance modelInstance;
     List<UserTask> userTasks = new ArrayList<>();
@@ -40,6 +38,11 @@ public class ProcessModelerImpl implements ProcessModeler {
     StartEvent startEvent = null;
     EndEvent endEvent = null;
     Process process = null;
+    int userTaskHeight = 80;
+    int userTaskWidth = 100;
+    int i = 0;
+    // TODO Maybe a simple algorithm to design layout to be at least a bit visible..
+    private String fileName = "test";
     private int taskX = 100;
     /*
     If a node has more than one children we need a parallel gate. So maybe we could call a method that creates everything starting from there (the gate) on?
@@ -47,8 +50,8 @@ public class ProcessModelerImpl implements ProcessModeler {
      */
     private int taskY = 50;
     private int tempX = 0; //for the position of the start node
-    int userTaskHeight = 80;
-    int userTaskWidth = 100;
+    private int doHeight = 60;
+    private int doWidth = 36;
 
     public void createBpmn(Recipe recipe){
         convertToProcess(recipe);
@@ -125,12 +128,11 @@ public class ProcessModelerImpl implements ProcessModeler {
 
     }
 
-
-
     /*
     Creates synchronisation gatter for the parallel gateways.
      */
     private void createSynchronisationGatter(Process process, BpmnPlane plane){
+
 
         for(UserTask userTask : userTasks){
             Collection<SequenceFlow> incomming = userTask.getIncoming();
@@ -173,8 +175,6 @@ public class ProcessModelerImpl implements ProcessModeler {
         }
     }
 
-
-
     /*
     Connects every "last" node with the endpoint.
      */
@@ -194,7 +194,6 @@ public class ProcessModelerImpl implements ProcessModeler {
             }
         }
     }
-
 
     /*
     Creates connection from startevent to starting nodes.
@@ -233,8 +232,6 @@ public class ProcessModelerImpl implements ProcessModeler {
         }
 
     }
-
-    int i = 0;
 
     /*
     Creates connection to children. Every parent is connected to every children. If there are more than one children we need a gateway in between.
@@ -297,7 +294,6 @@ public class ProcessModelerImpl implements ProcessModeler {
 
     }
 
-
     /*
     Create all user tasks.
      */
@@ -324,8 +320,10 @@ public class ProcessModelerImpl implements ProcessModeler {
                 int i = 0;
                     for (Ingredient ingredient : node.getData().getIngredients()) {
                         //userTask.builder().camundaInputParameter("Ingredient", ingredient.getName());
-                        //dataObjects.add(createDataObject(process, createIdOf("dataObject_I"+i+createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getCompleteName(), plane, true));
-                   i++;
+                        DataObjectReference  dor= createDataObject(process, createIdOf("dataObject_I"+i+createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getCompleteName(), plane, true);
+                        dataObjects.add(dor);
+                        DataInputAssociation dia = createDataAssociation(process, dor, userTask, plane);
+                        i++;
                     }
 
                     for (Ingredient product : node.getData().getProducts()) {
@@ -347,6 +345,11 @@ public class ProcessModelerImpl implements ProcessModeler {
         }
     }
 
+    private DataInputAssociation createDataAssociation(Process process, DataObjectReference dataObjectReference, UserTask userTask, BpmnPlane plane){
+        // TODO
+        return null;
+    }
+
     /*
     Returns the by default created id for flows to check for their existence already because we cannot add dupplicates.
      */
@@ -354,7 +357,6 @@ public class ProcessModelerImpl implements ProcessModeler {
     private String createId(FlowNode from, FlowNode to) {
         return  from.getId() + "-" + to.getId();
     }
-
 
     /*
     Returns true, if a given id of a gateway already exists. False otherwise
@@ -368,6 +370,11 @@ public class ProcessModelerImpl implements ProcessModeler {
         }
         return false;
     }
+
+
+    /*
+    Creates a dataObject.
+     */
 
     /*
     Returns true if a given userTaskID exists already.
@@ -396,13 +403,6 @@ public class ProcessModelerImpl implements ProcessModeler {
         return null;
     }
 
-
-    /*
-    Creates a dataObject.
-     */
-
-    private int doHeight = 60;
-    private int doWidth = 36;
     private DataObjectReference createDataObject(BpmnModelElementInstance bpmnModelElementInstance, String id, String name, BpmnPlane plane, boolean withLabel) {
         DataObjectReference dataObject = modelInstance.newInstance(DataObjectReference.class);
         dataObject.setAttributeValue("id", id, true);
