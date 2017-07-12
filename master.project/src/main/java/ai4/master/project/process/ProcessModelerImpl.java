@@ -39,7 +39,7 @@ public class ProcessModelerImpl implements ProcessModeler {
     EndEvent endEvent = null;
     Process process = null;
     int userTaskHeight = 80;
-    int userTaskWidth = 100;
+    int userTaskWidth = 150;
     int i = 0;
     // TODO Maybe a simple algorithm to design layout to be at least a bit visible..
     private String fileName = "test";
