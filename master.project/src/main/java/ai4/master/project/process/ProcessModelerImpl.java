@@ -28,8 +28,6 @@ import java.util.*;
 public class ProcessModelerImpl implements ProcessModeler {
 
 
-    // TODO Maybe a simple algorithm to design layout to be at least a bit visible..
-    private String fileName = "test";
     public static boolean isForLayout = false;
     BpmnModelInstance modelInstance;
     List<UserTask> userTasks = new ArrayList<>();
@@ -40,6 +38,11 @@ public class ProcessModelerImpl implements ProcessModeler {
     StartEvent startEvent = null;
     EndEvent endEvent = null;
     Process process = null;
+    int userTaskHeight = 80;
+    int userTaskWidth = 100;
+    int i = 0;
+    // TODO Maybe a simple algorithm to design layout to be at least a bit visible..
+    private String fileName = "test";
     private int taskX = 100;
     /*
     If a node has more than one children we need a parallel gate. So maybe we could call a method that creates everything starting from there (the gate) on?
@@ -47,8 +50,8 @@ public class ProcessModelerImpl implements ProcessModeler {
      */
     private int taskY = 50;
     private int tempX = 0; //for the position of the start node
-    int userTaskHeight = 80;
-    int userTaskWidth = 100;
+    private int doHeight = 60;
+    private int doWidth = 36;
 
     public void createBpmn(Recipe recipe){
         convertToProcess(recipe);
@@ -125,9 +128,6 @@ public class ProcessModelerImpl implements ProcessModeler {
 
     }
 
-
-
-
     /*
     Creates synchronisation gatter for the parallel gateways.
      */
@@ -175,8 +175,6 @@ public class ProcessModelerImpl implements ProcessModeler {
         }
     }
 
-
-
     /*
     Connects every "last" node with the endpoint.
      */
@@ -196,7 +194,6 @@ public class ProcessModelerImpl implements ProcessModeler {
             }
         }
     }
-
 
     /*
     Creates connection from startevent to starting nodes.
@@ -299,7 +296,6 @@ public class ProcessModelerImpl implements ProcessModeler {
 
     }
 
-
     /*
     Create all user tasks.
      */
@@ -326,7 +322,6 @@ public class ProcessModelerImpl implements ProcessModeler {
 
                         boundaryEvents.put(event, boundaryEvent);
                     }
-
                     System.out.println("Node " + node.getData().getText() + " parent size: " + node.getParent().getChildren().size());
                     incXby(150);
 
@@ -372,7 +367,6 @@ public class ProcessModelerImpl implements ProcessModeler {
         return  from.getId() + "-" + to.getId();
     }
 
-
     /*
     Returns true, if a given id of a gateway already exists. False otherwise
      */
@@ -385,6 +379,11 @@ public class ProcessModelerImpl implements ProcessModeler {
         }
         return false;
     }
+
+
+    /*
+    Creates a dataObject.
+     */
 
     /*
     Returns true if a given userTaskID exists already.
