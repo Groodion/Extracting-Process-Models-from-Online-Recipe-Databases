@@ -91,6 +91,21 @@ public class Regex {
 		
 		return sB.toString();
 	}
+	@Override
+	public String toString() {
+		StringBuilder sB = new StringBuilder();
+		
+		if(id != null && id.length() != 0) {
+			sB.append(id);
+			sB.append(" - ");
+		}
+		
+		sB.append("/");
+		sB.append(expression);
+		sB.append("/");
+		
+		return sB.toString();
+	}
 	
 	public Regex clone(KeyWordDatabase kwdb) {
 		return new Regex(this);

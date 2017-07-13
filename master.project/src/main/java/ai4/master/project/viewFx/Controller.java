@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -39,7 +40,11 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
@@ -50,6 +55,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -255,14 +261,30 @@ public class Controller implements Initializable {
 		stepsPane.getChildren().clear();
 		
 		if(recipe.get().getSteps().isEmpty()) {
-			createTextFlowPane(recipe.get().getPreparation());
+			createTextFlowPane(recipe.get().getPreparation(), stepsPane);
 		} else {
 			for(Step step : recipe.get().getSteps()) {
-				createTextFlowPane(step.getText());
+				HBox stepPane = new HBox();
+				stepPane.setSpacing(10);
+				Label showStepInfoBtn = new Label("O");
+				showStepInfoBtn.setMaxHeight(Double.MAX_VALUE);
+				showStepInfoBtn.setOnMouseClicked(e -> {
+					Alert stepInfoDlg = new Alert(AlertType.INFORMATION);
+					stepInfoDlg.setContentText(step.toEasyToReadString());
+					stepInfoDlg.showAndWait();
+				});
+				stepPane.getChildren().add(showStepInfoBtn);
+				createTextFlowPane(step.getText(), stepPane);
+				
+				stepsPane.getChildren().add(stepPane);
 			}
 		}
+		
+		Collections.sort(identifiedTools);
+		Collections.sort(identifiedIngredients);
+		Collections.sort(identifiedActions);
 	}
-	public void createTextFlowPane(String text) {
+	public void createTextFlowPane(String text, Pane parent) {
 		FlowPane textFlowPane = new FlowPane();
 		textFlowPane.setMaxWidth(Double.MAX_VALUE);
 		text = text.replaceAll("[!\"§$%&/()=?*+'#,;.:_<>\n]", " $0 ");
@@ -274,7 +296,7 @@ public class Controller implements Initializable {
 			createWordLabel(word, textFlowPane);
 			textFlowPane.getChildren().add(new Label(" "));
 		}
-		stepsPane.getChildren().add(textFlowPane);
+		parent.getChildren().add(textFlowPane);
 	}
 	public void createWordLabel(String word, FlowPane flowPane) {
 		Label label = new Label(word);
@@ -315,9 +337,13 @@ public class Controller implements Initializable {
 				ContextMenu cm = new ContextMenu();
 
 				MenuItem addToTools = new MenuItem("add to Tools");
+				MenuItem addAsSynonymToTools = new MenuItem("add as synonym to Tools");
 				MenuItem addToIngredients = new MenuItem("add to Ingredients");
+				MenuItem addAsSynonymToIngredients = new MenuItem("add as synonym to Ingredients");
 				MenuItem addToGroups = new MenuItem("add to Groups");
+				MenuItem addAsSynonymToGroups = new MenuItem("add as synonym to Groups");
 				MenuItem addToCookingActions = new MenuItem("add to CookingActions");
+				MenuItem addAsSynonymToCookingActions = new MenuItem("add as synonym to CookingActions");
 
 				Alert objectAdded = new Alert(AlertType.INFORMATION);
 				objectAdded.setHeaderText("Object added");
@@ -330,6 +356,31 @@ public class Controller implements Initializable {
 					updateRecipeSteps();
 					kwdbHasChanged = true;
 				});
+				addAsSynonymToTools.setOnAction(e -> {
+					Dialog<BaseTool> selectToolDialog = new Dialog<BaseTool>();
+					selectToolDialog.getDialogPane().getButtonTypes().addAll(
+							ButtonType.CANCEL,
+							ButtonType.OK
+					);
+					((Button) selectToolDialog.getDialogPane().lookupButton(ButtonType.OK)).setDefaultButton(false);
+					selectToolDialog.setHeaderText("Add '" + word + "' as synonym to ");
+					ComboBox<BaseTool> selectToolCB = new ComboBox<BaseTool>();
+					selectToolCB.setItems(FXCollections.observableArrayList(kwdb.get().getTools()));
+					selectToolCB.getSelectionModel().selectFirst();
+					selectToolDialog.setResultConverter(buttonType -> {
+						if(buttonType == ButtonType.OK) {
+							return selectToolCB.getValue();
+						} else {
+							return null;
+						}
+					});
+					selectToolDialog.getDialogPane().setContent(new StackPane(selectToolCB));
+					selectToolDialog.showAndWait().ifPresent(tool -> {
+						kwdbHasChanged = true;
+						tool.addName(word);
+						updateRecipeSteps();
+					});
+				});
 				addToIngredients.setOnAction(e -> {
 					BaseIngredient ingredient = new BaseIngredient();
 					ingredient.addName(word);
@@ -338,6 +389,32 @@ public class Controller implements Initializable {
 					updateRecipeSteps();
 					kwdbHasChanged = true;
 				});
+				addAsSynonymToIngredients.setOnAction(e -> {
+					Dialog<BaseIngredient> selectIngredientDialog = new Dialog<BaseIngredient>();
+					selectIngredientDialog.getDialogPane().getButtonTypes().addAll(
+							ButtonType.CANCEL,
+							ButtonType.OK
+					);
+					((Button) selectIngredientDialog.getDialogPane().lookupButton(ButtonType.OK)).setDefaultButton(false);
+					selectIngredientDialog.setHeaderText("Add '" + word + "' as synonym to ");
+					ComboBox<BaseIngredient> selectIngredientCB = new ComboBox<BaseIngredient>();
+					selectIngredientCB.setItems(FXCollections.observableArrayList(kwdb.get().getIngredients()));
+					selectIngredientCB.getSelectionModel().selectFirst();
+					selectIngredientDialog.setResultConverter(buttonType -> {
+						if(buttonType == ButtonType.OK) {
+							System.out.println("ok");
+							return selectIngredientCB.getValue();
+						} else {
+							return null;
+						}
+					});
+					selectIngredientDialog.getDialogPane().setContent(new StackPane(selectIngredientCB));
+					selectIngredientDialog.showAndWait().ifPresent(ingredient -> {
+						kwdbHasChanged = true;
+						ingredient.addName(word);
+						updateRecipeSteps();
+					});
+				});
 				addToGroups.setOnAction(e -> {
 					BaseIngredientGroup group = new BaseIngredientGroup();
 					group.addName(word);
@@ -345,6 +422,31 @@ public class Controller implements Initializable {
 					objectAdded.showAndWait();
 					updateRecipeSteps();
 					kwdbHasChanged = true;
+				});
+				addAsSynonymToGroups.setOnAction(e -> {
+					Dialog<BaseIngredientGroup> selectIngredientGroupGroupDialog = new Dialog<BaseIngredientGroup>();
+					selectIngredientGroupGroupDialog.getDialogPane().getButtonTypes().addAll(
+							ButtonType.CANCEL,
+							ButtonType.OK
+					);
+					((Button) selectIngredientGroupGroupDialog.getDialogPane().lookupButton(ButtonType.OK)).setDefaultButton(false);
+					selectIngredientGroupGroupDialog.setHeaderText("Add '" + word + "' as synonym to ");
+					ComboBox<BaseIngredientGroup> selectIngredientGroupCB = new ComboBox<BaseIngredientGroup>();
+					selectIngredientGroupCB.setItems(FXCollections.observableArrayList(kwdb.get().getIngredientGroups()));
+					selectIngredientGroupCB.getSelectionModel().selectFirst();
+					selectIngredientGroupGroupDialog.setResultConverter(buttonType -> {
+						if(buttonType == ButtonType.OK) {
+							return selectIngredientGroupCB.getValue();
+						} else {
+							return null;
+						}
+					});
+					selectIngredientGroupGroupDialog.getDialogPane().setContent(new StackPane(selectIngredientGroupCB));
+					selectIngredientGroupGroupDialog.showAndWait().ifPresent(ingredientGroupGroup -> {
+						kwdbHasChanged = true;
+						ingredientGroupGroup.addName(word);
+						updateRecipeSteps();
+					});
 				});
 				addToCookingActions.setOnAction(e -> {
 					BaseCookingAction action = new BaseCookingAction();
@@ -355,11 +457,42 @@ public class Controller implements Initializable {
 					updateRecipeSteps();
 					kwdbHasChanged = true;
 				});
+				addAsSynonymToCookingActions.setOnAction(e -> {
+					Dialog<BaseCookingAction> selectCookingActionDialog = new Dialog<BaseCookingAction>();
+					selectCookingActionDialog.getDialogPane().getButtonTypes().addAll(
+							ButtonType.CANCEL,
+							ButtonType.OK
+					);
+					((Button) selectCookingActionDialog.getDialogPane().lookupButton(ButtonType.OK)).setDefaultButton(false);
+					selectCookingActionDialog.setHeaderText("Add '" + word + "' as synonym to ");
+					ComboBox<BaseCookingAction> selectCookingActionCB = new ComboBox<BaseCookingAction>();
+					selectCookingActionCB.setItems(FXCollections.observableArrayList(kwdb.get().getCookingActions()));
+					selectCookingActionCB.getSelectionModel().selectFirst();
+					selectCookingActionDialog.setResultConverter(buttonType -> {
+						if(buttonType == ButtonType.OK) {
+							return selectCookingActionCB.getValue();
+						} else {
+							return null;
+						}
+					});
+					selectCookingActionDialog.getDialogPane().setContent(new StackPane(selectCookingActionCB));
+					selectCookingActionDialog.showAndWait().ifPresent(cookingAction -> {
+						kwdbHasChanged = true;
+						cookingAction.addName(word);
+						updateRecipeSteps();
+					});
+				});
 				
-				cm.getItems().add(addToTools);
-				cm.getItems().add(addToIngredients);
-				cm.getItems().add(addToGroups);
-				cm.getItems().add(addToCookingActions);
+				cm.getItems().addAll(
+						addToTools,
+						addAsSynonymToTools,
+						addToIngredients,
+						addAsSynonymToIngredients,
+						addToGroups,
+						addAsSynonymToGroups,
+						addToCookingActions,
+						addAsSynonymToCookingActions
+				);
 
 				label.setOnMouseClicked(e -> {
 					if (e.getButton() == MouseButton.SECONDARY) {
@@ -396,6 +529,9 @@ public class Controller implements Initializable {
 			});
 			blockingPane.setVisible(false);
 		});
+	}
+	public void showProperties() {
+		
 	}
 	
 	public void prevStep() {

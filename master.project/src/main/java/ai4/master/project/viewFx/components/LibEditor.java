@@ -252,13 +252,11 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 		
 		header.getChildren().addAll(selectEditorCB, fillPane, searchField);
 		mainLayout.getChildren().addAll(
-
 				header,
 				editorViewsStackPane
-
 		);
 		
-		this.getDialogPane().setContent(mainLayout);
+		getDialogPane().setContent(mainLayout);
 	}
 	
 	public void searchAndScroll(String word) {

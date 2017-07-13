@@ -11,14 +11,19 @@ import ai4.master.project.tree.Tree;
 import ai4.master.project.tree.TreeTraverser;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.impl.instance.SourceRef;
+import org.camunda.bpm.model.bpmn.impl.instance.TargetRef;
 import org.camunda.bpm.model.bpmn.instance.*;
 import org.camunda.bpm.model.bpmn.instance.Process;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.*;
 import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
 import org.camunda.bpm.model.bpmn.instance.di.Waypoint;
+import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -33,12 +38,11 @@ public class ProcessModelerImpl implements ProcessModeler {
     List<SequenceFlow> flows = new ArrayList<>();
     List<ParallelGateway> gates = new ArrayList<>();
     List<DataObjectReference> dataObjects = new ArrayList<>();
-    Map<CookingEvent, BoundaryEvent> boundaryEvents = new HashMap<>();
     StartEvent startEvent = null;
     EndEvent endEvent = null;
     Process process = null;
     int userTaskHeight = 80;
-    int userTaskWidth = 100;
+    int userTaskWidth = 150;
     int i = 0;
     // TODO Maybe a simple algorithm to design layout to be at least a bit visible..
     private String fileName = "test";
@@ -87,7 +91,7 @@ public class ProcessModelerImpl implements ProcessModeler {
         definitions.addChildElement(diagram);}
         /** INITIALIZATION END **/
 
-        startEvent = createElement(process, "start", "Start", StartEvent.class, plane, taskX, taskY, 50, 50, false);
+        startEvent = createElement(process, "start", "Start", StartEvent.class, plane, taskX, taskY, 50, 50, true);
         tempX = taskX + 150; //tempX is used in case we generate a parallel gateway
         incXby(300);
 
@@ -310,14 +314,7 @@ public class ProcessModelerImpl implements ProcessModeler {
 
                 if(!isForLayout) {
                     for (CookingEvent event : events) {
-                        //userTask.builder().boundaryEvent().timerWithDuration(event.getText());
-                        BoundaryEvent boundaryEvent = createElement(process, createIdOf("boundary_"+event.getText()), event.getText(), BoundaryEvent.class, plane,500,500,0,0,true);
-                        boundaryEvent.builder().timerWithDuration(event.getText());
-                        boundaryEvent.setAttachedTo(userTask);
-                        BpmnShape userTaskShape = (BpmnShape) userTask.getDiagramElement();
-                        BpmnShape boundaryShape = (BpmnShape) boundaryEvent.getDiagramElement();
-
-                        boundaryEvents.put(event, boundaryEvent);
+                        userTask.builder().boundaryEvent().timerWithDuration(event.getText());
                     }
                     System.out.println("Node " + node.getData().getText() + " parent size: " + node.getParent().getChildren().size());
                     incXby(150);
@@ -328,7 +325,7 @@ public class ProcessModelerImpl implements ProcessModeler {
                         //userTask.builder().camundaInputParameter("Ingredient", ingredient.getName());
                         DataObjectReference  dor= createDataObject(process, createIdOf("dataObject_I"+i+createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getCompleteName(), plane, true);
                         dataObjects.add(dor);
-                        DataInputAssociation dia = createDataAssociation(process, dor, userTask, plane);
+                        //DataInputAssociation dia = createDataAssociation(process, dor, userTask, plane);
                         i++;
                     }
 
@@ -352,15 +349,23 @@ public class ProcessModelerImpl implements ProcessModeler {
     }
 
     private DataInputAssociation createDataAssociation(Process process, DataObjectReference dataObjectReference, UserTask userTask, BpmnPlane plane){
-        // TODO
+        // TODO:
+        String identifier = dataObjectReference.getId() + "-" + userTask.getId();
+
+        DataInputAssociation dataInputAssociation = modelInstance.newInstance(DataInputAssociation.class);
+        dataInputAssociation.setAttributeValue("id", identifier, true);
+
+        TargetRef targetRef = modelInstance.newInstance(TargetRef.class);
+        targetRef.setTextContent(userTask.getId());
+
+        SourceRef sourceRef = modelInstance.newInstance(SourceRef.class);
+        sourceRef.setTextContent(dataObjectReference.getId());
+
+        dataInputAssociation.addChildElement(targetRef);
+        dataInputAssociation.addChildElement(sourceRef);
+        userTask.getDataInputAssociations().add(dataInputAssociation);
         return null;
     }
-
-
-    /*
-    Creates a dataObject.
-     */
-
     /*
     Returns the by default created id for flows to check for their existence already because we cannot add dupplicates.
      */
