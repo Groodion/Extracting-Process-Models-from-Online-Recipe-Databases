@@ -2,7 +2,6 @@ package ai4.master.project.process;
 
 import ai4.master.project.output.XMLWriter;
 import ai4.master.project.recipe.CookingEvent;
-import ai4.master.project.recipe.Position;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
 import ai4.master.project.recipe.object.Ingredient;
@@ -233,8 +232,6 @@ public class ProcessModelerImpl implements ProcessModeler {
 
     }
 
-    int i = 0;
-
     /*
     Creates connection to children. Every parent is connected to every children. If there are more than one children we need a gateway in between.
      */
@@ -359,6 +356,11 @@ public class ProcessModelerImpl implements ProcessModeler {
         return null;
     }
 
+
+    /*
+    Creates a dataObject.
+     */
+
     /*
     Returns the by default created id for flows to check for their existence already because we cannot add dupplicates.
      */
@@ -411,15 +413,6 @@ public class ProcessModelerImpl implements ProcessModeler {
         }
         return null;
     }
-
-
-    /*
-    Creates a dataObject.
-     */
-
-    private int doHeight = 60;
-    private int doWidth = 36;
-
 
     private DataObjectReference createDataObject(BpmnModelElementInstance bpmnModelElementInstance, String id, String name, BpmnPlane plane, boolean withLabel) {
         DataObjectReference dataObject = modelInstance.newInstance(DataObjectReference.class);
