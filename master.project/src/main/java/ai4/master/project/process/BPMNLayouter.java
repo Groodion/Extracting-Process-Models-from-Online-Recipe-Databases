@@ -1,6 +1,5 @@
 package ai4.master.project.process;
 
-import org.activiti.engine.identity.User;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.ProcessType;

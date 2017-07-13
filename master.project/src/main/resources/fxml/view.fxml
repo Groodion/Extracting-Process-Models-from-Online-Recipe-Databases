@@ -27,16 +27,16 @@
 							<graphic>
 								<ImageView fitHeight="50" fitWidth="50" >
 									<image>
-										<Image url="@../img/language.png" />
+										<Image url="@../img/book.png" />
 									</image>
 								</ImageView>
 							</graphic>
 						</Button>
-						<Button text="Info" styleClass="button-type-1" HBox.hgrow="NEVER">
+						<Button styleClass="button-type-1" HBox.hgrow="NEVER" onAction="#showProperties">
 							<graphic>
 								<ImageView fitHeight="50" fitWidth="50" >
 									<image>
-										<Image url="@../img/information.png" />
+										<Image url="@../img/settings.png" />
 									</image>
 								</ImageView>
 							</graphic>

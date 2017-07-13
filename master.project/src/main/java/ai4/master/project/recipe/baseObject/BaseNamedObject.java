@@ -7,11 +7,12 @@ import ai4.master.project.stanfordParser.sentence.Word;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class BaseNamedObject<N extends NamedObject<B>, B extends BaseNamedObject<N, B>> {
+public abstract class BaseNamedObject<N extends NamedObject<B>, B extends BaseNamedObject<N, B>> implements Comparable<B> {
 	
 	private String firstName;
 	private Set<String> names;
 	private Set<String> stemmedNames;
+	
 	
 	public BaseNamedObject() {
 		names = new HashSet<String>();
@@ -55,6 +56,20 @@ public abstract class BaseNamedObject<N extends NamedObject<B>, B extends BaseNa
 		}
 	}
 	
+	@Override
+	public int compareTo(B other) {
+		if(other == null) {
+			return 1;
+		} else if(firstName == null) {
+			if(other.getFirstName() == null) {
+				return 0;
+			} else {
+				return -1;
+			}
+		} else {
+			return getFirstName().compareTo(other.getFirstName());	
+		}		
+	}
 	@Override
 	public String toString() {
 		return firstName;

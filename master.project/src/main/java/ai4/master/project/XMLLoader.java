@@ -12,6 +12,7 @@ import org.jdom2.input.sax.XMLReaders;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 
 
 public class XMLLoader {	
@@ -95,6 +96,15 @@ public class XMLLoader {
 				System.err.println("Unknown Child " + child.getName() + " in " + root.getName());
 			}
 		}
+		
+		Collections.sort(kwdb.getTools());
+		Collections.sort(kwdb.getIngredients());
+		Collections.sort(kwdb.getIngredientGroups());
+		Collections.sort(kwdb.getCookingActions());
+		Collections.sort(kwdb.getEventIndicators());
+		Collections.sort(kwdb.getPartIndicators());
+		Collections.sort(kwdb.getLastSentenceReferences());
+		
 		return kwdb;
 	}
 	

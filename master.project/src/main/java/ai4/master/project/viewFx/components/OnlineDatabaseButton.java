@@ -29,6 +29,7 @@ public class OnlineDatabaseButton extends HBox {
 				dialog.setTitle("Choose recipe source");
 				dialog.setHeaderText(name);
 				dialog.setContentText("Please enter the recipe id:");
+				dialog.setResult("43611014899035");
 
 				Optional<String> result = dialog.showAndWait();
 				if (result.isPresent()) {

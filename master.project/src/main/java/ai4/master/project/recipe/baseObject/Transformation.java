@@ -116,6 +116,26 @@ public class Transformation {
 		return ingredient;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sB = new StringBuilder();
+		
+		if(product != null) {
+			sB.append("Product: ");
+			sB.append(product.getCompleteName());
+		} else if(tag != null) {
+			if(tag instanceof QuantifierTag) {
+				sB.append("QuantifierTag: ");
+			} else {
+				sB.append("IngredientTag: ");
+			}
+			sB.append(tag.getName());
+		} else {
+			sB.append("Empty");
+		}
+		
+		return sB.toString();
+	}
 	public String toXML() {
 		StringBuilder sB = new StringBuilder();
 		
