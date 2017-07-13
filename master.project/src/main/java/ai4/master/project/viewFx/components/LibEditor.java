@@ -159,7 +159,7 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 			lastSentenceReferences.addAll(this.kwdb.getLastSentenceReferences());
 			eventIndicators.addAll(this.kwdb.getEventIndicators());
 			partIndicators.addAll(this.kwdb.getPartIndicators());
-						
+
 			editorInitialized = true;
 		});
 		
@@ -191,10 +191,12 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 		Button okayButton = (Button) this.getDialogPane().lookupButton(okayButtonType);
 		okayButton.setId("OKAY");
 		okayButton.setFocusTraversable(false);
+		okayButton.setDefaultButton(false);
 
 		Button cancelButton = (Button) this.getDialogPane().lookupButton(cancelButtonType);
 		cancelButton.setId("CANCEL");
 		cancelButton.setFocusTraversable(false);
+		cancelButton.setDefaultButton(false);
 	}
 	private void initMainLayout(ObjectProperty<KeyWordDatabase> kwdb) {		
 		VBox mainLayout = new VBox();

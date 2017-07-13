@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import ai4.master.project.apirequests.RecipeGetter;
 import ai4.master.project.recipe.Recipe;
+import ai4.master.project.viewFx.Controller;
 import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -23,7 +24,7 @@ public class OnlineDatabaseButton extends HBox {
 	public OnlineDatabaseButton(String name, String link, String language, String logoPath, RecipeGetter recipeGetter, ObjectProperty<Recipe> recipe) {
 		setOnMouseClicked(e -> {
 			if (recipeGetter != null) {
-
+				Controller.blockView();
 				TextInputDialog dialog = new TextInputDialog("");
 				dialog.setTitle("Choose recipe source");
 				dialog.setHeaderText(name);
@@ -34,6 +35,7 @@ public class OnlineDatabaseButton extends HBox {
 					String id = result.get();
 					recipe.set(recipeGetter.getRecipe(id));
 				}
+				Controller.unblockView();
 			}
 		});
 

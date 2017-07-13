@@ -10,17 +10,22 @@ import java.util.ResourceBundle;
 
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.apirequests.RecipeGetterChefkoch;
+import ai4.master.project.apirequests.RecipeGetterKochbar;
 import ai4.master.project.recipe.LANG_FLAG;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
+import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
 import ai4.master.project.recipe.baseObject.BaseNamedObject;
 import ai4.master.project.recipe.baseObject.BaseTool;
+import ai4.master.project.recipe.baseObject.Regex;
+import ai4.master.project.recipe.baseObject.Regex.Result;
 import ai4.master.project.stanfordParser.Parser;
 import ai4.master.project.viewFx.components.LibEditor;
 import ai4.master.project.viewFx.components.OnlineDatabaseButton;
 import ai4.master.project.viewFx.components.ProcessTracker;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -32,6 +37,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -43,6 +50,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -51,7 +59,7 @@ import javafx.stage.FileChooser;
 public class Controller implements Initializable {
 
 	public static final ObservableList<String> MESSAGES = FXCollections.observableArrayList();
-	
+	private static Pane bPane;
 	
 	@FXML
 	private VBox recipeDatabasesPane;
@@ -78,6 +86,8 @@ public class Controller implements Initializable {
 	private ListView<BaseCookingAction> actionsListView;
 	@FXML
 	private ListView<String> messagesListView;
+	@FXML
+	private Pane blockingPane;
 	
 	private LibEditor libEditor;
 	
@@ -107,6 +117,8 @@ public class Controller implements Initializable {
 	}
 	@Override
 	public void initialize(URL url, ResourceBundle rB) {
+		bPane = blockingPane;
+		
 		/*
 		 * Logik
 		 */
@@ -125,6 +137,25 @@ public class Controller implements Initializable {
 		toolsListView.getSelectionModel().selectedItemProperty().addListener(cListener);
 		ingredientsListView.getSelectionModel().selectedItemProperty().addListener(cListener);
 		actionsListView.getSelectionModel().selectedItemProperty().addListener(cListener);
+
+		toolsListView.setOnMouseClicked(e -> {
+			if(e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
+				showLibEditor();
+				libEditor.searchAndScroll(toolsListView.getSelectionModel().getSelectedItem().getFirstName());
+			}
+		});
+		ingredientsListView.setOnMouseClicked(e -> {
+			if(e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
+				showLibEditor();
+				libEditor.searchAndScroll(ingredientsListView.getSelectionModel().getSelectedItem().getFirstName());
+			}
+		});
+		actionsListView.setOnMouseClicked(e -> {
+			if(e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
+				showLibEditor();
+				libEditor.searchAndScroll(actionsListView.getSelectionModel().getSelectedItem().getFirstName());
+			}
+		});
 		
 		recipe.addListener((b, o, n) -> {
 			if (n == null) {
@@ -157,7 +188,7 @@ public class Controller implements Initializable {
 		recipeDatabasesPane.getChildren().addAll(
 				new OnlineDatabaseButton("Chefkoch", "www.chefkoch.de", "German", "/img/chefkoch.png",
 						new RecipeGetterChefkoch(), recipe),
-				new OnlineDatabaseButton("Kochbar", "www.kochbar.de", "German", "/img/kochbar.jpg", null, recipe),
+				new OnlineDatabaseButton("Kochbar", "www.kochbar.de", "German", "/img/kochbar.jpg", new RecipeGetterKochbar(), recipe),
 				new OnlineDatabaseButton("Food2Fork", "www.food2fork.com", "English", "/img/food2fork.jpg", null,
 						recipe));
 	}
@@ -288,6 +319,43 @@ public class Controller implements Initializable {
 				MenuItem addToGroups = new MenuItem("add to Groups");
 				MenuItem addToCookingActions = new MenuItem("add to CookingActions");
 
+				Alert objectAdded = new Alert(AlertType.INFORMATION);
+				objectAdded.setHeaderText("Object added");
+							
+				addToTools.setOnAction(e -> {
+					BaseTool tool = new BaseTool();
+					tool.addName(word);
+					kwdb.get().getTools().add(tool);
+					objectAdded.showAndWait();
+					updateRecipeSteps();
+					kwdbHasChanged = true;
+				});
+				addToIngredients.setOnAction(e -> {
+					BaseIngredient ingredient = new BaseIngredient();
+					ingredient.addName(word);
+					kwdb.get().getIngredients().add(ingredient);
+					objectAdded.showAndWait();
+					updateRecipeSteps();
+					kwdbHasChanged = true;
+				});
+				addToGroups.setOnAction(e -> {
+					BaseIngredientGroup group = new BaseIngredientGroup();
+					group.addName(word);
+					kwdb.get().getIngredientGroups().add(group);
+					objectAdded.showAndWait();
+					updateRecipeSteps();
+					kwdbHasChanged = true;
+				});
+				addToCookingActions.setOnAction(e -> {
+					BaseCookingAction action = new BaseCookingAction();
+					action.getRegexList().add(new Regex(".*", Result.NO_RESULT));
+					action.addName(word);
+					kwdb.get().getCookingActions().add(action);
+					objectAdded.showAndWait();
+					updateRecipeSteps();
+					kwdbHasChanged = true;
+				});
+				
 				cm.getItems().add(addToTools);
 				cm.getItems().add(addToIngredients);
 				cm.getItems().add(addToGroups);
@@ -306,21 +374,27 @@ public class Controller implements Initializable {
 	}
 	
 	public void parseRecipe() {
+		blockingPane.setVisible(true);
 		MESSAGES.clear();
 		parser.parseRecipe(recipe.get());
 		updateRecipeSteps();
 		recipeParsed.set(true);
+		blockingPane.setVisible(false);
 	}
 	
 	public void showLibEditor() {
+		blockingPane.setVisible(true);
 		if(libEditor == null) {
 			libEditor = new LibEditor(kwdb);
 		}
 		
-		Optional<KeyWordDatabase> kwdb = libEditor.showAndWait();
-		kwdb.ifPresent(db -> {
-			this.kwdb.set(db);
-			kwdbHasChanged = true;
+		Platform.runLater(() -> {
+			Optional<KeyWordDatabase> kwdb = libEditor.showAndWait();
+			kwdb.ifPresent(db -> {
+				this.kwdb.set(db);
+				kwdbHasChanged = true;
+			});
+			blockingPane.setVisible(false);
 		});
 	}
 	
@@ -374,5 +448,12 @@ public class Controller implements Initializable {
 	}
 	public boolean kwdbHasChanged() {
 		return kwdbHasChanged;
+	}
+
+	public static void blockView() {
+		bPane.setVisible(true);
+	}
+	public static void unblockView() {
+		bPane.setVisible(false);
 	}
 }

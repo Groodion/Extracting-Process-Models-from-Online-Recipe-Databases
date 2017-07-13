@@ -20,12 +20,14 @@ public class CookingActionEntry {
 	private ObservableList<Transformation> transformations;	
 	private ObservableList<BaseTool> tools;	
 	
+
 	public CookingActionEntry(BaseCookingAction cookingAction, ObservableList<BaseCookingAction> cookingActions, Map<Object, ObservableList<String>> regexIdMap) {
 		ObservableList<String> regexIds = FXCollections.observableArrayList();
-		
+				
 		name = new SimpleStringProperty(cookingAction.getFirstName());
 				
 		synonyms = FXCollections.observableArrayList(cookingAction.getNames());
+		synonyms.remove(cookingAction.getFirstName());
 		
 		regex = FXCollections.observableArrayList(cookingAction.getRegexList());
 		transformations = FXCollections.observableArrayList(cookingAction.getTransformations());
@@ -110,9 +112,9 @@ public class CookingActionEntry {
 		
 		entry.synonyms.removeIf(synonym -> synonym.replace(" ", "").length() == 0);
 		
-		cookingAction.getNames().add(entry.getName());
+		cookingAction.addName(entry.getName());
 		for(String name : entry.getSynonyms()) {
-			cookingAction.getNames().add(name);
+			cookingAction.addName(name);
 		}
 		
 		cookingAction.getRegexList().addAll(entry.getRegex());

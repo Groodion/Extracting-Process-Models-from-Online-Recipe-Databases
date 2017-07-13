@@ -39,8 +39,10 @@ public class RecipeGetterKochbar implements RecipeGetter {
         }
         String fullIngredient = "";
         for (int i=0;i<names.size();i++) {
+            recipe.getIngredients().add(names.get(i));
             fullIngredient += names.get(i) + " " + sizes.get(i) + "\n";
         }
+                
         return fullIngredient;
     }
 

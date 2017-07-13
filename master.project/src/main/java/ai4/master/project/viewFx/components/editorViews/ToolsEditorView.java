@@ -28,14 +28,12 @@ import javafx.scene.layout.VBox;
 public class ToolsEditorView extends EditorView {
 
 	private ObjectProperty<KeyWordDatabase> kwdb;
-	private ObservableList<BaseTool> tools;
 	private TableView<ToolEntry> toolsTable;
 
 	
 	@SuppressWarnings("unchecked")
 	public ToolsEditorView(ObservableList<BaseTool> tools, ObjectProperty<KeyWordDatabase> kwdb) {
 		this.kwdb = kwdb;
-		this.tools = tools;
 		
 		setSpacing(10);
 		

@@ -79,15 +79,14 @@ public class View extends Application {
 		
 		loading = new ImageView();
 		loading.setPickOnBounds(true);
-		loading.setFitHeight(16);
-		loading.setFitWidth(179);
-		loading.setLayoutX(157);
+		loading.setFitWidth(100);
+		loading.setLayoutX(200);
 		loading.setLayoutY(164);
 		loading.preserveRatioProperty().set(true);
 		loading.setImage(new Image(View.class.getResourceAsStream("/img/294.GIF")));
 		
 		AnchorPane pane = new AnchorPane();
-		pane.setStyle("-fx-background-color: #2b579a");
+		pane.setStyle("-fx-background-color: #008B61");
 		pane.getChildren().addAll(loading, welcome, subtitle, copyright, close);
 		Scene scene = new Scene(pane);
 		
@@ -118,7 +117,7 @@ public class View extends Application {
         	primaryStage.initStyle(StageStyle.DECORATED);
     		primaryStage.setOnCloseRequest(r -> {
     			if (controller.kwdbHasChanged()) {
-    				Alert alert = new Alert(AlertType.CONFIRMATION);
+    				Alert alert = new Alert(AlertType.CONFIRMATION, null, ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
     				alert.setTitle("Save Changes");
     				alert.setHeaderText("The database has been changed!");
     				alert.setContentText("Do you want to save the changes?");
@@ -148,6 +147,8 @@ public class View extends Application {
     								fileNotFoundOrCorruptedAlert.showAndWait();
     							}
     						}
+    					} else if(button == ButtonType.CANCEL) {
+    						r.consume();
     					}
     				});
     			}

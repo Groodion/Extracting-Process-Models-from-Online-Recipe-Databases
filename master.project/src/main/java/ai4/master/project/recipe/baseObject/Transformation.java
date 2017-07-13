@@ -25,13 +25,13 @@ public class Transformation {
 	private Transformation(Transformation parent, KeyWordDatabase kwdb) {
 		this();
 		
-		if(product != null) {
+		if(parent.product != null) {
 			product = parent.product.clone(kwdb);
 		}
 		for(Ingredient ingredient : parent.mandatoryIngredients) {
 			mandatoryIngredients.add(ingredient.clone(kwdb));
 		}
-		if(tag != null) {
+		if(parent.tag != null) {
 			tag = parent.tag.clone(kwdb);
 		}
 		regexIds.addAll(parent.regexIds);

@@ -30,7 +30,6 @@ import javafx.scene.layout.VBox;
 public class IngredientsEditorView extends EditorView {
 	
 	private ObjectProperty<KeyWordDatabase> kwdb;
-	private ObservableList<BaseIngredient> ingredients;
 	private TableView<IngredientEntry> ingredientsTable;
 
 	
@@ -38,7 +37,6 @@ public class IngredientsEditorView extends EditorView {
 	public IngredientsEditorView(ObservableList<BaseIngredient> ingredients,
 			ObservableList<BaseIngredientGroup> ingredientGroups,
 			ObjectProperty<KeyWordDatabase> kwdb) {
-		this.ingredients = ingredients;
 		this.kwdb = kwdb;
 		
 		setSpacing(10);
@@ -189,10 +187,13 @@ public class IngredientsEditorView extends EditorView {
 		return kwdb.get().findIngredient(word) != null;
 	}
 	public void scrollTo(String word) {
-		scrollTo(kwdb.get().findIngredient(word));
-	}
-	public void scrollTo(BaseIngredient ingredient) {
-		ingredientsTable.scrollTo(ingredients.indexOf(ingredient));
+		for(IngredientEntry entry : ingredientsTable.getItems()) {
+			if(entry.getName().equals(word) || entry.getSynonyms().contains(word)) {
+				ingredientsTable.scrollTo(entry);
+				ingredientsTable.getSelectionModel().select(entry);
+				break;
+			}
+		}
 	}
 
 	private class SynonymsCell extends TableCell<IngredientEntry, ObservableList<String>> { 

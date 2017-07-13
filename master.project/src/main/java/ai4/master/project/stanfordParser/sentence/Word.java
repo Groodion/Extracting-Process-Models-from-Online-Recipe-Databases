@@ -388,8 +388,10 @@ public class Word extends PartialObject<Word> {
 		case VVFIN:
 		case VVIMP:
 		case VVIZU:
+		case VVPP:
 			role = Role.ACTION;
 			cookingAction = kwdb.findCookingAction(stem(getText()));
+			System.out.println(getText());
 		case VAFIN:
 		case VAIMP:
 		case VAINF:
@@ -397,9 +399,8 @@ public class Word extends PartialObject<Word> {
 		case VMFIN:
 		case VMINF:
 		case VMPP:
-		case VVPP:
 			isVerb = true;
-			//System.out.println(getText() + " " + getPos());
+			System.out.println(getText() + " " + getPos());
 			break;
 		case XY:
 			break;
