@@ -18,12 +18,9 @@ import org.camunda.bpm.model.bpmn.instance.Process;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.*;
 import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
 import org.camunda.bpm.model.bpmn.instance.di.Waypoint;
-import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -38,6 +35,7 @@ public class ProcessModelerImpl implements ProcessModeler {
     List<SequenceFlow> flows = new ArrayList<>();
     List<ParallelGateway> gates = new ArrayList<>();
     List<DataObjectReference> dataObjects = new ArrayList<>();
+    Map<BoundaryEvent, CookingEvent> timerEvents = new HashMap<>();
     StartEvent startEvent = null;
     EndEvent endEvent = null;
     Process process = null;
@@ -315,6 +313,10 @@ public class ProcessModelerImpl implements ProcessModeler {
                 if(!isForLayout) {
                     for (CookingEvent event : events) {
                         userTask.builder().boundaryEvent().timerWithDuration(event.getText());
+
+                        BoundaryEvent boundaryEvent = createElement(process,createIdOf("timer_"+event.getText()),event.getText(),BoundaryEvent.class,plane,0,0,30,30,true);
+                        boundaryEvent.setAttachedTo(userTask);
+                        timerEvents.put(boundaryEvent,event);
                     }
                     System.out.println("Node " + node.getData().getText() + " parent size: " + node.getParent().getChildren().size());
                     incXby(150);
@@ -349,7 +351,6 @@ public class ProcessModelerImpl implements ProcessModeler {
     }
 
     private DataInputAssociation createDataAssociation(Process process, DataObjectReference dataObjectReference, UserTask userTask, BpmnPlane plane){
-        // TODO:
         String identifier = dataObjectReference.getId() + "-" + userTask.getId();
 
         DataInputAssociation dataInputAssociation = modelInstance.newInstance(DataInputAssociation.class);
@@ -364,7 +365,9 @@ public class ProcessModelerImpl implements ProcessModeler {
         dataInputAssociation.addChildElement(targetRef);
         dataInputAssociation.addChildElement(sourceRef);
         userTask.getDataInputAssociations().add(dataInputAssociation);
-        return null;
+
+        // TODO Set DataInpuTassociation tasks in Layouter
+        return dataInputAssociation;
     }
     /*
     Returns the by default created id for flows to check for their existence already because we cannot add dupplicates.
