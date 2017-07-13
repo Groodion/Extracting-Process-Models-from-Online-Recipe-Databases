@@ -11,11 +11,14 @@ import ai4.master.project.tree.Tree;
 import ai4.master.project.tree.TreeTraverser;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.impl.instance.SourceRef;
+import org.camunda.bpm.model.bpmn.impl.instance.TargetRef;
 import org.camunda.bpm.model.bpmn.instance.*;
 import org.camunda.bpm.model.bpmn.instance.Process;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.*;
 import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
 import org.camunda.bpm.model.bpmn.instance.di.Waypoint;
+import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -322,7 +325,7 @@ public class ProcessModelerImpl implements ProcessModeler {
                         //userTask.builder().camundaInputParameter("Ingredient", ingredient.getName());
                         DataObjectReference  dor= createDataObject(process, createIdOf("dataObject_I"+i+createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getCompleteName(), plane, true);
                         dataObjects.add(dor);
-                        DataInputAssociation dia = createDataAssociation(process, dor, userTask, plane);
+                        //DataInputAssociation dia = createDataAssociation(process, dor, userTask, plane);
                         i++;
                     }
 
@@ -346,10 +349,23 @@ public class ProcessModelerImpl implements ProcessModeler {
     }
 
     private DataInputAssociation createDataAssociation(Process process, DataObjectReference dataObjectReference, UserTask userTask, BpmnPlane plane){
-        // TODO
+        // TODO:
+        String identifier = dataObjectReference.getId() + "-" + userTask.getId();
+
+        DataInputAssociation dataInputAssociation = modelInstance.newInstance(DataInputAssociation.class);
+        dataInputAssociation.setAttributeValue("id", identifier, true);
+
+        TargetRef targetRef = modelInstance.newInstance(TargetRef.class);
+        targetRef.setTextContent(userTask.getId());
+
+        SourceRef sourceRef = modelInstance.newInstance(SourceRef.class);
+        sourceRef.setTextContent(dataObjectReference.getId());
+
+        dataInputAssociation.addChildElement(targetRef);
+        dataInputAssociation.addChildElement(sourceRef);
+        userTask.getDataInputAssociations().add(dataInputAssociation);
         return null;
     }
-
     /*
     Returns the by default created id for flows to check for their existence already because we cannot add dupplicates.
      */
