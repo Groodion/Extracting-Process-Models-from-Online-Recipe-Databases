@@ -36,6 +36,7 @@ public class ProcessModelerImpl implements ProcessModeler {
     List<ParallelGateway> gates = new ArrayList<>();
     List<DataObjectReference> dataObjects = new ArrayList<>();
     Map<BoundaryEvent, CookingEvent> timerEvents = new HashMap<>();
+    List<BoundaryEvent> timers = new ArrayList<>();
     StartEvent startEvent = null;
     EndEvent endEvent = null;
     Process process = null;
@@ -118,8 +119,6 @@ public class ProcessModelerImpl implements ProcessModeler {
     Creates synchronisation gatter for the parallel gateways.
      */
     private void createSynchronisationGatter(Process process, BpmnPlane plane) {
-
-
         for (UserTask userTask : userTasks) {
             Collection<SequenceFlow> incomming = userTask.getIncoming();
             if (incomming.size() < 2) {
@@ -275,6 +274,7 @@ public class ProcessModelerImpl implements ProcessModeler {
                     BoundaryEvent boundaryEvent = createElement(process, createIdOf("timer_" + event.getText()), event.getText(), BoundaryEvent.class, plane, 30, 30, true);
                     boundaryEvent.setAttachedTo(userTask);
                     timerEvents.put(boundaryEvent, event);
+                    timers.add(boundaryEvent);
                 }
 
                 /* Iterate over the Input parameter ( = ingredients) and output parameter ( = products) and add them */

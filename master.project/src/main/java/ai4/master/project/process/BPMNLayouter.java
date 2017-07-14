@@ -1,5 +1,7 @@
 package ai4.master.project.process;
 
+import ai4.master.project.recipe.CookingEvent;
+import ai4.master.project.recipe.Position;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.*;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnLabel;
@@ -48,7 +50,18 @@ public class BPMNLayouter {
         }
     }
     private void layoutBoundaryEvents(){
-        // TODO
+        for(BoundaryEvent timer : processModeler.timers){
+            CookingEvent cookingEvent = processModeler.timerEvents.get(timer);
+            UserTask attachedTo = (UserTask) timer.getAttachedTo();
+
+            if(cookingEvent.getPos() == Position.BEFORE){
+                timer.getDiagramElement().getBounds().setX(attachedTo.getDiagramElement().getBounds().getX());
+                timer.getDiagramElement().getBounds().setY(attachedTo.getDiagramElement().getBounds().getY() + attachedTo.getDiagramElement().getBounds().getHeight()/2);
+            }else if(cookingEvent.getPos() == Position.AFTER){
+                timer.getDiagramElement().getBounds().setX(attachedTo.getDiagramElement().getBounds().getX()+ attachedTo.getDiagramElement().getBounds().getWidth());
+                timer.getDiagramElement().getBounds().setY(attachedTo.getDiagramElement().getBounds().getY() + attachedTo.getDiagramElement().getBounds().getHeight()/2);
+            }
+        }
     }
     private void setDataObjects(){
         int oldX = currentX;
@@ -86,8 +99,10 @@ public class BPMNLayouter {
             FlowNode target = flow.getTarget();
             commingFlows.addAll(target.getOutgoing());
             BpmnShape targetShape = (BpmnShape) target.getDiagramElement();
-            targetShape.getBounds().setX(currentX);
-            targetShape.getBounds().setY(currentY);
+            BpmnShape originShape = (BpmnShape) origin.getDiagramElement();
+
+            targetShape.getBounds().setX(originShape.getBounds().getX()+200);
+            targetShape.getBounds().setY(originShape.getBounds().getY());
             BpmnLabel bpmnLabel = targetShape.getBpmnLabel();
             if(bpmnLabel != null) {
                 bpmnLabel.getBounds().setX(currentX);
