@@ -1,21 +1,10 @@
 package ai4.master.project.process;
 
-import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.ProcessType;
-import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
 import org.camunda.bpm.model.bpmn.instance.*;
-import org.camunda.bpm.model.bpmn.instance.Process;
-import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnDiagram;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnLabel;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
-import org.camunda.bpm.model.bpmn.instance.di.DiagramElement;
 import org.camunda.bpm.model.bpmn.instance.di.Waypoint;
-import org.camunda.bpm.model.xml.ModelInstance;
-import org.camunda.bpm.model.xml.instance.DomElement;
-import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.camunda.bpm.model.xml.type.ModelElementType;
-import org.intellij.lang.annotations.Flow;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,12 +34,19 @@ public class BPMNLayouter {
     public void layout(){
         clearBoundaries();
         setDataObjects();
+        setGateSize();
         parse();
         layoutBoundaryEvents();
     }
 
 
 
+    private void setGateSize(){
+        for(ParallelGateway gateway : processModeler.gates){
+            gateway.getDiagramElement().getBounds().setHeight(30);
+            gateway.getDiagramElement().getBounds().setWidth(30);
+        }
+    }
     private void layoutBoundaryEvents(){
         // TODO
     }
@@ -85,15 +81,20 @@ public class BPMNLayouter {
         List<SequenceFlow> commingFlows = new ArrayList<>();
         for(SequenceFlow flow : flows){
             flow.getDiagramElement().getWaypoints().clear();
-            flow.getDiagramElement().getWaypoints().add(createWaypoint(origin, FlowDirection.Source));
+            flow.getDiagramElement().getWaypoints().add(createWaypoint(origin));
 
             FlowNode target = flow.getTarget();
             commingFlows.addAll(target.getOutgoing());
             BpmnShape targetShape = (BpmnShape) target.getDiagramElement();
             targetShape.getBounds().setX(currentX);
             targetShape.getBounds().setY(currentY);
+            BpmnLabel bpmnLabel = targetShape.getBpmnLabel();
+            if(bpmnLabel != null) {
+                bpmnLabel.getBounds().setX(currentX);
+                bpmnLabel.getBounds().setY(currentY);
+            }
             currentX += 200;
-            flow.getDiagramElement().getWaypoints().add(createWaypoint(target, FlowDirection.Target));
+            flow.getDiagramElement().getWaypoints().add(createWaypoint(target));
         }
         if(commingFlows.size() > 1){
             //Here we are after a parallel gateway
@@ -112,7 +113,7 @@ public class BPMNLayouter {
             commingFlows.add(new ArrayList<>());
             flow.getDiagramElement().getWaypoints().clear();
 
-            flow.getDiagramElement().getWaypoints().add(createWaypoint(flow.getSource(),FlowDirection.Source));
+            flow.getDiagramElement().getWaypoints().add(createWaypoint(flow.getSource()));
 
             FlowNode target = flow.getTarget();
            commingFlows.get(i).addAll(target.getOutgoing());
@@ -120,8 +121,13 @@ public class BPMNLayouter {
             BpmnShape targetShape = (BpmnShape) target.getDiagramElement();
             targetShape.getBounds().setX(currentX);
             targetShape.getBounds().setY(currentY);
+            BpmnLabel bpmnLabel = targetShape.getBpmnLabel();
+            if(bpmnLabel != null) {
+                bpmnLabel.getBounds().setX(currentX);
+                bpmnLabel.getBounds().setY(currentY);
+            }
             currentY += 200;
-            flow.getDiagramElement().getWaypoints().add(createWaypoint(target, FlowDirection.Target));
+            flow.getDiagramElement().getWaypoints().add(createWaypoint(target));
         }
         currentY = baseY;
         currentX += 200;
@@ -137,14 +143,7 @@ public class BPMNLayouter {
         }
     }
 
-
-
-
-    enum FlowDirection{Source, Target};
-    enum Instance{StartEvent, EndEvenrt, ParallelGateway, UserTask, BoundaryTask, Undefined};
-
-
-    private Waypoint createWaypoint(FlowNode origin, FlowDirection direction){
+    private Waypoint createWaypoint(FlowNode origin){
         double shapeHeight = 1;
         double shapeWidth = 1;
         BpmnShape originShape = (BpmnShape) origin.getDiagramElement();
@@ -155,7 +154,7 @@ public class BPMNLayouter {
         w.setX(originShape.getBounds().getX() + shapeWidth/2);
 
         return w;
-    }
+    };
 
     private Instance flowNodeIs(FlowNode flowNode){
         if(flowNode instanceof StartEvent){
@@ -174,7 +173,7 @@ public class BPMNLayouter {
             return Instance.BoundaryTask;
         }
         return Instance.Undefined;
-    }
+    };
 
     private  List<Waypoint> createWaypoints(UserTask a, UserTask b){
         List<Waypoint> list = new ArrayList<>();
@@ -195,6 +194,7 @@ public class BPMNLayouter {
         list.add(w2);
         return list;
     }
+
     private void clearBoundaries(){
         System.out.println("Clearing boundaries");
         for(SequenceFlow flow : processModeler.flows){
@@ -220,4 +220,7 @@ public class BPMNLayouter {
 
 
     }
+
+enum FlowDirection{Source, Target}
+enum Instance{StartEvent, EndEvenrt, ParallelGateway, UserTask, BoundaryTask, Undefined}
 }
