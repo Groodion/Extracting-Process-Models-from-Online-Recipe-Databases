@@ -133,6 +133,7 @@ public class ProcessModelerImpl implements ProcessModeler {
 
             for (SequenceFlow sequenceFlow : incomming) {
                 sequenceFlow.setTarget(parallelGateway);
+                parallelGateway.getIncoming().add(sequenceFlow);
             }
             userTask.getIncoming().clear();
             SequenceFlow sequenceFlow = createSequenceFlow(process, parallelGateway, userTask, plane);
@@ -151,6 +152,7 @@ public class ProcessModelerImpl implements ProcessModeler {
 
             for (SequenceFlow sequenceFlow : incomming) {
                 sequenceFlow.setTarget(parallelGateway);
+                parallelGateway.getIncoming().add(sequenceFlow);
             }
             endEvent.getIncoming().clear();
             SequenceFlow sequenceFlow = createSequenceFlow(process, parallelGateway, endEvent, plane);

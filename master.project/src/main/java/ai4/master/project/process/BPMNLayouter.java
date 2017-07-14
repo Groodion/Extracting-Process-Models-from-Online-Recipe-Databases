@@ -45,12 +45,13 @@ public class BPMNLayouter {
 
     private void connectSyncGates(){
         for(ParallelGateway gateway : processModeler.gates){
-            if(!gateway.getId().substring(0,4).equals("sync")){
-                System.out.println(gateway.getId() + " doesnt equal sync");
-                continue;}
+            if(!gateway.getId().substring(0,4).equals("sync")){continue;}
 
             Collection<SequenceFlow> incomming = gateway.getIncoming();
+            System.out.println("Incomming size for sync gateway: " + incomming.size());
             for(SequenceFlow in : incomming){
+                Waypoint wp = createWaypoint(in.getTarget());
+                System.out.println("Point from Sync to: " + wp.getX() + ", " + wp.getY());
                 in.getDiagramElement().getWaypoints().add(createWaypoint(in.getTarget()));
             }
         }
@@ -230,10 +231,6 @@ public class BPMNLayouter {
     }
 
     private void clearBoundaries(){
-        System.out.println("Clearing boundaries");
-        for(SequenceFlow flow : processModeler.flows){
-            //flow.getDiagramElement().getWaypoints().clear();
-        }
         for(UserTask userTask : processModeler.userTasks){
             if(userTask != null){
                  userTask.getDiagramElement().getBounds().setY(900);
