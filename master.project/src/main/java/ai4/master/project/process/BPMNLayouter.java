@@ -39,9 +39,22 @@ public class BPMNLayouter {
         setGateSize();
         parse();
         layoutBoundaryEvents();
+        connectSyncGates();
     }
 
 
+    private void connectSyncGates(){
+        for(ParallelGateway gateway : processModeler.gates){
+            if(!gateway.getId().substring(0,4).equals("sync")){
+                System.out.println(gateway.getId() + " doesnt equal sync");
+                continue;}
+
+            Collection<SequenceFlow> incomming = gateway.getIncoming();
+            for(SequenceFlow in : incomming){
+                in.getDiagramElement().getWaypoints().add(createWaypoint(in.getTarget()));
+            }
+        }
+    }
 
     private void setGateSize(){
         for(ParallelGateway gateway : processModeler.gates){
@@ -60,6 +73,12 @@ public class BPMNLayouter {
             }else if(cookingEvent.getPos() == Position.AFTER){
                 timer.getDiagramElement().getBounds().setX(attachedTo.getDiagramElement().getBounds().getX()+ attachedTo.getDiagramElement().getBounds().getWidth());
                 timer.getDiagramElement().getBounds().setY(attachedTo.getDiagramElement().getBounds().getY() + attachedTo.getDiagramElement().getBounds().getHeight()/2);
+            }
+
+            BpmnLabel label = timer.getDiagramElement().getBpmnLabel();
+            if(label != null){
+                label.getBounds().setX(timer.getDiagramElement().getBounds().getX()+timer.getDiagramElement().getBounds().getHeight());
+                label.getBounds().setY(timer.getDiagramElement().getBounds().getY() + timer.getDiagramElement().getBounds().getHeight());
             }
         }
     }
