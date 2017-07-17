@@ -9,6 +9,8 @@ import ai4.master.project.recipe.object.Tool;
 import ai4.master.project.tree.Node;
 import ai4.master.project.tree.Tree;
 import ai4.master.project.tree.TreeTraverser;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.impl.instance.SourceRef;
@@ -37,13 +39,19 @@ public class ProcessModelerImpl implements ProcessModeler {
     List<DataObjectReference> dataObjects = new ArrayList<>();
     Map<BoundaryEvent, CookingEvent> timerEvents = new HashMap<>();
     List<BoundaryEvent> timers = new ArrayList<>();
+    List<DataInputAssociation> dataInputAssociations = new ArrayList<>();
     StartEvent startEvent = null;
     EndEvent endEvent = null;
     Process process = null;
+
+
+    /*
+    Just for process bar reasions
+     */
     int userTaskHeight = 80;
     int userTaskWidth = 150;
     int i = 0;
-
+    private DoubleProperty progress;
     private String fileName = "test";
     /*
     If a node has more than one children we need a parallel gate. So maybe we could call a method that creates everything starting from there (the gate) on?
@@ -53,12 +61,14 @@ public class ProcessModelerImpl implements ProcessModeler {
     private int doWidth = 36;
 
     public void createBpmn(Recipe recipe) {
+        progress = new SimpleDoubleProperty();
         convertToProcess(recipe);
     }
 
     private BpmnModelInstance convertToProcess(Recipe recipe) {
 
         Tree<Step> t = new RecipeToTreeConverter().createTree(recipe);
+        progress.setValue(0.25);
         List<Node<Step>> nodes = new TreeTraverser<Step>(t).preOrder();
         /** INITIALIZATION OF IMPORTANT BPMN DEFINTIONS START HERE */
         modelInstance = Bpmn.createEmptyModel();
@@ -77,14 +87,15 @@ public class ProcessModelerImpl implements ProcessModeler {
         diagram.setBpmnPlane(plane);
         /** INITIALIZATION END **/
 
+        progress.setValue(0.30);
         startEvent = createElement(process, "start", "Start", StartEvent.class, plane, 50, 50, true);
         //First we create the user tasks for all nodes.
         createUserTasks(nodes, process, plane);
-
+        progress.setValue(0.45);
         // We connect every node to every child node.
         // In case there are more than 1 children, we put a parallel gateway in between.
         createConnectionToChildren(nodes, process, plane);
-
+        progress.setValue(0.60);
         // The first node is an empty root node. Every children from there has to be connected to the start node.
         createStartEventToConnections(t, startEvent, process, plane);
 
@@ -92,24 +103,24 @@ public class ProcessModelerImpl implements ProcessModeler {
 
         //Every node without children belongs to the endEvent
         createNodeToEndEventConnection(nodes, endEvent, process, plane);
-
+        progress.setValue(0.75);
         // Create a sync gatter at the end
         createSynchronisationGatter(process, plane);
         // validate and write model to file
 
         Bpmn.validateModel(modelInstance);
         createXml();
-
+        progress.setValue(0.80);
         this.setFileName(this.fileName + "_layouted");
         definitions.addChildElement(diagram);
         BPMNLayouter layouter = new BPMNLayouter(this, modelInstance);
         layouter.layout();
-
+        progress.setValue(0.98);
 
         // validate and write model to file
         Bpmn.validateModel(modelInstance);
         createXml();
-
+        progress.setValue(1.00);
 
         return modelInstance;
 
@@ -286,6 +297,7 @@ public class ProcessModelerImpl implements ProcessModeler {
                     DataObjectReference dor = createDataObject(process, createIdOf("dataObject_I" + i + createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getCompleteName(), plane, true);
                     dataObjects.add(dor);
                     DataInputAssociation dia = createDataAssociation(process, dor, userTask, plane);
+                    dataInputAssociations.add(dia);
                     i++;
                 }
 
@@ -295,6 +307,7 @@ public class ProcessModelerImpl implements ProcessModeler {
                     DataObjectReference dor = createDataObject(process, createIdOf("dataObject_I" + i + createIdOf(tool.getName()) + createIdOf(node.getData().getText())), tool.getName(), plane, true);
                     dataObjects.add(dor);
                     DataInputAssociation dia = createDataAssociation(process, dor, userTask, plane);
+                    dataInputAssociations.add(dia);
                 }
                 userTasks.add(userTask);
 
@@ -304,25 +317,6 @@ public class ProcessModelerImpl implements ProcessModeler {
     }
 
 
-    private DataInputAssociation createDataAssociation(Process process, DataObjectReference dataObjectReference, UserTask userTask, BpmnPlane plane) {
-        String identifier = dataObjectReference.getId() + "-" + userTask.getId();
-
-        DataInputAssociation dataInputAssociation = modelInstance.newInstance(DataInputAssociation.class);
-        dataInputAssociation.setAttributeValue("id", identifier, true);
-
-        TargetRef targetRef = modelInstance.newInstance(TargetRef.class);
-        targetRef.setTextContent(userTask.getId());
-
-        SourceRef sourceRef = modelInstance.newInstance(SourceRef.class);
-        sourceRef.setTextContent(dataObjectReference.getId());
-
-        dataInputAssociation.addChildElement(targetRef);
-        dataInputAssociation.addChildElement(sourceRef);
-        userTask.getDataInputAssociations().add(dataInputAssociation);
-
-        // TODO Set DataInpuTassociation tasks in Layouter
-        return dataInputAssociation;
-    }
 
     /*
     Returns the by default created id for flows to check for their existence already because we cannot add dupplicates.
@@ -346,9 +340,7 @@ public class ProcessModelerImpl implements ProcessModeler {
     }
 
 
-    /*
-    Creates a dataObject.
-     */
+
 
     /*
     Returns true if a given userTaskID exists already.
@@ -376,7 +368,9 @@ public class ProcessModelerImpl implements ProcessModeler {
         }
         return null;
     }
-
+    /*
+      Creates a dataObject.
+       */
     private DataObjectReference createDataObject(BpmnModelElementInstance bpmnModelElementInstance, String id, String name, BpmnPlane plane, boolean withLabel) {
         DataObjectReference dataObject = modelInstance.newInstance(DataObjectReference.class);
         dataObject.setAttributeValue("id", id, true);
@@ -408,6 +402,45 @@ public class ProcessModelerImpl implements ProcessModeler {
 
 
         return dataObject;
+    }
+
+    /*
+    Creates a DataInputAssociation to a UserTask
+     */
+    private DataInputAssociation createDataAssociation(Process process, DataObjectReference dataObjectReference, UserTask userTask, BpmnPlane plane) {
+        String identifier = dataObjectReference.getId() + "-" + userTask.getId();
+
+        DataInputAssociation dataInputAssociation = modelInstance.newInstance(DataInputAssociation.class);
+        dataInputAssociation.setAttributeValue("id", identifier, true);
+
+        TargetRef targetRef = modelInstance.newInstance(TargetRef.class);
+        targetRef.setTextContent(userTask.getId());
+
+        SourceRef sourceRef = modelInstance.newInstance(SourceRef.class);
+        sourceRef.setTextContent(dataObjectReference.getId());
+
+        dataInputAssociation.addChildElement(targetRef);
+        dataInputAssociation.addChildElement(sourceRef);
+        userTask.getDataInputAssociations().add(dataInputAssociation);
+
+
+        /*BpmnEdge bpmnEdge = modelInstance.newInstance(BpmnEdge.class);
+        bpmnEdge.setBpmnElement(dataInputAssociation);
+
+        //Add two fake waypoints to be able to change them later. If you don't add them, there will be an error because a sequenceflow needs at least2.
+        Waypoint wp = modelInstance.newInstance(Waypoint.class);
+        wp.setX(2);
+        wp.setY(2);
+        bpmnEdge.addChildElement(wp);
+        Waypoint wp2 = modelInstance.newInstance(Waypoint.class);
+        wp.setX(1);
+        wp.setY(1);
+        bpmnEdge.addChildElement(wp2);
+
+        plane.addChildElement(bpmnEdge); */
+
+        // TODO Set DataInpuTassociation tasks in Layouter
+        return dataInputAssociation;
     }
 
     /*
@@ -518,6 +551,22 @@ public class ProcessModelerImpl implements ProcessModeler {
         xmlWriter.writeTo(Bpmn.convertToString(modelInstance));
     }
 
+
+    /*
+    Returns the XML
+     */
+    public String getXml(){
+        Bpmn.validateModel(modelInstance);
+        return Bpmn.convertToString(modelInstance);
+    }
+    @Override
+    public DoubleProperty getProgress(){
+        if(this.progress == null){
+            progress = new SimpleDoubleProperty();
+            progress.setValue(0.0);
+        }
+        return this.progress;
+    }
     public void setFileName(String name) {
         this.fileName = name;
     }

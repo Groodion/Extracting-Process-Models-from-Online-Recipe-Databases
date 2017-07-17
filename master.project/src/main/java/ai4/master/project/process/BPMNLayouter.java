@@ -23,6 +23,7 @@ public class BPMNLayouter {
     private int currentX = 0;
     private int currentY = 250;
 
+    private int incrementX = 300;
     private int baseY = 250;
     private int baseX = 0;
 
@@ -42,18 +43,27 @@ public class BPMNLayouter {
         connectSyncGates();
     }
 
-
+//Maybe set sync-positions
     private void connectSyncGates(){
         for(ParallelGateway gateway : processModeler.gates){
             if(!gateway.getId().substring(0,4).equals("sync")){continue;}
 
             Collection<SequenceFlow> incomming = gateway.getIncoming();
             System.out.println("Incomming size for sync gateway: " + incomming.size());
+            double maxX = gateway.getDiagramElement().getBounds().getX(); //cannot be smaller..
             for(SequenceFlow in : incomming){
-                Waypoint wp = createWaypoint(in.getTarget());
-                System.out.println("Point from Sync to: " + wp.getX() + ", " + wp.getY());
+                BpmnShape taskShape = (BpmnShape) in.getSource().getDiagramElement();
+                System.out.println("Current shape x: " + taskShape.getBounds().getX());
+                if(taskShape.getBounds().getX() > maxX){
+                    maxX = taskShape.getBounds().getX();
+                }
                 in.getDiagramElement().getWaypoints().add(createWaypoint(in.getTarget()));
             }
+            System.out.println("Setting from: " + gateway.getDiagramElement().getBounds().getX() + " to " + maxX);
+            // Doesn't behave like intended. First focus on the other important aspects
+            //gateway.getDiagramElement().getBounds().setX(maxX);
+
+
         }
     }
 
@@ -95,7 +105,7 @@ public class BPMNLayouter {
             label.getBounds().setY(bpmnShape.getBounds().getHeight()+20);
 
 
-            currentX += 200;
+            currentX += incrementX;
 
         }
 
@@ -105,7 +115,7 @@ public class BPMNLayouter {
             processModeler.startEvent.getDiagramElement().getBounds().setX(currentX);
             processModeler.startEvent.getDiagramElement().getBounds().setY(currentY);
 
-            currentX += 200;
+            currentX += incrementX;
             setLayout(processModeler.startEvent, processModeler.startEvent.getOutgoing());
     }
 
@@ -128,7 +138,7 @@ public class BPMNLayouter {
                 bpmnLabel.getBounds().setX(currentX);
                 bpmnLabel.getBounds().setY(currentY);
             }
-            currentX += 200;
+            currentX += incrementX;
             flow.getDiagramElement().getWaypoints().add(createWaypoint(target));
         }
         if(commingFlows.size() > 1){
@@ -161,11 +171,11 @@ public class BPMNLayouter {
                 bpmnLabel.getBounds().setX(currentX);
                 bpmnLabel.getBounds().setY(currentY);
             }
-            currentY += 200;
+            currentY += incrementX;
             flow.getDiagramElement().getWaypoints().add(createWaypoint(target));
         }
         currentY = baseY;
-        currentX += 200;
+        currentX += incrementX;
         for(List<SequenceFlow> l : commingFlows){
             if(l.size() > 1){
                 // Parallel again

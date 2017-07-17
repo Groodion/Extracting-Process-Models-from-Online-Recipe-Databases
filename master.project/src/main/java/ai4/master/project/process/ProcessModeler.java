@@ -1,7 +1,8 @@
 package ai4.master.project.process;
 
 import ai4.master.project.recipe.Recipe;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 
 
 /**
@@ -18,4 +19,13 @@ public interface ProcessModeler {
     void createBpmn(Recipe recipe);
 
     void setFileName(String name);
+
+
+    String getXml();
+
+    default DoubleProperty getProgress(){
+       DoubleProperty d = new SimpleDoubleProperty();
+       d.setValue(0.0);
+       return d;
+    }
 }
