@@ -23,7 +23,6 @@ public class TreeTraverser<T> {
 
     public void activatePrint(){ print = true;}
     public void deactivatePrint() {print = false;}
-    // TODO as far as I think we need a levelwise traversing. This needs to be implemented probably. But we still need to check for this ..
     /**
      * Traverses the tree starting from root in preOrder direction
      * @return the nodes in preOrder ordering

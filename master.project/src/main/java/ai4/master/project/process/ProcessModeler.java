@@ -8,6 +8,8 @@ import javafx.beans.property.SimpleDoubleProperty;
 /**
  * Created by René Bärnreuther on 15.05.2017.
  * A modeler that creates a BPMN Model from a recipe has to implement this interface.
+ *
+ * We use this interface to be able to (theoretically) use different BPMN-Frameworks.
  */
 public interface ProcessModeler {
 
@@ -18,11 +20,23 @@ public interface ProcessModeler {
      */
     void createBpmn(Recipe recipe);
 
+    /**
+     * Sets the filename of the file to create
+     * @param name
+     */
     void setFileName(String name);
 
 
+    /**
+     *
+     * @return the BPMN-Model as a xml-String.
+     */
     String getXml();
 
+    /**
+     *
+     * @return the current progress of the conversation.
+     */
     default DoubleProperty getProgress(){
        DoubleProperty d = new SimpleDoubleProperty();
        d.setValue(0.0);

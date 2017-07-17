@@ -63,7 +63,7 @@ public class ParserTest {
 
                 //Now steps are saved in recipe
                 ProcessModeler processModeler = new ProcessModelerImpl();
-                processModeler.setFileName(currentRecipe + "toBpmn");
+        		processModeler.setFileName(ids[i]);
                 processModeler.createBpmn(recipe);
             } catch (Exception ex) {
                 System.err.println("Could not parse Recipe with id: " + currentRecipe);

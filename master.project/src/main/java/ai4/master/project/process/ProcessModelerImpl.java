@@ -22,6 +22,7 @@ import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
 import org.camunda.bpm.model.bpmn.instance.di.Waypoint;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.*;
 
 
@@ -31,28 +32,30 @@ import java.util.*;
 public class ProcessModelerImpl implements ProcessModeler {
 
 
-    BpmnModelInstance modelInstance;
+    private BpmnModelInstance modelInstance;
 
-    List<UserTask> userTasks = new ArrayList<>();
-    List<SequenceFlow> flows = new ArrayList<>();
-    List<ParallelGateway> gates = new ArrayList<>();
-    List<DataObjectReference> dataObjects = new ArrayList<>();
-    Map<BoundaryEvent, CookingEvent> timerEvents = new HashMap<>();
-    List<BoundaryEvent> timers = new ArrayList<>();
-    List<DataInputAssociation> dataInputAssociations = new ArrayList<>();
-    StartEvent startEvent = null;
-    EndEvent endEvent = null;
-    Process process = null;
-
+    private List<UserTask> userTasks = new ArrayList<>();
+    private List<SequenceFlow> flows = new ArrayList<>();
+    private List<ParallelGateway> gates = new ArrayList<>();
+    private List<DataObjectReference> dataObjects = new ArrayList<>();
+    private Map<BoundaryEvent, CookingEvent> timerEvents = new HashMap<>();
+    private List<BoundaryEvent> timers = new ArrayList<>();
+    private List<DataInputAssociation> dataInputAssociations = new ArrayList<>();
+    private StartEvent startEvent = null;
+    private EndEvent endEvent = null;
+    private Process process = null;
+    private File file = null;
 
     /*
     Just for process bar reasions
      */
-    int userTaskHeight = 80;
-    int userTaskWidth = 150;
-    int i = 0;
     private DoubleProperty progress;
+
+    private int userTaskHeight = 80;
+    private int userTaskWidth = 150;
+    private int i = 0;
     private String fileName = "test";
+
     /*
     If a node has more than one children we need a parallel gate. So maybe we could call a method that creates everything starting from there (the gate) on?
     We give the method the "subtree" and create the BPMN Model from there on and return and append it maybe.
@@ -65,6 +68,9 @@ public class ProcessModelerImpl implements ProcessModeler {
         convertToProcess(recipe);
     }
 
+    /*
+    Converts the Recipe to the process
+     */
     private BpmnModelInstance convertToProcess(Recipe recipe) {
 
         Tree<Step> t = new RecipeToTreeConverter().createTree(recipe);
@@ -113,7 +119,7 @@ public class ProcessModelerImpl implements ProcessModeler {
         progress.setValue(0.80);
         this.setFileName(this.fileName + "_layouted");
         definitions.addChildElement(diagram);
-        BPMNLayouter layouter = new BPMNLayouter(this, modelInstance);
+        BPMNLayouter layouter = new BPMNLayouter(this);
         layouter.layout();
         progress.setValue(0.98);
 
@@ -286,6 +292,7 @@ public class ProcessModelerImpl implements ProcessModeler {
                 for (CookingEvent event : events) {
                     BoundaryEvent boundaryEvent = createElement(process, createIdOf("timer_" + event.getText()), event.getText(), BoundaryEvent.class, plane, 30, 30, true);
                     boundaryEvent.setAttachedTo(userTask);
+                    boundaryEvent.builder().timerWithDuration(event.getText());
                     timerEvents.put(boundaryEvent, event);
                     timers.add(boundaryEvent);
                 }
@@ -316,8 +323,6 @@ public class ProcessModelerImpl implements ProcessModeler {
 
     }
 
-
-
     /*
     Returns the by default created id for flows to check for their existence already because we cannot add dupplicates.
      */
@@ -338,9 +343,6 @@ public class ProcessModelerImpl implements ProcessModeler {
         }
         return false;
     }
-
-
-
 
     /*
     Returns true if a given userTaskID exists already.
@@ -368,6 +370,7 @@ public class ProcessModelerImpl implements ProcessModeler {
         }
         return null;
     }
+
     /*
       Creates a dataObject.
        */
@@ -479,6 +482,9 @@ public class ProcessModelerImpl implements ProcessModeler {
         return element;
     }
 
+    /*
+    Creates a Sequence Flow
+     */
     private SequenceFlow createSequenceFlow(org.camunda.bpm.model.bpmn.instance.Process process, FlowNode from, FlowNode to, BpmnPlane plane) {
         String identifier = from.getId() + "-" + to.getId();
 
@@ -506,7 +512,6 @@ public class ProcessModelerImpl implements ProcessModeler {
 
         return sequenceFlow;
     }
-
 
     /*
     Checks for a given sequence. Returns true if the sequence exists alredy.
@@ -541,8 +546,6 @@ public class ProcessModelerImpl implements ProcessModeler {
 
     /**
      * Creates a XML-Instance of the given model
-     *
-     * @return the model in bpmn xml format
      */
     public void createXml() {
         Bpmn.validateModel(modelInstance);
@@ -551,7 +554,6 @@ public class ProcessModelerImpl implements ProcessModeler {
         xmlWriter.writeTo(Bpmn.convertToString(modelInstance));
     }
 
-
     /*
     Returns the XML
      */
@@ -559,6 +561,10 @@ public class ProcessModelerImpl implements ProcessModeler {
         Bpmn.validateModel(modelInstance);
         return Bpmn.convertToString(modelInstance);
     }
+
+    /**
+     * @return the current progress of the conversation.
+     */
     @Override
     public DoubleProperty getProgress(){
         if(this.progress == null){
@@ -567,7 +573,163 @@ public class ProcessModelerImpl implements ProcessModeler {
         }
         return this.progress;
     }
+
+    /**
+     * @param name the filename to be given to the file
+     */
     public void setFileName(String name) {
         this.fileName = name;
+    }
+
+    /*
+    Sets the current file.
+     */
+    public void setFile(File file){
+        this.file = file;
+    }
+
+    /*
+    Creates a xml-file from the currently saved file.
+     */
+    public void createXmlFromFile(){
+        Bpmn.validateModel(modelInstance);
+        XMLWriter xmlWriter = new XMLWriter(fileName);
+        xmlWriter.writeTo(file, getXml());
+    }
+
+    public BpmnModelInstance getModelInstance() {
+        return modelInstance;
+    }
+
+    public void setModelInstance(BpmnModelInstance modelInstance) {
+        this.modelInstance = modelInstance;
+    }
+
+    public List<UserTask> getUserTasks() {
+        return userTasks;
+    }
+
+    public void setUserTasks(List<UserTask> userTasks) {
+        this.userTasks = userTasks;
+    }
+
+    public List<SequenceFlow> getFlows() {
+        return flows;
+    }
+
+    public void setFlows(List<SequenceFlow> flows) {
+        this.flows = flows;
+    }
+
+    public List<ParallelGateway> getGates() {
+        return gates;
+    }
+
+    public void setGates(List<ParallelGateway> gates) {
+        this.gates = gates;
+    }
+
+    public List<DataObjectReference> getDataObjects() {
+        return dataObjects;
+    }
+
+    public void setDataObjects(List<DataObjectReference> dataObjects) {
+        this.dataObjects = dataObjects;
+    }
+
+    public Map<BoundaryEvent, CookingEvent> getTimerEvents() {
+        return timerEvents;
+    }
+
+    public void setTimerEvents(Map<BoundaryEvent, CookingEvent> timerEvents) {
+        this.timerEvents = timerEvents;
+    }
+
+    public List<BoundaryEvent> getTimers() {
+        return timers;
+    }
+
+    public void setTimers(List<BoundaryEvent> timers) {
+        this.timers = timers;
+    }
+
+    public List<DataInputAssociation> getDataInputAssociations() {
+        return dataInputAssociations;
+    }
+
+    public void setDataInputAssociations(List<DataInputAssociation> dataInputAssociations) {
+        this.dataInputAssociations = dataInputAssociations;
+    }
+
+    public StartEvent getStartEvent() {
+        return startEvent;
+    }
+
+    public void setStartEvent(StartEvent startEvent) {
+        this.startEvent = startEvent;
+    }
+
+    public EndEvent getEndEvent() {
+        return endEvent;
+    }
+
+    public void setEndEvent(EndEvent endEvent) {
+        this.endEvent = endEvent;
+    }
+
+    public Process getProcess() {
+        return process;
+    }
+
+    public void setProcess(Process process) {
+        this.process = process;
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public DoubleProperty progressProperty() {
+        return progress;
+    }
+
+    public void setProgress(double progress) {
+        this.progress.set(progress);
+    }
+
+    public int getUserTaskHeight() {
+        return userTaskHeight;
+    }
+
+    public void setUserTaskHeight(int userTaskHeight) {
+        this.userTaskHeight = userTaskHeight;
+    }
+
+    public int getUserTaskWidth() {
+        return userTaskWidth;
+    }
+
+    public void setUserTaskWidth(int userTaskWidth) {
+        this.userTaskWidth = userTaskWidth;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public int getDoHeight() {
+        return doHeight;
+    }
+
+    public void setDoHeight(int doHeight) {
+        this.doHeight = doHeight;
+    }
+
+    public int getDoWidth() {
+        return doWidth;
+    }
+
+    public void setDoWidth(int doWidth) {
+        this.doWidth = doWidth;
     }
 }
