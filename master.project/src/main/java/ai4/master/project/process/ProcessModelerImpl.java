@@ -41,8 +41,11 @@ public class ProcessModelerImpl implements ProcessModeler {
     private Map<BoundaryEvent, CookingEvent> timerEvents = new HashMap<>();
     private List<BoundaryEvent> timers = new ArrayList<>();
     private List<DataInputAssociation> dataInputAssociations = new ArrayList<>();
+    private Map<DataInputAssociation, UserTask> dataObjectAssoc = new HashMap<>();
     private StartEvent startEvent = null;
     private EndEvent endEvent = null;
+
+
     private Process process = null;
     private File file = null;
 
@@ -290,7 +293,7 @@ public class ProcessModelerImpl implements ProcessModeler {
                 List<CookingEvent> events = node.getData().getEvents();
 
                 for (CookingEvent event : events) {
-                    BoundaryEvent boundaryEvent = createElement(process, createIdOf("timer_" + event.getText()), event.getText(), BoundaryEvent.class, plane, 30, 30, true);
+                    BoundaryEvent boundaryEvent = createElement(process, createIdOf("timer_" + event.getText()), "", BoundaryEvent.class, plane, 30, 30, false);
                     boundaryEvent.setAttachedTo(userTask);
                     boundaryEvent.builder().timerWithDuration(event.getText());
                     timerEvents.put(boundaryEvent, event);
@@ -301,7 +304,7 @@ public class ProcessModelerImpl implements ProcessModeler {
                 int i = 0;
                 for (Ingredient ingredient : node.getData().getIngredients()) {
                     //userTask.builder().camundaInputParameter("Ingredient", ingredient.getName());
-                    DataObjectReference dor = createDataObject(process, createIdOf("dataObject_I" + i + createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getCompleteName(), plane, true);
+                    DataObjectReference dor = createDataObject(process, createIdOf("dataObject_I" + i + createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getName(), plane, true);
                     dataObjects.add(dor);
                     DataInputAssociation dia = createDataAssociation(process, dor, userTask, plane);
                     dataInputAssociations.add(dia);
@@ -426,23 +429,20 @@ public class ProcessModelerImpl implements ProcessModeler {
         dataInputAssociation.addChildElement(sourceRef);
         userTask.getDataInputAssociations().add(dataInputAssociation);
 
+        BpmnEdge edge = modelInstance.newInstance(BpmnEdge.class);
+        edge.setBpmnElement(dataInputAssociation);
 
-        /*BpmnEdge bpmnEdge = modelInstance.newInstance(BpmnEdge.class);
-        bpmnEdge.setBpmnElement(dataInputAssociation);
+        Waypoint w1 = modelInstance.newInstance(Waypoint.class);
+        w1.setX(0);
+        w1.setY(0);
+        Waypoint w2 = modelInstance.newInstance(Waypoint.class);
+        w2.setX(1);
+        w2.setY(1);
+        edge.addChildElement(w1);
+        edge.addChildElement(w2);
+        plane.addChildElement(edge);
 
-        //Add two fake waypoints to be able to change them later. If you don't add them, there will be an error because a sequenceflow needs at least2.
-        Waypoint wp = modelInstance.newInstance(Waypoint.class);
-        wp.setX(2);
-        wp.setY(2);
-        bpmnEdge.addChildElement(wp);
-        Waypoint wp2 = modelInstance.newInstance(Waypoint.class);
-        wp.setX(1);
-        wp.setY(1);
-        bpmnEdge.addChildElement(wp2);
-
-        plane.addChildElement(bpmnEdge); */
-
-        // TODO Set DataInpuTassociation tasks in Layouter
+        dataObjectAssoc.put(dataInputAssociation, userTask);
         return dataInputAssociation;
     }
 
@@ -557,7 +557,7 @@ public class ProcessModelerImpl implements ProcessModeler {
     /*
     Returns the XML
      */
-    public String getXml(){
+    public String getXml() {
         Bpmn.validateModel(modelInstance);
         return Bpmn.convertToString(modelInstance);
     }
@@ -566,8 +566,8 @@ public class ProcessModelerImpl implements ProcessModeler {
      * @return the current progress of the conversation.
      */
     @Override
-    public DoubleProperty getProgress(){
-        if(this.progress == null){
+    public DoubleProperty getProgress() {
+        if (this.progress == null) {
             progress = new SimpleDoubleProperty();
             progress.setValue(0.0);
         }
@@ -584,14 +584,14 @@ public class ProcessModelerImpl implements ProcessModeler {
     /*
     Sets the current file.
      */
-    public void setFile(File file){
+    public void setFile(File file) {
         this.file = file;
     }
 
     /*
     Creates a xml-file from the currently saved file.
      */
-    public void createXmlFromFile(){
+    public void createXmlFromFile() {
         Bpmn.validateModel(modelInstance);
         XMLWriter xmlWriter = new XMLWriter(fileName);
         xmlWriter.writeTo(file, getXml());
@@ -731,5 +731,13 @@ public class ProcessModelerImpl implements ProcessModeler {
 
     public void setDoWidth(int doWidth) {
         this.doWidth = doWidth;
+    }
+
+    public Map<DataInputAssociation, UserTask> getDataObjectAssoc() {
+        return dataObjectAssoc;
+    }
+
+    public void setDataObjectAssoc(Map<DataInputAssociation, UserTask> dataObjectAssoc) {
+        this.dataObjectAssoc = dataObjectAssoc;
     }
 }
