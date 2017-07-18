@@ -129,6 +129,7 @@ public class ProcessModelerImpl implements ProcessModeler {
         // validate and write model to file
         Bpmn.validateModel(modelInstance);
         createXml();
+        createXmlFromFile();
         progress.setValue(1.00);
 
         return modelInstance;
@@ -549,7 +550,7 @@ public class ProcessModelerImpl implements ProcessModeler {
      */
     public void createXml() {
         Bpmn.validateModel(modelInstance);
-        System.out.println("Writing to: " + fileName);
+        System.out.println("Writing to: " + file.getAbsolutePath());
         XMLWriter xmlWriter = new XMLWriter(fileName);
         xmlWriter.writeTo(Bpmn.convertToString(modelInstance));
     }

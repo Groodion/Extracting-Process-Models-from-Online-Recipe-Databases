@@ -15,6 +15,8 @@ import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Scanner;
+import java.util.regex.Pattern;
 
 /**
  * Created by Rene Bärnreuther on 04.05.2017.
@@ -161,4 +163,19 @@ public class RecipeGetterChefkoch implements RecipeGetter {
         }
         return "";
     }
+
+
+	@Override
+	public Recipe getRecipeByLink(String link) {
+		Scanner scanner = new Scanner(link);
+		String id = scanner.findInLine("[0-9]+");
+		scanner.close();
+		
+		return getRecipe(id);
+	}
+
+	@Override
+	public Recipe getRecipeByCategory(String category) {
+		return getRecipe(getRecipeIDs(category, 1));
+	}
 }

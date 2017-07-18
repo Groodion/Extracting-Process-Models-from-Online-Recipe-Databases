@@ -9,6 +9,8 @@ import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
 import ai4.master.project.recipe.baseObject.BaseTool;
+import ai4.master.project.viewFx.Configurations;
+import ai4.master.project.viewFx.Controller;
 import ai4.master.project.viewFx.components.editorViews.CookingActionsEditorView;
 import ai4.master.project.viewFx.components.editorViews.EditorView;
 import ai4.master.project.viewFx.components.editorViews.EventIndicatorsEditorView;
@@ -49,6 +51,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.SVGPath;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
 public class SettingsDialog extends Dialog<String> {
@@ -56,20 +59,16 @@ public class SettingsDialog extends Dialog<String> {
 	private Button search;
 
 	public SettingsDialog() {
-		this.getDialogPane().getStylesheets().add(
-				   getClass().getResource("/css/style.css").toExternalForm());
-		
-		
-		
-		
+		this.getDialogPane().getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+
 		setResultConverter(r -> {
-			if(r.getButtonData() == ButtonData.OK_DONE) {
+			if (r.getButtonData() == ButtonData.OK_DONE) {
 				return null;
 			} else {
 				return null;
 			}
 		});
-		
+
 		initDialog();
 		initMainLayout();
 	}
@@ -78,13 +77,22 @@ public class SettingsDialog extends Dialog<String> {
 		setTitle("Settings");
 		setHeaderText("Settings");
 		setResizable(true);
-		getDialogPane().setPrefSize(1024, 720);
+		getDialogPane().setPrefSize(700, 500);
 		setGraphic(new ImageView(this.getClass().getResource("/img/preferences.png").toString()));
 		setOnCloseRequest(e -> close());
 
 		ButtonType okayButtonType = new ButtonType("Okay", ButtonData.OK_DONE);
 		ButtonType cancelButtonType = new ButtonType("Abbrechen", ButtonData.CANCEL_CLOSE);
-		
+
+		setResultConverter(button -> {
+			if (button == okayButtonType) {
+				Configurations.save();
+			}
+
+			Controller.unblockView();
+			return "";
+		});
+
 		getDialogPane().getButtonTypes().addAll(okayButtonType, cancelButtonType);
 
 		Button okayButton = (Button) this.getDialogPane().lookupButton(okayButtonType);
@@ -97,8 +105,8 @@ public class SettingsDialog extends Dialog<String> {
 		cancelButton.setFocusTraversable(false);
 		cancelButton.setDefaultButton(false);
 	}
-	private void initMainLayout() {
-		
+
+	private void initMainLayout() {		
 		GridPane mainLayout = new GridPane();
 		mainLayout.setHgap(10);
 		mainLayout.setVgap(10);
@@ -110,133 +118,114 @@ public class SettingsDialog extends Dialog<String> {
 		mainLayout.getColumnConstraints().addAll(column0, column1);
 		
 		RowConstraints row0 = new RowConstraints();
-		row0.setPercentHeight(50);
-		RowConstraints row1 = new RowConstraints();
-		row1.setPercentHeight(50);
-		mainLayout.getRowConstraints().addAll(row0, row1);
+		row0.setPercentHeight(100);
+		mainLayout.getRowConstraints().addAll(row0);
 		
 		TitledPane parserSettings = new TitledPane();
 		parserSettings.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		parserSettings.setCollapsible(false);
-		parserSettings.setText("Parser Settings");
-		TitledPane saveSettings = new TitledPane();
-		saveSettings.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+		parserSettings.setText("File Settings");
 		
-		saveSettings.setText("Save Settings");
-		saveSettings.setCollapsible(false);
 		TitledPane layoutSettings = new TitledPane();
 		layoutSettings.setCollapsible(false);
 		layoutSettings.setText("Layout Settings");
 		layoutSettings.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-		GridPane parserLayout = new GridPane();
-		parserLayout.setHgap(10);
-		parserLayout.setVgap(10);
-		parserSettings.setContent(parserLayout);
-		
+		GridPane fileLayout = new GridPane();
+		fileLayout.setHgap(10);
+		fileLayout.setVgap(10);
+		fileLayout.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+		parserSettings.setContent(fileLayout);
 		
 		mainLayout.add(parserSettings, 0, 0);
-		mainLayout.add(saveSettings, 0, 1);
 		mainLayout.add(layoutSettings, 1, 0);
 		
-		parserLayout.add(new Label("Parser"), 0, 0);
-		
-		ComboBox<String> parser = new ComboBox();
-		parserLayout.add(parser, 1, 0);
+		fileLayout.add(new Label("Parser"), 0, 0);
 		
 		
-		GridPane saveLayout = new GridPane();
-		saveSettings.setContent(saveLayout);
-		saveLayout.setHgap(10);
-		saveLayout.setVgap(10);
-		saveLayout.add(new Label("Location for BPMN Models: "), 0, 0);
+		///
+		TextField parserPath = new TextField();
+		parserPath.setMaxWidth(Double.MAX_VALUE);
+		
+		parserPath.textProperty().bind(Configurations.PARSER_CONFIGURATION.asString());
+		fileLayout.add(parserPath, 1, 0);
+		parserPath.setPromptText("Parser");
+		parserPath.setOnMouseClicked(e -> {
+			FileChooser fileChooser = new FileChooser();
+			fileChooser.setInitialDirectory(Configurations.PARSER_CONFIGURATION.get().getParentFile());
+			fileChooser.setTitle("Select File");
+	
+			fileChooser.setInitialDirectory(Configurations.PARSER_CONFIGURATION.get());
+	
+			File file = fileChooser.showOpenDialog(null);
+	
+			if (file != null) {
+				Configurations.PARSER_CONFIGURATION.set(file);
+			}
+		});
+		
+
+		fileLayout.add(new Label("Location for BPMN Models: "), 0, 1);
 		savePath = new TextField();
 		
-		saveLayout.add(savePath, 1, 0);
+		fileLayout.add(savePath, 1, 1);
+		
 		savePath.setPromptText("Path");
-		savePath.setOnMouseClicked(new EventHandler<MouseEvent>() {
+		savePath.setMaxWidth(Double.MAX_VALUE);
+		savePath.textProperty().bind(Configurations.BPMN_LOCATION.asString());
 
-			
-			@Override
-			public void handle(MouseEvent e) {
-				FileChooser fileChooser = new FileChooser();
-				fileChooser.setTitle("Select File");
+		savePath.setOnMouseClicked(e -> {
+			DirectoryChooser directoryChooser = new DirectoryChooser();
+			directoryChooser.setTitle("Select Directory");
 
-				File initialDirectory = null;
+			directoryChooser.setInitialDirectory(Configurations.BPMN_LOCATION.get());
 
-				try {
-					initialDirectory = new File(savePath.getText()).getParentFile();
-				} catch (Exception ex) {
+			File directory = directoryChooser.showDialog(null);
 
-				}
-
-				if (initialDirectory != null) {
-					fileChooser.setInitialDirectory(initialDirectory);
-				}
-
-				File file = fileChooser.showOpenDialog(null);
-
-				if (file != null) {
-					savePath.setText(file.getAbsolutePath());
-				}
+			if (directory != null) {
+				Configurations.BPMN_LOCATION.set(directory);
 			}
-			
 		});
 
-		GridPane styleLayout = new GridPane();
-		styleLayout.setHgap(10);
-		styleLayout.setVgap(10);
+		fileLayout.add(new Label("Lib Location: "),0,2);
 		
+		TextField libPath = new TextField();
+		libPath.setMaxWidth(Double.MAX_VALUE);
+		libPath.textProperty().bind(Configurations.LIB_LOCATION.asString());
+		fileLayout.add(libPath, 1, 2);
+		libPath.setPromptText("Lib Path");
+		libPath.setOnMouseClicked(e -> {
+			FileChooser fileChooser = new FileChooser();
+			fileChooser.setInitialDirectory(Configurations.LIB_LOCATION.get().getParentFile());
+			fileChooser.setTitle("Select File");
+	
+			fileChooser.setInitialDirectory(Configurations.LIB_LOCATION.get());
+	
+			File file = fileChooser.showOpenDialog(null);
+	
+			if (file != null) {
+				Configurations.LIB_LOCATION.set(file);
+			}
+		});
+	
+		GridPane styleLayout = new GridPane();styleLayout.setHgap(10);styleLayout.setVgap(10);
+	
 		layoutSettings.setContent(styleLayout);
-		Label font = new Label("Font: ");
-		Label fontSize = new Label("Font size: ");
-		Label errorColor = new Label("Error color: ");
 		Label unknownIngredient = new Label("Unknown Ingredient: ");
+		Label unknownGroup = new Label("Unknown Group: ");
 		Label unknownTool = new Label("Unknown Tool: ");
 		Label unknownCookingAction = new Label("Unknown CookingAction: ");
-		
-		styleLayout.add(font, 0, 0);
-		styleLayout.add(fontSize, 0, 1);
-		styleLayout.add(errorColor, 0, 2);
-		styleLayout.add(unknownIngredient, 0, 3);
-		styleLayout.add(unknownTool, 0, 4);
-		styleLayout.add(unknownCookingAction, 0, 5);
-		
-		ColorPicker colorPicker1 = new ColorPicker();
-		styleLayout.add(colorPicker1, 1, 2);
-        
-		ColorPicker colorPicker2 = new ColorPicker();
-		styleLayout.add(colorPicker2, 1, 3);
-		
-		ColorPicker colorPicker3 = new ColorPicker();
-		styleLayout.add(colorPicker3, 1, 4);
-		
-		ColorPicker colorPicker4 = new ColorPicker();
-		styleLayout.add(colorPicker4, 1, 5);
- 
-        colorPicker1.setOnAction(new EventHandler() {
-            public void handle(Event t) {
-            }
-        });
-        
-        colorPicker2.setOnAction(new EventHandler() {
-            public void handle(Event t) {
-            }
-        });
-        
-        colorPicker3.setOnAction(new EventHandler() {
-            public void handle(Event t) {
-            }
-        });
-        
-        colorPicker4.setOnAction(new EventHandler() {
-            public void handle(Event t) {
-            }
-        });
-		
+	
+		styleLayout.add(unknownIngredient,0,0);styleLayout.add(unknownGroup,0,1);styleLayout.add(unknownTool,0,2);styleLayout.add(unknownCookingAction,0,3);
+	
+		ColorPicker colorPicker1 = new ColorPicker();colorPicker1.valueProperty().bindBidirectional(Configurations.INGREDIENT_COLOR);styleLayout.add(colorPicker1,1,0);
+	
+		ColorPicker colorPicker2 = new ColorPicker();colorPicker2.valueProperty().bindBidirectional(Configurations.GROUPS_COLOR);styleLayout.add(colorPicker2,1,1);
+	
+		ColorPicker colorPicker3 = new ColorPicker();colorPicker3.valueProperty().bindBidirectional(Configurations.TOOL_COLOR);styleLayout.add(colorPicker3,1,2);
+	
+		ColorPicker colorPicker4 = new ColorPicker();colorPicker4.valueProperty().bindBidirectional(Configurations.COOKING_ACTION_COLOR);styleLayout.add(colorPicker4,1,3);
+	
 		getDialogPane().setContent(mainLayout);
 	}
-	
-
-
 }

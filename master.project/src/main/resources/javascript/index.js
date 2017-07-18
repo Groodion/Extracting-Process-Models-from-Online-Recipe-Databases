@@ -23,13 +23,14 @@
 
  }
 
+ var bpmnViewer;
 function showBpmnDiagram(filePath){
   // import function
   function importXML(xml) {
 
 	// create viewer
 	var BpmnViewer = window.BpmnJS;
-	var bpmnViewer = new BpmnViewer({
+	bpmnViewer = new BpmnViewer({
 		container: '#canvas'
 	});
 

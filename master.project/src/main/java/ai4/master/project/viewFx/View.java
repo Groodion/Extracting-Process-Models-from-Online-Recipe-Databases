@@ -22,14 +22,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 public class View extends Application {
-
-	public static String pathToKeyWordDatabase;
 
 	private Text welcome;
 	private Text subtitle;
@@ -96,11 +95,19 @@ public class View extends Application {
 		Task<Parent> service = new Task<Parent>() {
 			@Override
 			protected Parent call() throws Exception {
-				pathToKeyWordDatabase = "resources/Lib.xml";
-
+				Configurations.load();
 				Font.loadFont(getClass().getResource("/fonts/HelveticaNeue.ttf").toExternalForm(), 20);
 				FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/view.fxml"));
-				Parent parent = loader.load();
+				Parent parent = null;
+				try {
+					parent = loader.load();					
+				} catch(Exception e) {
+					e.printStackTrace();
+					
+					//TODO ALERT
+					
+					System.exit(0);
+				}
 				controller = loader.getController();
 				return parent;
 			}
@@ -108,8 +115,11 @@ public class View extends Application {
 
 		service.setOnSucceeded(e -> {
 			primaryStage.setScene(new Scene(service.getValue()));
-			primaryStage.setWidth(1024);
-			primaryStage.setHeight(720);
+			primaryStage.setWidth(Configurations.VIEW_WIDTH.get());
+			primaryStage.setHeight(Configurations.VIEW_HEIGHT.get());
+			Configurations.VIEW_WIDTH.bind(primaryStage.widthProperty());
+			Configurations.VIEW_HEIGHT.bind(primaryStage.heightProperty());
+			
 			primaryStage.initStyle(StageStyle.DECORATED);
 			primaryStage.setOnCloseRequest(r -> {
 				if (controller.kwdbHasChanged()) {
@@ -121,7 +131,7 @@ public class View extends Application {
 					Optional<ButtonType> result = alert.showAndWait();
 					result.ifPresent(button -> {
 						if (button == ButtonType.YES) {
-							File dbFile = new File(pathToKeyWordDatabase);
+							File dbFile = Configurations.LIB_LOCATION.get();
 							if (!dbFile.exists()) {
 								try {
 									dbFile.createNewFile();
@@ -130,6 +140,8 @@ public class View extends Application {
 									fileNotFoundOrCorruptedAlert.setHeaderText("Error");
 									fileNotFoundOrCorruptedAlert.setHeaderText("Can't create file at specified location!");
 									fileNotFoundOrCorruptedAlert.showAndWait();
+									
+									ex.printStackTrace();
 								}
 							}
 
@@ -142,6 +154,8 @@ public class View extends Application {
 									fileNotFoundOrCorruptedAlert.setHeaderText("Error");
 									fileNotFoundOrCorruptedAlert.setHeaderText("Can't access file!");
 									fileNotFoundOrCorruptedAlert.showAndWait();
+									
+									ex.printStackTrace();
 								}
 							}
 						} else if (button == ButtonType.CANCEL) {
@@ -149,6 +163,7 @@ public class View extends Application {
 						}
 					});
 				}
+				Configurations.save();
 			});
 			//http://www.chefkoch.de/rezepte/3361661499859558/Zarte-Schokokuechlein.html Produziert eine IndexOutofBounds beim Parsen
 			
