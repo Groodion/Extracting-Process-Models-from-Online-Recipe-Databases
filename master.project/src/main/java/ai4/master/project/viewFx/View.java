@@ -1,12 +1,5 @@
 package ai4.master.project.viewFx;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.Optional;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -14,19 +7,21 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
+import java.io.*;
+import java.util.Optional;
 
 public class View extends Application {
 
@@ -44,7 +39,7 @@ public class View extends Application {
 		Stage splashScreen = new Stage();
 		welcome = new Text("Welcome");
 		subtitle = new Text("Parsing recipes from online databases");
-		copyright = new Text("AI4 Universität Bayreuth");
+		copyright = new Text("AI4 Universitï¿½t Bayreuth");
 
 		welcome.setStyle("-fx-fill: #ffffff");
 		subtitle.setStyle("-fx-fill: #ffffff");
