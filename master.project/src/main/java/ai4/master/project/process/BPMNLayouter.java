@@ -100,21 +100,14 @@ public class BPMNLayouter {
             gateway.getDiagramElement().getBounds().setHeight(30);
             gateway.getDiagramElement().getBounds().setWidth(30);
             Collection<SequenceFlow> incomming = gateway.getIncoming();
-            System.out.println("Incomming size for sync gateway: " + incomming.size());
             double maxX = gateway.getDiagramElement().getBounds().getX(); //cannot be smaller..
             for (SequenceFlow in : incomming) {
                 BpmnShape taskShape = (BpmnShape) in.getSource().getDiagramElement();
-                System.out.println("Current shape x: " + taskShape.getBounds().getX());
                 if (taskShape.getBounds().getX() > maxX) {
                     maxX = taskShape.getBounds().getX();
                 }
                 in.getDiagramElement().getWaypoints().add(createWaypoint(in.getTarget(), Direction.TO));
             }
-            System.out.println("Setting from: " + gateway.getDiagramElement().getBounds().getX() + " to " + maxX);
-            // Doesn't behave like intended. First focus on the other important aspects
-            //gateway.getDiagramElement().getBounds().setX(maxX);
-
-
         }
     }
 
@@ -192,7 +185,11 @@ public class BPMNLayouter {
                 bpmnLabel.getBounds().setY(currentY);
             }
             currentX += incrementX;
-            flow.getDiagramElement().getWaypoints().add(createWaypoint(target, Direction.TO));
+            if (target.getIncoming().size() > 1) {
+                flow.getDiagramElement().getWaypoints().add(createWaypoint(target, Direction.DOWN));
+            } else {
+                flow.getDiagramElement().getWaypoints().add(createWaypoint(target, Direction.TO));
+            }
         }
         if (commingFlows.size() > 1) {
             //Here we are after a parallel gateway
@@ -257,9 +254,12 @@ public class BPMNLayouter {
         if (direction == Direction.TO) {
             w.setY(originShape.getBounds().getY() + shapeHeight / 2);
             w.setX(originShape.getBounds().getX());
-        } else {
+        } else if (direction == Direction.FROM) {
             w.setY(originShape.getBounds().getY() + shapeHeight / 2);
             w.setX(originShape.getBounds().getX() + shapeWidth);
+        } else {
+            w.setY(originShape.getBounds().getY() + shapeHeight);
+            w.setX(originShape.getBounds().getX() + shapeWidth / 2);
         }
 
         return w;
@@ -269,7 +269,7 @@ public class BPMNLayouter {
     Creates a Waypoint for the node.
      */
     enum Direction {
-        FROM, TO
+        FROM, TO, DOWN
     }
 
     ;
