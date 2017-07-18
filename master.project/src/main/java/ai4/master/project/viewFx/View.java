@@ -150,6 +150,8 @@ public class View extends Application {
 					});
 				}
 			});
+			//http://www.chefkoch.de/rezepte/3361661499859558/Zarte-Schokokuechlein.html Produziert eine IndexOutofBounds beim Parsen
+			
 			primaryStage.show();
 			splashScreen.hide();
 		});

@@ -6,7 +6,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
-<?import javafx.scene.web.*?>
 <?import java.lang.*?>
 
 <StackPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ai4.master.project.viewFx.Controller">
@@ -162,9 +161,12 @@
 										</StackPane>
 									</children>
 								</GridPane>
-								<BorderPane fx:id="diagrammView" maxHeight="Infinity" maxWidth="Infinity" visible="false">
-							
-								</BorderPane>
+								<HBox maxHeight="Infinity"  visible="false">
+									<children>
+										<!--  <Button minHeight="40" text="Test" onAction="#testAction" /> -->
+										<!--  <WebView fx:id="webView" /> -->
+									</children>
+								</HBox>
 							</children>
 						</StackPane>
 					</children>

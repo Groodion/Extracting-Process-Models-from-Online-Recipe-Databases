@@ -23,18 +23,29 @@ import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.recipe.baseObject.Regex;
 import ai4.master.project.recipe.baseObject.Regex.Result;
 import ai4.master.project.stanfordParser.Parser;
+import ai4.master.project.viewFx.components.BridgeObjID;
+import ai4.master.project.viewFx.components.BridgeSize;
 import ai4.master.project.viewFx.components.LibEditor;
 import ai4.master.project.viewFx.components.OnlineDatabaseButton;
 import ai4.master.project.viewFx.components.ProcessTracker;
+import ai4.master.project.viewFx.components.SettingsDialog;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.binding.DoubleExpression;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -48,19 +59,26 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
+import netscape.javascript.JSObject;
 
 public class Controller implements Initializable {
 
@@ -95,7 +113,12 @@ public class Controller implements Initializable {
 	@FXML
 	private Pane blockingPane;
 	
+	@FXML
+	private BorderPane diagrammView;
+	
+	
 	private LibEditor libEditor;
+	private SettingsDialog settingsDialog;
 	
 	private ObjectProperty<Recipe> recipe;
 	private ObjectProperty<KeyWordDatabase> kwdb;
@@ -108,6 +131,8 @@ public class Controller implements Initializable {
 	private Parser parser;
 	private boolean kwdbHasChanged = false;
 	
+	private  WebView webView;
+	private WebEngine engine;
 	
 	public Controller() {
 		parser = new Parser("lib/models/german-fast.tagger");
@@ -124,7 +149,7 @@ public class Controller implements Initializable {
 	@Override
 	public void initialize(URL url, ResourceBundle rB) {
 		bPane = blockingPane;
-		
+		preparationTA.setText("ist");
 		/*
 		 * Logik
 		 */
@@ -187,6 +212,7 @@ public class Controller implements Initializable {
 
 		});
 
+		initializeDiagrammViewer();
 		/*
 		 * Layout
 		 */
@@ -199,6 +225,108 @@ public class Controller implements Initializable {
 						recipe));
 	}
 
+	public void initializeDiagrammViewer() {
+		System.out.println("1");
+		
+			Platform.runLater(() -> {
+				try {
+					
+					webView = new WebView();
+					webView.setStyle("-fx-background-color:red");
+					webView.heightProperty().addListener((b,o,n) -> {
+						System.out.println("height:" + n);
+					});
+					webView.widthProperty().addListener((b,o,n) -> {
+						System.out.println("width:" + n);
+					});
+					ScrollPane scrollPane = new ScrollPane(webView);
+					scrollPane.setStyle("-fx-background-color:blue");
+//					webView.setMaxSize(Double.MIN_VALUE, Double.MAX_VALUE);
+//					scrollPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+					
+					engine = webView.getEngine();
+					
+
+					// creating bridgeObjID for javascript injection
+					BridgeObjID	bridgeObjID = new BridgeObjID();
+					bridgeObjID.getProperty().addListener(new ChangeListener<String>(){
+
+						@Override
+						public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+							// TODO Auto-generated method stub
+							System.out.println("selected ObjID: "+newValue);
+						}
+					});
+
+
+					// creating bridgeSize for javascript injection
+					BridgeSize	bridgeSize	= new BridgeSize();
+					
+
+					
+					String file = Controller.class.getClassLoader().getResource("indexFX.html").toExternalForm();
+					engine.load(file);
+
+						
+					engine.getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>(){
+
+						@Override
+						public void changed(ObservableValue<? extends Worker.State> observable, Worker.State oldState, Worker.State newState) {
+							// TODO Auto-generated method stub
+							System.out.println("changed: old "+oldState+" new "+newState);
+							if(newState == Worker.State.SUCCEEDED){
+								JSObject win = (JSObject) engine.executeScript("window");
+								// injection of bridgeObjID into javascript
+								win.setMember("bridgeObjID", bridgeObjID);
+								// injection of bridgeSize into javascript
+								win.setMember("bridgeSize", bridgeSize);
+								win.setMember("java", this);
+								System.out.println("Bridge and BridgeSize are injected");
+								
+								Timeline t = new Timeline();
+								t.getKeyFrames().add(new KeyFrame(Duration.ONE, e -> {
+									String value = engine.executeScript("getViewSize()").toString();
+									String[] parts = value.split(",");
+									
+									double width = Double.parseDouble(parts[0]);
+									double height = Double.parseDouble(parts[1]);
+									
+									webView.setPrefSize(width + 100, height + 100);
+								}));
+								t.setCycleCount(-1);
+								t.play();
+							}
+						}
+
+					});
+					
+					ContextMenu cmDiagrammSave = new ContextMenu();
+					MenuItem save = new MenuItem("Save");
+					save.setOnAction(e -> {
+						
+					});
+					cmDiagrammSave.getItems().add(save);
+					
+					webView.setOnMouseClicked(e -> {
+						if (e.getButton() == MouseButton.SECONDARY) {
+							cmDiagrammSave.show(webView, e.getScreenX(), e.getScreenY());
+						}
+						else {
+							cmDiagrammSave.hide();
+						}
+					});
+					
+
+					diagrammView.setCenter(scrollPane);
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+				
+			});		
+	}
+	
+	
 	public boolean isRecipeParsed() {
 		return recipeParsed.get();
 	}
@@ -531,6 +659,12 @@ public class Controller implements Initializable {
 		});
 	}
 	public void showProperties() {
+		blockingPane.setVisible(true);
+		if(settingsDialog == null) {
+			settingsDialog = new SettingsDialog();
+		}
+		
+		settingsDialog.showAndWait();
 		
 	}
 	
@@ -570,7 +704,12 @@ public class Controller implements Initializable {
 				break;
 			}
 			case 2: {
-	
+				try {
+					callDiagram(new SimpleStringProperty("file:/C:/Users/Martin%20Käppel/Uni_Workspace/BPMN/js/piza2.bpmn"));
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
 				break;
 			}
 			case 3: {
@@ -585,6 +724,16 @@ public class Controller implements Initializable {
 	public boolean kwdbHasChanged() {
 		return kwdbHasChanged;
 	}
+	
+	private void callDiagram(StringProperty bpmnUrl){
+		if(bpmnUrl.getValue() != null){
+			String js1 = "removeBpmnDiagram()";
+			engine.executeScript(js1);
+
+			String js2 = "showBpmnDiagram('"+bpmnUrl.getValue()+"');";
+			engine.executeScript(js2);
+		}
+	}
 
 	public static void blockView() {
 		bPane.setVisible(true);
@@ -592,4 +741,5 @@ public class Controller implements Initializable {
 	public static void unblockView() {
 		bPane.setVisible(false);
 	}
+
 }

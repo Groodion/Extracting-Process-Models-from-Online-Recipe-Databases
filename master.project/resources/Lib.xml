@@ -611,7 +611,7 @@
 		<CookingAction name="anbraten">
 			<regs>
 				<Regex result="first" ingredientsNeeded="true"
-					referencePreviousProducts="true" chargeTools="false">.*</Regex>
+					referencePreviousProducts="false" chargeTools="false">.*</Regex>
 			</regs>
 			<transformations>
 				<Transformation>
