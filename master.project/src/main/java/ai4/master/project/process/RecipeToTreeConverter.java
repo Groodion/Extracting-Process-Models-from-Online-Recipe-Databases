@@ -125,7 +125,6 @@ public class RecipeToTreeConverter {
                 }
             }
         }
-        // TODO We need to compare tools somehow?
         for(Tool input : inputTool ){
             for(Tool output: outputTool){
                 if(input.isCharged() ||output.isCharged()){

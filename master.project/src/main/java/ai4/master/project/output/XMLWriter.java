@@ -1,5 +1,7 @@
 package ai4.master.project.output;
 
+import org.apache.commons.lang3.ObjectUtils;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,6 +25,19 @@ public class XMLWriter {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
+
+        return this;
+    }
+
+    public XMLWriter writeTo(File file, String input){
+        if(file == null){
+            file = new File("File_was_null.bpmn");
+        }
+        try (BufferedWriter writer = new BufferedWriter( new OutputStreamWriter( new FileOutputStream(file) , "UTF-8") )) {
+            writer.write(input);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
 
         return this;
     }

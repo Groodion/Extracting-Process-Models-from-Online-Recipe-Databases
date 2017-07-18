@@ -7,7 +7,6 @@ import ai4.master.project.tree.TreeTraverser;
 /**
  * Created by René Bärnreuther on 05.06.2017.
  * Implements an example for the Nodes and the tree traverser
- * TODO Do we need a wrapper method around node?
  */
 public class TreeMain {
 

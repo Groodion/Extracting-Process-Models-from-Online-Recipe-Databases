@@ -5,7 +5,6 @@ import ai4.master.project.process.ProcessModeler;
 import ai4.master.project.process.ProcessModelerImpl;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
-import ai4.master.project.recipe.TestRecipeFactory;
 import ai4.master.project.stanfordParser.Parser;
 import ai4.master.project.viewFx.Controller;
 
@@ -19,21 +18,14 @@ public class ParserTest {
 */
 	//15XX not working with tool compare
 	static String[] ids = {
-		"997991205154456"
-	};
+        "43611014899035", "997991205154456", "150681066371674", "982031203667502"
+};
     public static void main(String[] args) throws Exception {
 //    	testParser();
    	testProcessModeler();
-//    	testSimpleProcessExample();
     }
 
 
-    public static void testSimpleProcessExample(){
-            Recipe r = new TestRecipeFactory().create();
-            ProcessModeler processModeler = new ProcessModelerImpl();
-            processModeler.setFileName("test-layout");
-        //    processModeler.convertToProcess(r);
-    }
 	public static void testParser() throws Exception {
 		XMLLoader loader = new XMLLoader();
 		KeyWordDatabase kwdb = loader.load(new URL("file","","resources/Lib.xml"));
@@ -71,7 +63,7 @@ public class ParserTest {
 
                 //Now steps are saved in recipe
                 ProcessModeler processModeler = new ProcessModelerImpl();
-                processModeler.setFileName(currentRecipe + "toBpmn");
+        		processModeler.setFileName(ids[i]);
                 processModeler.createBpmn(recipe);
             } catch (Exception ex) {
                 System.err.println("Could not parse Recipe with id: " + currentRecipe);
