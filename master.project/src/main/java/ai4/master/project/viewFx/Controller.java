@@ -30,6 +30,7 @@ import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.recipe.baseObject.Regex;
 import ai4.master.project.recipe.baseObject.Regex.Result;
 import ai4.master.project.stanfordParser.Parser;
+import ai4.master.project.stanfordParser.exceptions.SentenceContainsNoVerbException;
 import ai4.master.project.viewFx.components.BridgeObjID;
 import ai4.master.project.viewFx.components.BridgeSize;
 import ai4.master.project.viewFx.components.LibEditor;
@@ -711,9 +712,14 @@ public class Controller implements Initializable {
 	public void parseRecipe() {
 		blockingPane.setVisible(true);
 		MESSAGES.clear();
-		parser.parseRecipe(recipe.get());
-		updateRecipeSteps();
-		recipeParsed.set(true);
+		try {
+			parser.parseRecipe(recipe.get());
+			updateRecipeSteps();
+			recipeParsed.set(true);
+		} catch (SentenceContainsNoVerbException e) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setContentText("The Sentence '" + e.getSentence().getText() + "' contains no verb and can't be parsed");
+		}
 		blockingPane.setVisible(false);
 	}
 
