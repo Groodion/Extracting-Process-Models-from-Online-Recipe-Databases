@@ -98,7 +98,6 @@ public class RecipeGetterChefkoch implements RecipeGetter {
         StringBuilder stringBuilder = new StringBuilder();
         String response = getHttpRequestBody(REZEPTE_API_STRING + id);
         JSONArray resultList = this.getJsonResultList(response);
-
         Iterator<JSONObject> resultListIterator = resultList.iterator();
         if (!resultListIterator.hasNext()) {
             return null;
@@ -160,6 +159,6 @@ public class RecipeGetterChefkoch implements RecipeGetter {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        return null;
+        return "";
     }
 }
