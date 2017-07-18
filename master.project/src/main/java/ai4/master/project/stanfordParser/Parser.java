@@ -1,4 +1,4 @@
-﻿package ai4.master.project.stanfordParser;
+package ai4.master.project.stanfordParser;
 
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.*;
@@ -23,7 +23,6 @@ import edu.stanford.nlp.process.DocumentPreprocessor;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.value.ObservableValue;
 
 import java.io.StringReader;
 import java.util.ArrayList;
