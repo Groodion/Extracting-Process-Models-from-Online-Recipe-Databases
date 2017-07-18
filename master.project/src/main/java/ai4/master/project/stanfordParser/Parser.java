@@ -20,6 +20,9 @@ import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.process.DocumentPreprocessor;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ObservableValue;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -30,10 +33,12 @@ public class Parser {
 
 	private MaxentTagger tagger;
 	private KeyWordDatabase kwdb;
-
+	private DoubleProperty progress;
+	
 	public Parser(String taggerUrl) {
 		tagger = new MaxentTagger(taggerUrl);
 		kwdb = new KeyWordDatabase();
+		progress = new SimpleDoubleProperty();
 	}
 
 	private List<Sentence> analyzeText(String text) {
@@ -42,7 +47,8 @@ public class Parser {
 		List<List<TaggedWord>> taggedList = tagger.process(getSplittedSentencesFromString(text));
 		Sentence sentence = null;
 
-		for (List<TaggedWord> taggedSentence : taggedList) {
+		for (int i = 0; i < taggedList.size(); i++) {
+			List<TaggedWord> taggedSentence = taggedList.get(i);
 			sentence = new Sentence(sentence);
 			SentencePart part = new SentencePart(sentence);
 
@@ -95,6 +101,8 @@ public class Parser {
 			}
 
 			sentences.add(sentence);
+			
+			progress.set((i+1) * 0.25 / taggedList.size());
 		}
 
 		return sentences;
@@ -124,6 +132,7 @@ public class Parser {
 	}
 
 	public void parseRecipe(Recipe recipe) {
+		progress.set(0);
 		recipe.getSteps().clear();
 		
 		String text = recipe.getPreparation();
@@ -131,10 +140,14 @@ public class Parser {
 
 		
 		List<Sentence> sentences = analyzeText(text);
+		progress.set(0.25);
+		
 
-		for (Sentence sentence : sentences) {
-			sentence.init(kwdb);
+		for (int i = 0; i < sentences.size(); i++) {
+			sentences.get(i).init(kwdb);
+			progress.set(0.25 + (i+1) * 0.25 / sentences.size());
 		}
+		progress.set(0.5);
 
 		IngredientList activeIngredients = new IngredientList();
 		List<BaseTool> chargedTools = new ArrayList<BaseTool>();
@@ -152,8 +165,11 @@ public class Parser {
 
 		Step lastStep = null;
 
-		for (Sentence s : sentences) {
-			for (SentencePart sP : s.getParts()) {
+		for (int j = 0; j < sentences.size(); j++) {
+			Sentence s = sentences.get(j);
+			double maxProg = 0.5 / sentences.size();
+			for (int k = 0; k < s.getParts().size(); k++) {
+				SentencePart sP = s.getParts().get(k);
 				if (sP.getCookingAction() == null) {
 					Controller.MESSAGES.add("Can't convert to Step:");
 					Controller.MESSAGES.add(sP.getText());
@@ -314,7 +330,14 @@ public class Parser {
 					
 					lastStep = step;
 				}
+				progress.set(0.5 + j * maxProg + (k+1) * maxProg / s.getParts().size());
 			}
+			progress.set(0.5 + (j+1) * maxProg);
 		}
+		progress.set(1);
+	}
+
+	public DoubleProperty progressProperty() {
+		return progress;
 	}
 }

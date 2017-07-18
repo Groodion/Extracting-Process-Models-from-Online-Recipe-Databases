@@ -1,17 +1,24 @@
 package ai4.master.project.viewFx;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 import ai4.master.project.KeyWordDatabase;
+import ai4.master.project.XMLLoader;
 import ai4.master.project.apirequests.RecipeGetterChefkoch;
 import ai4.master.project.apirequests.RecipeGetterKochbar;
+import ai4.master.project.output.XMLWriter;
+import ai4.master.project.process.ProcessModeler;
+import ai4.master.project.process.ProcessModelerImpl;
 import ai4.master.project.recipe.LANG_FLAG;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
@@ -59,6 +66,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -77,6 +85,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Duration;
 import netscape.javascript.JSObject;
 
@@ -84,7 +93,7 @@ public class Controller implements Initializable {
 
 	public static final ObservableList<String> MESSAGES = FXCollections.observableArrayList();
 	private static Pane bPane;
-	
+
 	@FXML
 	private VBox recipeDatabasesPane;
 
@@ -96,7 +105,7 @@ public class Controller implements Initializable {
 	private TextArea preparationTA;
 	@FXML
 	private ProcessTracker processTracker;
-	@FXML 
+	@FXML
 	private StackPane contentStack;
 	@FXML
 	private FlowPane ingredientsPane;
@@ -112,14 +121,15 @@ public class Controller implements Initializable {
 	private ListView<String> messagesListView;
 	@FXML
 	private Pane blockingPane;
-	
+	@FXML
+	private ProgressBar progressBar;
+
 	@FXML
 	private BorderPane diagrammView;
-	
-	
+
 	private LibEditor libEditor;
 	private SettingsDialog settingsDialog;
-	
+
 	private ObjectProperty<Recipe> recipe;
 	private ObjectProperty<KeyWordDatabase> kwdb;
 	private ObjectProperty<BaseNamedObject<?, ?>> selectedObject;
@@ -127,41 +137,96 @@ public class Controller implements Initializable {
 	private ObservableList<BaseTool> identifiedTools;
 	private ObservableList<BaseIngredient> identifiedIngredients;
 	private ObservableList<BaseCookingAction> identifiedActions;
-	
+
 	private Parser parser;
 	private boolean kwdbHasChanged = false;
-	
-	private  WebView webView;
+	private StringProperty bpmnCode;
+
+	private WebView webView;
 	private WebEngine engine;
-	
+
 	public Controller() {
-		parser = new Parser("lib/models/german-fast.tagger");
+		parser = new Parser(Configurations.PARSER_CONFIGURATION.get().getAbsolutePath());
 		recipe = new SimpleObjectProperty<Recipe>(new Recipe(LANG_FLAG.DE));
-		kwdb = new SimpleObjectProperty<KeyWordDatabase>(KeyWordDatabase.GERMAN_KWDB);
+		kwdb = new SimpleObjectProperty<KeyWordDatabase>(
+				XMLLoader.load(Configurations.LIB_LOCATION.get().getAbsolutePath()));
 		selectedObject = new SimpleObjectProperty<BaseNamedObject<?, ?>>();
 		recipeParsed = new SimpleBooleanProperty(false);
 		parser.setKwdb(kwdb.get());
+		bpmnCode = new SimpleStringProperty();
+		Configurations.PARSER_CONFIGURATION.addListener((b, o, n) -> {
+			parser = new Parser(n.getAbsolutePath());
+		});
+
+		Configurations.LIB_LOCATION.addListener((b, o, n) -> {
+			if (kwdbHasChanged()) {
+				Alert alert = new Alert(AlertType.CONFIRMATION, null, ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
+				alert.setTitle("Save Changes");
+				alert.setHeaderText("The database has been changed!");
+				alert.setContentText("Do you want to save the changes?");
+				((Button) alert.getDialogPane().lookupButton(ButtonType.YES)).setDefaultButton(false);
+				Optional<ButtonType> result = alert.showAndWait();
+				result.ifPresent(button -> {
+					if (button == ButtonType.YES) {
+						File dbFile = o;
+						if (!dbFile.exists()) {
+							try {
+								dbFile.createNewFile();
+							} catch (IOException ex) {
+								Alert fileNotFoundOrCorruptedAlert = new Alert(AlertType.ERROR);
+								fileNotFoundOrCorruptedAlert.setHeaderText("Error");
+								fileNotFoundOrCorruptedAlert.setHeaderText("Can't create file at specified location!");
+								fileNotFoundOrCorruptedAlert.showAndWait();
+								ex.printStackTrace();
+							}
+						}
+
+						if (dbFile.exists()) {
+							try (BufferedWriter writer = new BufferedWriter(
+									new OutputStreamWriter(new FileOutputStream(dbFile), "UTF-8"))) {
+								writer.write(getKeyWordDatabase().toXML());
+								writer.flush();
+							} catch (IOException ex) {
+								Alert fileNotFoundOrCorruptedAlert = new Alert(AlertType.ERROR);
+								fileNotFoundOrCorruptedAlert.setHeaderText("Error");
+								fileNotFoundOrCorruptedAlert.setHeaderText("Can't access file!");
+								fileNotFoundOrCorruptedAlert.showAndWait();
+								ex.printStackTrace();
+							}
+						}
+					} else if (button == ButtonType.CANCEL) {
+						kwdbHasChanged = false;
+						Configurations.LIB_LOCATION.set(o);
+						kwdbHasChanged = true;
+						return;
+					}
+					kwdb.set(XMLLoader.load(n.getAbsolutePath()));
+				});
+			} else {
+				kwdb.set(XMLLoader.load(n.getAbsolutePath()));
+			}
+		});
 
 		identifiedTools = FXCollections.observableArrayList();
 		identifiedIngredients = FXCollections.observableArrayList();
 		identifiedActions = FXCollections.observableArrayList();
 	}
+
 	@Override
 	public void initialize(URL url, ResourceBundle rB) {
 		bPane = blockingPane;
-		preparationTA.setText("ist");
 		/*
 		 * Logik
 		 */
 		kwdb.addListener((b, o, n) -> {
 			parser.setKwdb(n);
 		});
-		
+
 		toolsListView.setItems(identifiedTools);
 		ingredientsListView.setItems(identifiedIngredients);
 		actionsListView.setItems(identifiedActions);
 		messagesListView.setItems(MESSAGES);
-		
+
 		ChangeListener<BaseNamedObject<?, ?>> cListener = (b, o, n) -> {
 			selectedObject.set(n);
 		};
@@ -170,24 +235,24 @@ public class Controller implements Initializable {
 		actionsListView.getSelectionModel().selectedItemProperty().addListener(cListener);
 
 		toolsListView.setOnMouseClicked(e -> {
-			if(e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
+			if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
 				showLibEditor();
 				libEditor.searchAndScroll(toolsListView.getSelectionModel().getSelectedItem().getFirstName());
 			}
 		});
 		ingredientsListView.setOnMouseClicked(e -> {
-			if(e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
+			if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
 				showLibEditor();
 				libEditor.searchAndScroll(ingredientsListView.getSelectionModel().getSelectedItem().getFirstName());
 			}
 		});
 		actionsListView.setOnMouseClicked(e -> {
-			if(e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
+			if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
 				showLibEditor();
 				libEditor.searchAndScroll(actionsListView.getSelectionModel().getSelectedItem().getFirstName());
 			}
 		});
-		
+
 		recipe.addListener((b, o, n) -> {
 			if (n == null) {
 				ingredientsTA.setText("");
@@ -212,131 +277,152 @@ public class Controller implements Initializable {
 
 		});
 
+		progressBar.setProgress(0);
+
 		initializeDiagrammViewer();
 		/*
 		 * Layout
 		 */
 
-		recipeDatabasesPane.getChildren().addAll(
-				new OnlineDatabaseButton("Chefkoch", "www.chefkoch.de", "German", "/img/chefkoch.png",
-						new RecipeGetterChefkoch(), recipe),
-				new OnlineDatabaseButton("Kochbar", "www.kochbar.de", "German", "/img/kochbar.jpg", new RecipeGetterKochbar(), recipe),
-				new OnlineDatabaseButton("Food2Fork", "www.food2fork.com", "English", "/img/food2fork.jpg", null,
-						recipe));
+		recipeDatabasesPane.getChildren()
+				.addAll(new OnlineDatabaseButton("Chefkoch", "www.chefkoch.de", "German", "/img/chefkoch.png",
+						new RecipeGetterChefkoch(), recipe, true),
+						new OnlineDatabaseButton("Kochbar", "www.kochbar.de", "German", "/img/kochbar.jpg",
+								new RecipeGetterKochbar(), recipe, false),
+						new OnlineDatabaseButton("Food2Fork", "www.food2fork.com", "English", "/img/food2fork.jpg",
+								null, recipe, false));
 	}
 
 	public void initializeDiagrammViewer() {
 		System.out.println("1");
-		
-			Platform.runLater(() -> {
-				try {
-					
-					webView = new WebView();
-					webView.setStyle("-fx-background-color:red");
-					webView.heightProperty().addListener((b,o,n) -> {
-						System.out.println("height:" + n);
-					});
-					webView.widthProperty().addListener((b,o,n) -> {
-						System.out.println("width:" + n);
-					});
-					ScrollPane scrollPane = new ScrollPane(webView);
-					scrollPane.setStyle("-fx-background-color:blue");
-//					webView.setMaxSize(Double.MIN_VALUE, Double.MAX_VALUE);
-//					scrollPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-					
-					engine = webView.getEngine();
-					
 
-					// creating bridgeObjID for javascript injection
-					BridgeObjID	bridgeObjID = new BridgeObjID();
-					bridgeObjID.getProperty().addListener(new ChangeListener<String>(){
+		Platform.runLater(() -> {
+			try {
 
-						@Override
-						public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-							// TODO Auto-generated method stub
-							System.out.println("selected ObjID: "+newValue);
+				webView = new WebView();
+				webView.heightProperty().addListener((b, o, n) -> {
+					System.out.println("height:" + n);
+				});
+				webView.widthProperty().addListener((b, o, n) -> {
+					System.out.println("width:" + n);
+				});
+				webView.setContextMenuEnabled(false);
+				ScrollPane scrollPane = new ScrollPane(webView);
+				// webView.setMaxSize(Double.MIN_VALUE, Double.MAX_VALUE);
+				// scrollPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+				engine = webView.getEngine();
+
+				// creating bridgeObjID for javascript injection
+				BridgeObjID bridgeObjID = new BridgeObjID();
+				bridgeObjID.getProperty().addListener(new ChangeListener<String>() {
+
+					@Override
+					public void changed(ObservableValue<? extends String> observable, String oldValue,
+							String newValue) {
+						// TODO Auto-generated method stub
+						System.out.println("selected ObjID: " + newValue);
+					}
+				});
+
+				// creating bridgeSize for javascript injection
+				BridgeSize bridgeSize = new BridgeSize();
+
+				String file = Controller.class.getClassLoader().getResource("indexFX.html").toExternalForm();
+				engine.load(file);
+
+				engine.getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
+
+					@Override
+					public void changed(ObservableValue<? extends Worker.State> observable, Worker.State oldState,
+							Worker.State newState) {
+						// TODO Auto-generated method stub
+						System.out.println("changed: old " + oldState + " new " + newState);
+						if (newState == Worker.State.SUCCEEDED) {
+							JSObject win = (JSObject) engine.executeScript("window");
+							// injection of bridgeObjID into javascript
+							win.setMember("bridgeObjID", bridgeObjID);
+							// injection of bridgeSize into javascript
+							win.setMember("bridgeSize", bridgeSize);
+							win.setMember("java", this);
+							System.out.println("Bridge and BridgeSize are injected");
+
+							Timeline t = new Timeline();
+							t.getKeyFrames().add(new KeyFrame(Duration.ONE, e -> {
+								String value = engine.executeScript("getViewSize()").toString();
+								String[] parts = value.split(",");
+
+								double width = Double.parseDouble(parts[0]);
+								double height = Double.parseDouble(parts[1]);
+
+								webView.setPrefSize(width + 100, height + 100);
+							}));
+							t.setCycleCount(-1);
+							t.play();
 						}
-					});
+					}
 
+				});
 
-					// creating bridgeSize for javascript injection
-					BridgeSize	bridgeSize	= new BridgeSize();
-					
+				ContextMenu cmDiagrammSave = new ContextMenu();
+				MenuItem saveAsSVG = new MenuItem("Save as svg");
+				MenuItem saveAsBPMN = new MenuItem("Save as bpmn");
+				saveAsSVG.setOnAction(e -> {
+					String temp = engine
+							.executeScript("var svgCode; bpmnViewer.saveSVG(function(a, svg) {svgCode = svg}); svgCode")
+							.toString();
+					FileChooser fc = new FileChooser();
+					fc.getExtensionFilters().add(new ExtensionFilter("SVG File (*.svg)", ".svg"));
+					File svgFile = fc.showSaveDialog(null);
+					if (svgFile != null) {
+						XMLWriter writer = new XMLWriter(svgFile.getName());
+						writer.writeTo(svgFile, temp);
+					}
 
-					
-					String file = Controller.class.getClassLoader().getResource("indexFX.html").toExternalForm();
-					engine.load(file);
+				});
 
-						
-					engine.getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>(){
+				saveAsBPMN.setOnAction(e -> {
+					FileChooser fc = new FileChooser();
+					fc.getExtensionFilters().add(new ExtensionFilter("BPMN File (*.bpmn)", ".bpmn"));
+					File bpmnFile = fc.showSaveDialog(null);
+					if (bpmnFile != null) {
+						XMLWriter writer = new XMLWriter(bpmnFile.getName());
+						writer.writeTo(bpmnFile, bpmnCode.get());
+					}
 
-						@Override
-						public void changed(ObservableValue<? extends Worker.State> observable, Worker.State oldState, Worker.State newState) {
-							// TODO Auto-generated method stub
-							System.out.println("changed: old "+oldState+" new "+newState);
-							if(newState == Worker.State.SUCCEEDED){
-								JSObject win = (JSObject) engine.executeScript("window");
-								// injection of bridgeObjID into javascript
-								win.setMember("bridgeObjID", bridgeObjID);
-								// injection of bridgeSize into javascript
-								win.setMember("bridgeSize", bridgeSize);
-								win.setMember("java", this);
-								System.out.println("Bridge and BridgeSize are injected");
-								
-								Timeline t = new Timeline();
-								t.getKeyFrames().add(new KeyFrame(Duration.ONE, e -> {
-									String value = engine.executeScript("getViewSize()").toString();
-									String[] parts = value.split(",");
-									
-									double width = Double.parseDouble(parts[0]);
-									double height = Double.parseDouble(parts[1]);
-									
-									webView.setPrefSize(width + 100, height + 100);
-								}));
-								t.setCycleCount(-1);
-								t.play();
-							}
-						}
+				});
 
-					});
-					
-					ContextMenu cmDiagrammSave = new ContextMenu();
-					MenuItem save = new MenuItem("Save");
-					save.setOnAction(e -> {
-						
-					});
-					cmDiagrammSave.getItems().add(save);
-					
-					webView.setOnMouseClicked(e -> {
-						if (e.getButton() == MouseButton.SECONDARY) {
-							cmDiagrammSave.show(webView, e.getScreenX(), e.getScreenY());
-						}
-						else {
-							cmDiagrammSave.hide();
-						}
-					});
-					
+				cmDiagrammSave.getItems().add(saveAsSVG);
+				cmDiagrammSave.getItems().add(saveAsBPMN);
 
-					diagrammView.setCenter(scrollPane);
-				}
-				catch(Exception e) {
-					e.printStackTrace();
-				}
-				
-			});		
+				webView.setOnMouseClicked(e -> {
+					if (e.getButton() == MouseButton.SECONDARY) {
+						cmDiagrammSave.show(webView, e.getScreenX(), e.getScreenY());
+					} else {
+						cmDiagrammSave.hide();
+					}
+				});
+
+				diagrammView.setCenter(scrollPane);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		});
 	}
-	
-	
+
 	public boolean isRecipeParsed() {
 		return recipeParsed.get();
 	}
+
 	public void setRecipeParsed(boolean recipeParsed) {
 		this.recipeParsed.set(recipeParsed);
 	}
+
 	public BooleanProperty recipeParsedProperty() {
 		return recipeParsed;
 	}
-	
+
 	public void selectFileForRecipeImport() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Select File");
@@ -346,7 +432,7 @@ public class Controller implements Initializable {
 		try {
 			initialDirectory = new File(recipeImportFilePathTF.getText()).getParentFile();
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 
 		if (initialDirectory != null) {
@@ -359,39 +445,39 @@ public class Controller implements Initializable {
 			recipeImportFilePathTF.setText(file.getAbsolutePath());
 		}
 	}
-	public void loadFileForRecipeImport() throws IOException {
-		 FileReader fr = new FileReader(recipeImportFilePathTF.getText());
-		 BufferedReader br = new BufferedReader(fr);
 
-		    String line = "";
-		    String text = "";
-		    while( (line = br.readLine()) != null )
-		    {
-		      text = text+line;
-		    }
-		    preparationTA.setText(text);
-		    br.close();
-		
+	public void loadFileForRecipeImport() throws IOException {
+		FileReader fr = new FileReader(recipeImportFilePathTF.getText());
+		BufferedReader br = new BufferedReader(fr);
+
+		String line = "";
+		String text = "";
+		while ((line = br.readLine()) != null) {
+			text = text + line;
+		}
+		preparationTA.setText(text);
+		br.close();
+
 	}
 
 	public void updateRecipeSteps() {
 		identifiedTools.clear();
 		identifiedIngredients.clear();
 		identifiedActions.clear();
-		
+
 		ingredientsPane.getChildren().clear();
-		
-		for(String ingrdient : recipe.get().getIngredients()) {
+
+		for (String ingrdient : recipe.get().getIngredients()) {
 			createWordLabel(ingrdient, ingredientsPane);
 			ingredientsPane.getChildren().add(new Label(" "));
 		}
-		
+
 		stepsPane.getChildren().clear();
-		
-		if(recipe.get().getSteps().isEmpty()) {
+
+		if (recipe.get().getSteps().isEmpty()) {
 			createTextFlowPane(recipe.get().getPreparation(), stepsPane);
 		} else {
-			for(Step step : recipe.get().getSteps()) {
+			for (Step step : recipe.get().getSteps()) {
 				HBox stepPane = new HBox();
 				stepPane.setSpacing(10);
 				Label showStepInfoBtn = new Label("O");
@@ -403,64 +489,67 @@ public class Controller implements Initializable {
 				});
 				stepPane.getChildren().add(showStepInfoBtn);
 				createTextFlowPane(step.getText(), stepPane);
-				
+
 				stepsPane.getChildren().add(stepPane);
 			}
 		}
-		
+
 		Collections.sort(identifiedTools);
 		Collections.sort(identifiedIngredients);
 		Collections.sort(identifiedActions);
 	}
+
 	public void createTextFlowPane(String text, Pane parent) {
 		FlowPane textFlowPane = new FlowPane();
 		textFlowPane.setMaxWidth(Double.MAX_VALUE);
 		text = text.replaceAll("[!\"§$%&/()=?*+'#,;.:_<>\n]", " $0 ");
 		text = text.trim();
-		
+
 		String[] words = text.split(" ");
-		
+
 		for (String word : words) {
 			createWordLabel(word, textFlowPane);
 			textFlowPane.getChildren().add(new Label(" "));
 		}
 		parent.getChildren().add(textFlowPane);
 	}
+
 	public void createWordLabel(String word, FlowPane flowPane) {
 		Label label = new Label(word);
 		if (!word.toLowerCase().equals(word.toUpperCase())) {
-			
+
 			BaseNamedObject<?, ?> obj = kwdb.get().find(word);
-			
-			
+
 			label.backgroundProperty().bind(Bindings.when(label.hoverProperty())
 					.then(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)))
 					.otherwise(Bindings.when(selectedObject.isNotNull().and(selectedObject.isEqualTo(obj)))
-							.then(new Background(new BackgroundFill(Color.color(0.9, 0.9, 0.9), CornerRadii.EMPTY, Insets.EMPTY)))
-							.otherwise(new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY)))));
+							.then(new Background(
+									new BackgroundFill(Color.color(0.9, 0.9, 0.9), CornerRadii.EMPTY, Insets.EMPTY)))
+							.otherwise(new Background(
+									new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY)))));
 
 			if (kwdb.get().findCookingAction(word) != null) {
-				label.setTextFill(Color.RED);
+				label.textFillProperty().bind(Configurations.COOKING_ACTION_COLOR);
 				BaseCookingAction action = kwdb.get().findCookingAction(word);
-				if(!identifiedActions.contains(action)) {
+				if (!identifiedActions.contains(action)) {
 					identifiedActions.add(action);
 				}
 			} else if (kwdb.get().findIngredient(word) != null) {
 				BaseIngredient ingredient = kwdb.get().findIngredient(word);
-				if(!identifiedIngredients.contains(ingredient)) {
+				if (!identifiedIngredients.contains(ingredient)) {
 					identifiedIngredients.add(ingredient);
 				}
 				if (kwdb.get().findIngredientGroup(word) != null) {
-					label.setTextFill(Color.GREENYELLOW);
+					label.textFillProperty().bind(Configurations.GROUPS_COLOR);
 				} else {
-					label.setTextFill(Color.GREEN);
+					label.textFillProperty().bind(Configurations.INGREDIENT_COLOR);
 				}
 			} else if (kwdb.get().findTool(word) != null) {
 				BaseTool tool = kwdb.get().findTool(word);
-				if(!identifiedTools.contains(tool)) {
+				if (!identifiedTools.contains(tool)) {
 					identifiedTools.add(tool);
 				}
-				label.setTextFill(Color.BLUE);
+				label.textFillProperty().bind(Configurations.TOOL_COLOR);
 			} else {
 				ContextMenu cm = new ContextMenu();
 
@@ -475,7 +564,7 @@ public class Controller implements Initializable {
 
 				Alert objectAdded = new Alert(AlertType.INFORMATION);
 				objectAdded.setHeaderText("Object added");
-							
+
 				addToTools.setOnAction(e -> {
 					BaseTool tool = new BaseTool();
 					tool.addName(word);
@@ -486,17 +575,14 @@ public class Controller implements Initializable {
 				});
 				addAsSynonymToTools.setOnAction(e -> {
 					Dialog<BaseTool> selectToolDialog = new Dialog<BaseTool>();
-					selectToolDialog.getDialogPane().getButtonTypes().addAll(
-							ButtonType.CANCEL,
-							ButtonType.OK
-					);
+					selectToolDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
 					((Button) selectToolDialog.getDialogPane().lookupButton(ButtonType.OK)).setDefaultButton(false);
 					selectToolDialog.setHeaderText("Add '" + word + "' as synonym to ");
 					ComboBox<BaseTool> selectToolCB = new ComboBox<BaseTool>();
 					selectToolCB.setItems(FXCollections.observableArrayList(kwdb.get().getTools()));
 					selectToolCB.getSelectionModel().selectFirst();
 					selectToolDialog.setResultConverter(buttonType -> {
-						if(buttonType == ButtonType.OK) {
+						if (buttonType == ButtonType.OK) {
 							return selectToolCB.getValue();
 						} else {
 							return null;
@@ -519,17 +605,15 @@ public class Controller implements Initializable {
 				});
 				addAsSynonymToIngredients.setOnAction(e -> {
 					Dialog<BaseIngredient> selectIngredientDialog = new Dialog<BaseIngredient>();
-					selectIngredientDialog.getDialogPane().getButtonTypes().addAll(
-							ButtonType.CANCEL,
-							ButtonType.OK
-					);
-					((Button) selectIngredientDialog.getDialogPane().lookupButton(ButtonType.OK)).setDefaultButton(false);
+					selectIngredientDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
+					((Button) selectIngredientDialog.getDialogPane().lookupButton(ButtonType.OK))
+							.setDefaultButton(false);
 					selectIngredientDialog.setHeaderText("Add '" + word + "' as synonym to ");
 					ComboBox<BaseIngredient> selectIngredientCB = new ComboBox<BaseIngredient>();
 					selectIngredientCB.setItems(FXCollections.observableArrayList(kwdb.get().getIngredients()));
 					selectIngredientCB.getSelectionModel().selectFirst();
 					selectIngredientDialog.setResultConverter(buttonType -> {
-						if(buttonType == ButtonType.OK) {
+						if (buttonType == ButtonType.OK) {
 							System.out.println("ok");
 							return selectIngredientCB.getValue();
 						} else {
@@ -553,17 +637,17 @@ public class Controller implements Initializable {
 				});
 				addAsSynonymToGroups.setOnAction(e -> {
 					Dialog<BaseIngredientGroup> selectIngredientGroupGroupDialog = new Dialog<BaseIngredientGroup>();
-					selectIngredientGroupGroupDialog.getDialogPane().getButtonTypes().addAll(
-							ButtonType.CANCEL,
-							ButtonType.OK
-					);
-					((Button) selectIngredientGroupGroupDialog.getDialogPane().lookupButton(ButtonType.OK)).setDefaultButton(false);
+					selectIngredientGroupGroupDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL,
+							ButtonType.OK);
+					((Button) selectIngredientGroupGroupDialog.getDialogPane().lookupButton(ButtonType.OK))
+							.setDefaultButton(false);
 					selectIngredientGroupGroupDialog.setHeaderText("Add '" + word + "' as synonym to ");
 					ComboBox<BaseIngredientGroup> selectIngredientGroupCB = new ComboBox<BaseIngredientGroup>();
-					selectIngredientGroupCB.setItems(FXCollections.observableArrayList(kwdb.get().getIngredientGroups()));
+					selectIngredientGroupCB
+							.setItems(FXCollections.observableArrayList(kwdb.get().getIngredientGroups()));
 					selectIngredientGroupCB.getSelectionModel().selectFirst();
 					selectIngredientGroupGroupDialog.setResultConverter(buttonType -> {
-						if(buttonType == ButtonType.OK) {
+						if (buttonType == ButtonType.OK) {
 							return selectIngredientGroupCB.getValue();
 						} else {
 							return null;
@@ -587,17 +671,15 @@ public class Controller implements Initializable {
 				});
 				addAsSynonymToCookingActions.setOnAction(e -> {
 					Dialog<BaseCookingAction> selectCookingActionDialog = new Dialog<BaseCookingAction>();
-					selectCookingActionDialog.getDialogPane().getButtonTypes().addAll(
-							ButtonType.CANCEL,
-							ButtonType.OK
-					);
-					((Button) selectCookingActionDialog.getDialogPane().lookupButton(ButtonType.OK)).setDefaultButton(false);
+					selectCookingActionDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
+					((Button) selectCookingActionDialog.getDialogPane().lookupButton(ButtonType.OK))
+							.setDefaultButton(false);
 					selectCookingActionDialog.setHeaderText("Add '" + word + "' as synonym to ");
 					ComboBox<BaseCookingAction> selectCookingActionCB = new ComboBox<BaseCookingAction>();
 					selectCookingActionCB.setItems(FXCollections.observableArrayList(kwdb.get().getCookingActions()));
 					selectCookingActionCB.getSelectionModel().selectFirst();
 					selectCookingActionDialog.setResultConverter(buttonType -> {
-						if(buttonType == ButtonType.OK) {
+						if (buttonType == ButtonType.OK) {
 							return selectCookingActionCB.getValue();
 						} else {
 							return null;
@@ -610,17 +692,9 @@ public class Controller implements Initializable {
 						updateRecipeSteps();
 					});
 				});
-				
-				cm.getItems().addAll(
-						addToTools,
-						addAsSynonymToTools,
-						addToIngredients,
-						addAsSynonymToIngredients,
-						addToGroups,
-						addAsSynonymToGroups,
-						addToCookingActions,
-						addAsSynonymToCookingActions
-				);
+
+				cm.getItems().addAll(addToTools, addAsSynonymToTools, addToIngredients, addAsSynonymToIngredients,
+						addToGroups, addAsSynonymToGroups, addToCookingActions, addAsSynonymToCookingActions);
 
 				label.setOnMouseClicked(e -> {
 					if (e.getButton() == MouseButton.SECONDARY) {
@@ -633,7 +707,7 @@ public class Controller implements Initializable {
 		}
 		flowPane.getChildren().add(label);
 	}
-	
+
 	public void parseRecipe() {
 		blockingPane.setVisible(true);
 		MESSAGES.clear();
@@ -642,13 +716,13 @@ public class Controller implements Initializable {
 		recipeParsed.set(true);
 		blockingPane.setVisible(false);
 	}
-	
+
 	public void showLibEditor() {
 		blockingPane.setVisible(true);
-		if(libEditor == null) {
+		if (libEditor == null) {
 			libEditor = new LibEditor(kwdb);
 		}
-		
+
 		Platform.runLater(() -> {
 			Optional<KeyWordDatabase> kwdb = libEditor.showAndWait();
 			kwdb.ifPresent(db -> {
@@ -658,79 +732,118 @@ public class Controller implements Initializable {
 			blockingPane.setVisible(false);
 		});
 	}
+
 	public void showProperties() {
 		blockingPane.setVisible(true);
-		if(settingsDialog == null) {
+		if (settingsDialog == null) {
 			settingsDialog = new SettingsDialog();
 		}
-		
+
 		settingsDialog.showAndWait();
-		
+
 	}
-	
+
 	public void prevStep() {
 		processTracker.previous();
-		
-		for(int i = 0; i < contentStack.getChildren().size(); i++) {
+
+		for (int i = 0; i < contentStack.getChildren().size(); i++) {
 			contentStack.getChildren().get(i).setVisible(i == processTracker.getActiveStep());
 		}
+
+		progressBar.progressProperty().unbind();
+		progressBar.setProgress(0);
+
+		switch ((int) processTracker.getActiveStep()) {
+		case 0: {
+			break;
+		}
+		case 1: {
+			progressBar.progressProperty().bind(parser.progressProperty());
+			break;
+		}
+		}
 	}
+
 	public void nextStep() {
 		MESSAGES.clear();
 		processTracker.next();
 
-		for(int i = 0; i < contentStack.getChildren().size(); i++) {
+		for (int i = 0; i < contentStack.getChildren().size(); i++) {
 			contentStack.getChildren().get(i).setVisible(i == processTracker.getActiveStep());
 		}
-		
+
+		progressBar.progressProperty().unbind();
+		progressBar.setProgress(0);
+
 		switch ((int) processTracker.getActiveStep()) {
-			case 1: {
-				recipeParsed.set(false);
-				Recipe recipe = this.recipe.get();
-				recipe.getIngredients().clear();
-				String ingredientsList = ingredientsTA.getText().replaceAll(",", " ").trim();
-				String[] ingredients = ingredientsList.split(" ");
-				for(String ingredient : ingredients) {
-					ingredient = ingredient.trim();
-					if(ingredient.length() != 0) {
-						recipe.getIngredients().add(ingredient);
-					}
+		case 1: {
+			progressBar.progressProperty().bind(parser.progressProperty());
+			recipeParsed.set(false);
+			Recipe recipe = this.recipe.get();
+			recipe.getIngredients().clear();
+			String ingredientsList = ingredientsTA.getText().replaceAll(",", " ").trim();
+			String[] ingredients = ingredientsList.split(" ");
+			for (String ingredient : ingredients) {
+				ingredient = ingredient.trim();
+				if (ingredient.length() != 0) {
+					recipe.getIngredients().add(ingredient);
 				}
-				recipe.setPreparation(preparationTA.getText());
-				
-				recipe.getSteps().clear();
-				
-				updateRecipeSteps();
-				break;
 			}
-			case 2: {
+			recipe.setPreparation(preparationTA.getText());
+
+			recipe.getSteps().clear();
+
+			updateRecipeSteps();
+			break;
+		}
+		case 2: {
+			Platform.runLater(() -> {
+				ProcessModeler processModeler = new ProcessModelerImpl();
+				progressBar.progressProperty().bind(processModeler.getProgress());
+
+				File temp = null;
 				try {
-					callDiagram(new SimpleStringProperty("file:/C:/Users/Martin%20Käppel/Uni_Workspace/BPMN/js/piza2.bpmn"));
-				}
-				catch(Exception e) {
+					temp = File.createTempFile("diagram", ".bpmn");
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				break;
-			}
-			case 3: {
-	
-				break;
-			}
+
+				processModeler.setFile(temp);
+				try {
+					processModeler.createBpmn(recipe.get());
+					bpmnCode.set(processModeler.getXml());
+					callDiagram(new SimpleStringProperty(temp.toURI().toString()));
+				} catch (Exception e) {
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.setTitle("Error");
+					alert.setHeaderText("Error during model creation!");
+					alert.showAndWait();
+					e.printStackTrace();
+				}
+			});
+			break;
+		}
 		}
 	}
+
+	public void finish() {
+		
+	}
+	
 	public KeyWordDatabase getKeyWordDatabase() {
 		return kwdb.get();
 	}
+
 	public boolean kwdbHasChanged() {
 		return kwdbHasChanged;
 	}
-	
-	private void callDiagram(StringProperty bpmnUrl){
-		if(bpmnUrl.getValue() != null){
+
+	private void callDiagram(StringProperty bpmnUrl) {
+		if (bpmnUrl.getValue() != null) {
 			String js1 = "removeBpmnDiagram()";
 			engine.executeScript(js1);
 
-			String js2 = "showBpmnDiagram('"+bpmnUrl.getValue()+"');";
+			String js2 = "showBpmnDiagram('" + bpmnUrl.getValue() + "');";
 			engine.executeScript(js2);
 		}
 	}
@@ -738,6 +851,7 @@ public class Controller implements Initializable {
 	public static void blockView() {
 		bPane.setVisible(true);
 	}
+
 	public static void unblockView() {
 		bPane.setVisible(false);
 	}

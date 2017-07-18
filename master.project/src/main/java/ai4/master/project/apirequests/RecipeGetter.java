@@ -36,4 +36,12 @@ public interface RecipeGetter {
 
 
     default LANG_FLAG getLanguage(){return LANG_FLAG.DE;}
+
+	default Recipe getRecipeByID(String id) {
+		return getRecipe(id);
+	}
+
+	Recipe getRecipeByLink(String link);
+
+	Recipe getRecipeByCategory(String category);
 }

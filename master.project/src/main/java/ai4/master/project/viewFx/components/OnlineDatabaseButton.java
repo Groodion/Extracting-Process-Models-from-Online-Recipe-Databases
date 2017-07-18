@@ -6,11 +6,16 @@ import ai4.master.project.apirequests.RecipeGetter;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.viewFx.Controller;
 import javafx.beans.property.ObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.VPos;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -21,29 +26,74 @@ public class OnlineDatabaseButton extends HBox {
 	public static final double LOGO_WIDTH = 116d;
 	public static final double LOGO_HEIGHT = 69d;
 
-	public OnlineDatabaseButton(String name, String link, String language, String logoPath, RecipeGetter recipeGetter, ObjectProperty<Recipe> recipe) {
+	public enum SearchType {
+		ID, LINK, CATEGORY
+	};
+
+	public OnlineDatabaseButton(String name, String link, String language, String logoPath, RecipeGetter recipeGetter,
+			ObjectProperty<Recipe> recipe, boolean searchCategory) {
 		setOnMouseClicked(e -> {
 			if (recipeGetter != null) {
 				Controller.blockView();
-				TextInputDialog dialog = new TextInputDialog("");
+				Dialog<String> dialog = new Dialog<String>();
+				
+				dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+				HBox layout = new HBox();
+				layout.setPadding(new Insets(10, 10, 10, 10));
+				layout.setSpacing(10);
+
 				dialog.setTitle("Choose recipe source");
 				dialog.setHeaderText(name);
-				dialog.setContentText("Please enter the recipe id:");
-				dialog.setResult("43611014899035");
 
-				Optional<String> result = dialog.showAndWait();
-				if (result.isPresent()) {
-					String id = result.get();
-					recipe.set(recipeGetter.getRecipe(id));
+				ComboBox<SearchType> type = new ComboBox<SearchType>(
+						FXCollections.observableArrayList(SearchType.values()));
+				type.getSelectionModel().selectFirst();
+				
+				if(!searchCategory) {
+					type.getItems().remove(SearchType.CATEGORY);
 				}
+
+				TextField input = new TextField();
+				input.promptTextProperty().bind(type.getSelectionModel().selectedItemProperty().asString());
+				layout.getChildren().addAll(type, input);
+
+				dialog.getDialogPane().setContent(layout);
+
+				dialog.setResultConverter(buttonType -> {
+					if (buttonType == ButtonType.OK) {
+						return input.getText();
+					} else {
+						return null;
+					}
+				});
+				
+				
+				Optional<String> result = dialog.showAndWait();
+				
+				result.ifPresent(r -> {
+					if(r != null) {
+						switch(type.getValue()) {
+							case ID:
+								recipe.set(recipeGetter.getRecipeByID(r));
+								break;
+							case LINK:
+								recipe.set(recipeGetter.getRecipeByLink(r));
+								break;
+							case CATEGORY:
+								recipe.set(recipeGetter.getRecipeByCategory(r));
+								break;
+						}
+					}
+				});
+				
 				Controller.unblockView();
 			}
 		});
 
-		if(recipeGetter == null) {
+		if (recipeGetter == null) {
 			this.setDisable(true);
 		}
-		
+
 		ImageView logo = new ImageView(this.getClass().getResource(logoPath).toString());
 		logo.setFitHeight(LOGO_HEIGHT);
 		logo.setFitWidth(LOGO_WIDTH);
@@ -72,10 +122,6 @@ public class OnlineDatabaseButton extends HBox {
 		layout.add(new Label("Link:"), 0, 2);
 		layout.add(new Label(link), 1, 2);
 
-		getChildren().addAll(
-				seperator,
-				logo,
-				layout
-		);
+		getChildren().addAll(seperator, logo, layout);
 	}
 }
