@@ -11,6 +11,7 @@ import ai4.master.project.recipe.object.CookingAction;
 import ai4.master.project.recipe.object.Ingredient;
 import ai4.master.project.recipe.object.IngredientGroup;
 import ai4.master.project.recipe.object.Tool;
+import ai4.master.project.stanfordParser.exceptions.SentenceContainsNoVerbException;
 import ai4.master.project.stanfordParser.sentence.PunctuationMark;
 import ai4.master.project.stanfordParser.sentence.Sentence;
 import ai4.master.project.stanfordParser.sentence.SentencePart;
@@ -36,7 +37,7 @@ public class Parser {
 		kwdb = new KeyWordDatabase();
 	}
 
-	private List<Sentence> analyzeText(String text) {
+	private List<Sentence> analyzeText(String text) throws SentenceContainsNoVerbException {
 		List<Sentence> sentences = new ArrayList<Sentence>();
 		// Text wird in saetze zerlegt
 		List<List<TaggedWord>> taggedList = tagger.process(getSplittedSentencesFromString(text));
@@ -82,7 +83,11 @@ public class Parser {
 				if (!sentence.getParts().get(j).containsVerb()) {
 					if (sentence.getParts().get(j).containsWord("ebenfalls")
 							|| sentence.getParts().get(j).containsWord(")")) {
-						sentence.getParts().get(j - 1).mergeWith(sentence.getParts().get(j));
+						if(j == 0) {
+							throw new SentenceContainsNoVerbException(sentence);
+						} else {
+							sentence.getParts().get(j - 1).mergeWith(sentence.getParts().get(j));
+						}
 					} else {
 						sentence.getParts().get(j).mergeWith(sentence.getParts().get(j + 1));
 					}
@@ -123,7 +128,7 @@ public class Parser {
 		this.kwdb = kwdb;
 	}
 
-	public void parseRecipe(Recipe recipe) {
+	public void parseRecipe(Recipe recipe) throws SentenceContainsNoVerbException {
 		recipe.getSteps().clear();
 		
 		String text = recipe.getPreparation();
