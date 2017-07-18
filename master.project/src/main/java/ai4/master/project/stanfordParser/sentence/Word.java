@@ -385,6 +385,7 @@ public class Word extends PartialObject<Word> {
 		case TRUNC:
 			break;
 		case VVINF:
+			if(cookingAction != null) break;
 		case VVFIN:
 		case VVIMP:
 		case VVIZU:

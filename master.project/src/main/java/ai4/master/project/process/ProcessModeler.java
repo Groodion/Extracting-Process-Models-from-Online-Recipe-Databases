@@ -1,5 +1,7 @@
 package ai4.master.project.process;
 
+import java.io.File;
+
 import ai4.master.project.recipe.Recipe;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -25,6 +27,7 @@ public interface ProcessModeler {
      * @param name
      */
     void setFileName(String name);
+    void setFile(File file);
 
 
     /**

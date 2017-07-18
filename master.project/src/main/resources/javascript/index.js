@@ -5,6 +5,9 @@
  * and opens it using the bpmn-js viewer.
  */
 
+  var diagramWidthForView = null;
+  var diagramHeightForView = null;
+
 
  function sayHello(msg) {
 	alert(msg);
@@ -20,14 +23,14 @@
 
  }
 
+ var bpmnViewer;
 function showBpmnDiagram(filePath){
-
   // import function
   function importXML(xml) {
 
 	// create viewer
 	var BpmnViewer = window.BpmnJS;
-	var bpmnViewer = new BpmnViewer({
+	bpmnViewer = new BpmnViewer({
 		container: '#canvas'
 	});
 
@@ -48,7 +51,10 @@ function showBpmnDiagram(filePath){
 	  // box covers the diagram, when the zoom factor is 1.0
 	  var box = canvas.viewbox().inner;
 
-	  $('#show_size').html('x: '+box.x+'; y: '+box.y+'; width: '+box.width+'; height: '+box.height);
+	  //$('#show_size').html('x: '+box.x+'; y: '+box.y+'; width: '+box.width+'; height: '+box.height);
+	  diagramWidthForView = box.width;
+	  diagramHeightForView = box.height;
+
 	  // bridgeSize is a bridgeSize class to the JavaFX application and is created by this application
 	  if(typeof(bridgeSize) !== "undefined") {bridgeSize.set(box.x, box.y, box.width, box.height);}
 
@@ -94,6 +100,5 @@ function showBpmnDiagram(filePath){
 
   // load external bpmn diagram file via AJAX and import it
   $.get(filePath, importXML, 'text');
-
 };
 

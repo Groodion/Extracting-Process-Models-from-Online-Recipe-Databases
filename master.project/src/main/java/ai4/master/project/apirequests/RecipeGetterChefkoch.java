@@ -15,6 +15,8 @@ import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Scanner;
+import java.util.regex.Pattern;
 
 /**
  * Created by Rene Bärnreuther on 04.05.2017.
@@ -98,7 +100,6 @@ public class RecipeGetterChefkoch implements RecipeGetter {
         StringBuilder stringBuilder = new StringBuilder();
         String response = getHttpRequestBody(REZEPTE_API_STRING + id);
         JSONArray resultList = this.getJsonResultList(response);
-
         Iterator<JSONObject> resultListIterator = resultList.iterator();
         if (!resultListIterator.hasNext()) {
             return null;
@@ -160,6 +161,21 @@ public class RecipeGetterChefkoch implements RecipeGetter {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        return null;
+        return "";
     }
+
+
+	@Override
+	public Recipe getRecipeByLink(String link) {
+		Scanner scanner = new Scanner(link);
+		String id = scanner.findInLine("[0-9]+");
+		scanner.close();
+		
+		return getRecipe(id);
+	}
+
+	@Override
+	public Recipe getRecipeByCategory(String category) {
+		return getRecipe(getRecipeIDs(category, 1));
+	}
 }

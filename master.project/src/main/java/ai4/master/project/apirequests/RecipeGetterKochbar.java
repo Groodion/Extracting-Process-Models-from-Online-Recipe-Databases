@@ -56,6 +56,18 @@ public class RecipeGetterKochbar implements RecipeGetter {
         return doc;
     }
 
+	@Override
+	public Recipe getRecipeByLink(String link) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Recipe getRecipeByCategory(String category) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 //    public static void main(String args[]){
 //        RecipeGetterKochbar r = new RecipeGetterKochbar();
 //        Recipe recipe = new Recipe(LANG_FLAG.DE);
