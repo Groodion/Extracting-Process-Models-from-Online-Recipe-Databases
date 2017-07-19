@@ -173,6 +173,7 @@ public class Controller implements Initializable {
 		Configurations.PARSER_CONFIGURATION.addListener((b, o, n) -> {
 			try {
 				View.blockLoading();
+				View.setLoadingText("Loading configurations... Parser");
 				parser = new Parser(n.getAbsolutePath());
 				parser.setKwdb(kwdb.get());
 				View.unblockLoading();
@@ -249,6 +250,7 @@ public class Controller implements Initializable {
 						
 			try {
 				View.blockLoading();
+				View.setLoadingText("Loading configurations... Library");
 				kwdb.set(XMLLoader.load(n.getAbsolutePath()));
 				View.unblockLoading();
 			} catch(Exception e) {
@@ -911,7 +913,9 @@ public class Controller implements Initializable {
 	}
 	
 	public void resetParsing() {
+		recipe.get().getSteps().clear();
 		
+		updateRecipeSteps();
 	}
 	
 	public KeyWordDatabase getKeyWordDatabase() {
