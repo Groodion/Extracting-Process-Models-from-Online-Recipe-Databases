@@ -65,6 +65,17 @@ public class BaseIngredient extends BaseNamedObject<Ingredient, BaseIngredient> 
 		
 		return sB.toString();
 	}
+	@Override
+	public String toRefXML() {
+		StringBuilder sB = new StringBuilder();
+		
+		sB.append("<Ingredient name=\"");
+		sB.append(getFirstName());
+		sB.append("\" />");
+		
+		return sB.toString();
+	}
+
 	
 	@Override
 	public BaseIngredient clone(KeyWordDatabase kwdb) {

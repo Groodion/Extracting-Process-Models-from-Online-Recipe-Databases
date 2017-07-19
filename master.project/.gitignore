@@ -1,2 +1,11 @@
 /target/
 /bin/
+*.bpmn
+*.png
+configurations.prop
+.idea/
+1508.png
+43611.png
+98203.png
+9979.png
+master.project.iml

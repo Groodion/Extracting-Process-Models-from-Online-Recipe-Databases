@@ -5,12 +5,14 @@ import ai4.master.project.recipe.*;
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.BaseTool;
+import ai4.master.project.recipe.baseObject.ItemGroup;
 import ai4.master.project.recipe.baseObject.Regex;
 import ai4.master.project.recipe.baseObject.Regex.Result;
 import ai4.master.project.recipe.object.CookingAction;
 import ai4.master.project.recipe.object.Ingredient;
 import ai4.master.project.recipe.object.IngredientGroup;
 import ai4.master.project.recipe.object.Tool;
+import ai4.master.project.stanfordParser.exceptions.SentenceContainsNoVerbException;
 import ai4.master.project.stanfordParser.sentence.PunctuationMark;
 import ai4.master.project.stanfordParser.sentence.Sentence;
 import ai4.master.project.stanfordParser.sentence.SentencePart;
@@ -22,7 +24,6 @@ import edu.stanford.nlp.process.DocumentPreprocessor;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.value.ObservableValue;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class Parser {
 		progress = new SimpleDoubleProperty();
 	}
 
-	private List<Sentence> analyzeText(String text) {
+	private List<Sentence> analyzeText(String text) throws SentenceContainsNoVerbException {
 		List<Sentence> sentences = new ArrayList<Sentence>();
 		// Text wird in saetze zerlegt
 		List<List<TaggedWord>> taggedList = tagger.process(getSplittedSentencesFromString(text));
@@ -88,7 +89,11 @@ public class Parser {
 				if (!sentence.getParts().get(j).containsVerb()) {
 					if (sentence.getParts().get(j).containsWord("ebenfalls")
 							|| sentence.getParts().get(j).containsWord(")")) {
-						sentence.getParts().get(j - 1).mergeWith(sentence.getParts().get(j));
+						if(j == 0) {
+							throw new SentenceContainsNoVerbException(sentence);
+						} else {
+							sentence.getParts().get(j - 1).mergeWith(sentence.getParts().get(j));
+						}
 					} else {
 						sentence.getParts().get(j).mergeWith(sentence.getParts().get(j + 1));
 					}
@@ -131,18 +136,16 @@ public class Parser {
 		this.kwdb = kwdb;
 	}
 
-	public void parseRecipe(Recipe recipe) {
+	public void parseRecipe(Recipe recipe) throws SentenceContainsNoVerbException {
 		progress.set(0);
 		recipe.getSteps().clear();
 		
 		String text = recipe.getPreparation();
 		recipe.setPreparation(text);
-
 		
 		List<Sentence> sentences = analyzeText(text);
 		progress.set(0.25);
 		
-
 		for (int i = 0; i < sentences.size(); i++) {
 			sentences.get(i).init(kwdb);
 			progress.set(0.25 + (i+1) * 0.25 / sentences.size());
@@ -183,21 +186,9 @@ public class Parser {
 					step.getIngredients().addAll(sP.getIngredients());
 					step.getTools().addAll(sP.getTools());
 
-					boolean needsImplicitTool = !step.getCookingAction().getBaseObject().getImplicitTools().isEmpty();
-
-					if (needsImplicitTool) {
-						for (Tool tool : step.getTools()) {
-							if (step.getCookingAction().getBaseObject().getImplicitTools()
-									.contains(tool.getBaseObject())) {
-								needsImplicitTool = false;
-								break;
-							}
-						}
-						if (needsImplicitTool) {
-							Tool implicitTool = step.getCookingAction().getBaseObject().getImplicitTools().get(0)
-									.toObject();
-							implicitTool.setImplicit(true);
-							step.getTools().add(implicitTool);
+					for(ItemGroup<BaseTool, Tool> toolGroup : step.getCookingAction().getBaseObject().getImplicitTools()) {
+						if(!toolGroup.checkList(step.getTools())) {
+							step.getTools().add(toolGroup.getImpliedItem());
 						}
 					}
 
@@ -219,11 +210,16 @@ public class Parser {
 							}
 						}
 					}
+					for(ItemGroup<BaseIngredient, Ingredient> ingredientGroup : step.getCookingAction().getBaseObject().getImplicitIngredients()) {
+						if(!ingredientGroup.checkList(step.getIngredients())) {
+							step.getIngredients().add(ingredientGroup.getImpliedItem());
+						}
+					}
 
 					boolean noResult = false;
 					boolean ingredientsNeeded = true;
 					Regex mRegex = new Regex(".*", Result.ALL);
-					
+
 					for (Ingredient ingredient : step.getIngredients()) {
 						if (ingredient instanceof IngredientGroup) {
 							List<Ingredient> aIngredients = activeIngredients.get(ingredient.getBaseObject());
@@ -240,7 +236,7 @@ public class Parser {
 					}
 					
 					for (Regex regex : action.getRegexList()) {
-						if (sP.matches(regex.getExpression(), false)) {
+						if (sP.matches(regex.getExpression(), false, step.getCookingAction().getBaseObject().getUsedRegexTags())) {
 							ingredientsNeeded = regex.isIngredientsNeeded();
 							mRegex = regex;
 							
@@ -251,20 +247,36 @@ public class Parser {
 							switch (regex.getResult()) {
 							case ALL:
 								for (Ingredient ingredient : step.getIngredients()) {
-									step.getProducts().addAll(action.transform(ingredient, step.getIngredients(), regex));
+									if(!ingredient.isImplicit()) {
+										step.getProducts().addAll(action.transform(ingredient, step.getIngredients(), regex));
+									}
 								}
 								break;
 							case FIRST:
-								if (!step.getIngredients().isEmpty())
-									step.getProducts().addAll(
-											action.transform(step.getIngredients().get(0), step.getIngredients(), regex));
+								Ingredient firstIngredient = null;
+								for(Ingredient ingredient : step.getIngredients()) {
+									if(!ingredient.isImplicit()) {
+										firstIngredient = ingredient;
+										break;
+									}
+								}
+								if (firstIngredient != null) {
+									step.getProducts().addAll(action.transform(firstIngredient, step.getIngredients(), regex));
+								}
 								break;
 							case LAST:
-								if (!step.getIngredients().isEmpty())
-									step.getProducts()
-											.addAll(action.transform(
-													step.getIngredients().get(step.getIngredients().size() - 1),
-													step.getIngredients(), regex));
+								Ingredient lastIngredient = null;
+
+								for(int i = step.getIngredients().size() - 1; i >= 0; i--) {
+									if(!step.getIngredients().get(i).isImplicit()) {
+										lastIngredient = step.getIngredients().get(i);
+										break;
+									}
+								}
+
+								if (lastIngredient != null) {
+									step.getProducts().addAll(action.transform(lastIngredient, step.getIngredients(), regex));
+								}
 								break;
 							case PREV:
 								step.getIngredients().addAll(lastStep.getProducts());
@@ -285,7 +297,16 @@ public class Parser {
 					sP.clearMemory();
 										
 					if (lastStep != null && ingredientsNeeded) {
-						if (step.getIngredients().isEmpty()) {
+						boolean ingredientsEmpty = true;
+						
+						for(Ingredient ingredient : step.getIngredients()) {
+							if(!ingredient.isImplicit()) {
+								ingredientsEmpty = false;
+								break;
+							}
+						}
+						
+						if (ingredientsEmpty) {
 							step.getIngredients().addAll(lastStep.getProducts());
 
 							if (!noResult) {

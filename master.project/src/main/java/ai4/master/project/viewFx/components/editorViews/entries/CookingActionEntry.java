@@ -31,7 +31,7 @@ public class CookingActionEntry {
 		
 		regex = FXCollections.observableArrayList(cookingAction.getRegexList());
 		transformations = FXCollections.observableArrayList(cookingAction.getTransformations());
-		tools = FXCollections.observableArrayList(cookingAction.getImplicitTools());
+		tools = FXCollections.observableArrayList();//TODO
 				
 		name.addListener((b, o, n) -> {
 			if(n == null || n.length() == 0) {
@@ -119,6 +119,5 @@ public class CookingActionEntry {
 		
 		cookingAction.getRegexList().addAll(entry.getRegex());
 		cookingAction.getTransformations().addAll(entry.getTransformations());
-		cookingAction.getImplicitTools().addAll(entry.getTools());
 	}
 }

@@ -13,16 +13,13 @@ import java.util.List;
 
 
 public class KeyWordDatabase {
-	
-	public static final KeyWordDatabase GERMAN_KWDB = XMLLoader.load("resources/Lib.xml");
-	
+		
 	private List<BaseTool> tools;
 	private List<BaseIngredient> ingredients;
 	private List<BaseCookingAction> cookingActions;
 	private List<BaseIngredientGroup> ingredientGroups;
 	private List<String> partIndicators;
 	private List<String> lastSentenceReferences;
-	private List<String> conditionIndicators;
 	private List<String> eventIndicators;
 	
 	public KeyWordDatabase() {
@@ -32,11 +29,7 @@ public class KeyWordDatabase {
 		cookingActions = new ArrayList<BaseCookingAction>();
 		partIndicators = new ArrayList<String>();
 		lastSentenceReferences = new ArrayList<String>();
-		conditionIndicators = new ArrayList<String>();
 		eventIndicators = new ArrayList<String>();
-		
-		//TODO import;
-		conditionIndicators.add(Word.stem("Bratzeit"));
 	}
 
 	public List<BaseTool> getTools() {
@@ -210,10 +203,6 @@ public class KeyWordDatabase {
 
 	public List<BaseIngredientGroup> getIngredientGroups() {
 		return ingredientGroups;
-	}
-
-	public boolean isConditionIndicator(String text) {
-		return conditionIndicators.contains(Word.stem(text));
 	}
 
 	public String toXML() {

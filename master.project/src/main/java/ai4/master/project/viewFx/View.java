@@ -9,6 +9,8 @@ import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -38,6 +40,8 @@ public class View extends Application {
 
 
 	private Controller controller;
+	
+	private static final IntegerProperty loadingCounter = new SimpleIntegerProperty(0);
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
@@ -190,5 +194,12 @@ public class View extends Application {
 	public static void main(String args[]) {
 		launch(args);
 		System.exit(1);
+	}
+	
+	public static void blockLoading() {
+		loadingCounter.set(loadingCounter.get() + 1);
+	}
+	public static void unblockLoading() {
+		loadingCounter.set(loadingCounter.get() - 1);		
 	}
 }

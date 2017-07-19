@@ -15,6 +15,7 @@ import ai4.master.project.stanfordParser.STTSTag;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class SentencePart extends PartialObject<SentencePart> {
 
@@ -118,7 +119,7 @@ public class SentencePart extends PartialObject<SentencePart> {
 
 	
 	private String[] combinations;
-	private String[] textComb(boolean ignorePunctuationMarks) {
+	private String[] textComb(boolean ignorePunctuationMarks, Set<String> tags) {
 		if(combinations == null) {
 			List<StringBuilder> combinations = new ArrayList<StringBuilder>();
 			
@@ -139,8 +140,10 @@ public class SentencePart extends PartialObject<SentencePart> {
 					
 					for(StringBuilder sB : combinations) {
 						nCombs.add(combine(sB, word.getText().toLowerCase()));
-						nCombs.add(combine(sB, word.getPos()));
-						if(word.getRole() != null) {
+						if(tags.contains('_' + word.getPos().toString())) {
+							nCombs.add(combine(sB, word.getPos()));
+						}
+						if(word.getRole() != null && tags.contains('~' + word.getRole().toString())) {
 							nCombs.add(combine(sB, word.getRole()));
 						}
 					}
@@ -162,8 +165,8 @@ public class SentencePart extends PartialObject<SentencePart> {
 	 * Testet ob der Satzteil einem regul�ren Ausdruck entspricht.
 	 * @return
 	 */
-	public boolean matches(String reg, boolean ignorePunctuationMarks) {
-		String[] combinations = textComb(ignorePunctuationMarks);
+	public boolean matches(String reg, boolean ignorePunctuationMarks, Set<String> usedTags) {
+		String[] combinations = textComb(ignorePunctuationMarks, usedTags);
 		
 		for(String combination : combinations) {
 			if(combination.matches(reg)) {
@@ -179,24 +182,6 @@ public class SentencePart extends PartialObject<SentencePart> {
 	 */
 	public void clearMemory() {
 		this.combinations = null;
-	}
-	
-	/**
-	 * Identifiziert bestimmte W�rter anhand eines regul�ren Ausdrucks. <b>FUNKTIONIERT NOCH NICHT</b>
-	 * @return
-	 */
-	public List<Object> identify(String reg) {
-		for(String combination : combinations) {
-			if(combination.matches(reg)) {
-				List<Object> objects = new ArrayList<Object>();
-				
-				
-				
-				return objects;
-			}
-		}
-		
-		return null;
 	}
 	
 	private static StringBuilder combine(StringBuilder sB, Object s) {

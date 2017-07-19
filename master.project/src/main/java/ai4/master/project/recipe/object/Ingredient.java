@@ -9,7 +9,7 @@ import ai4.master.project.recipe.object.ingredientTag.QuantifierTag;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Ingredient extends NamedObject<BaseIngredient> {
+public class Ingredient extends ImplicitNamedObject<BaseIngredient> {
 
 	private List<IngredientTag> tags;
 
@@ -72,7 +72,7 @@ public class Ingredient extends NamedObject<BaseIngredient> {
 	
 	@Override
 	public String toString() {
-		return "Ingredient [name=" + getName() + ", tags=" + tags + "]";
+		return "Ingredient [name=" + getName() + ", tags=" + tags + ", implicit=" + isImplicit() + "]";
 	}
 
 	@Override

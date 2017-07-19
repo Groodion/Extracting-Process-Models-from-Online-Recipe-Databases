@@ -8,6 +8,7 @@ import ai4.master.project.recipe.Step;
 import ai4.master.project.stanfordParser.Parser;
 import ai4.master.project.viewFx.Controller;
 
+import java.io.File;
 import java.net.URL;
 
 public class ParserTest {
@@ -18,7 +19,7 @@ public class ParserTest {
 */
 	//15XX not working with tool compare
 	static String[] ids = {
-        "43611014899035", "997991205154456", "150681066371674", "982031203667502"
+        "43611014899035"
 };
     public static void main(String[] args) throws Exception {
 //    	testParser();
@@ -63,6 +64,7 @@ public class ParserTest {
 
                 //Now steps are saved in recipe
                 ProcessModeler processModeler = new ProcessModelerImpl();
+        		processModeler.setFile(new File("test.bpmn"));
         		processModeler.setFileName(ids[i]);
                 processModeler.createBpmn(recipe);
             } catch (Exception ex) {

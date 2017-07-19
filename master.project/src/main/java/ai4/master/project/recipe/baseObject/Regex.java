@@ -1,5 +1,9 @@
 package ai4.master.project.recipe.baseObject;
 
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
+
 import ai4.master.project.KeyWordDatabase;
 
 public class Regex {
@@ -14,9 +18,11 @@ public class Regex {
 	private String id = null;
 	private boolean chargingTools;
 	
+	private Set<String> usedTags;
 	
 	public Regex(String expression, Result result, boolean ingredientsNeeded, boolean referencePreviousProducts) {
-		this.expression = expression;
+		this.usedTags = new HashSet<String>();
+		setExpression(expression);
 		this.result = result;
 		this.ingredientsNeeded = ingredientsNeeded;
 		this.referencePreviousProducts = referencePreviousProducts;
@@ -36,8 +42,20 @@ public class Regex {
 	}
 	public void setExpression(String expression) {
 		this.expression = expression;
+		
+		usedTags.clear();
+		Scanner scanner = new Scanner(expression);
+		scanner.useDelimiter(" ");
+		String pattern = "[_~][A-Z]+";
+		while(scanner.hasNext(pattern)) {
+			usedTags.add(scanner.next(pattern));
+		}
+		scanner.close();
 	}
-
+	public Set<String> getUsedTags() {
+		return usedTags;
+	}
+	
 	public Result getResult() {
 		return result;
 	}

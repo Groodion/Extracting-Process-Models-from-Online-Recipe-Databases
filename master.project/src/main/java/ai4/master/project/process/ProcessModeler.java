@@ -1,10 +1,9 @@
 package ai4.master.project.process;
 
-import java.io.File;
-
 import ai4.master.project.recipe.Recipe;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+
+import java.io.File;
 
 
 /**
@@ -40,9 +39,5 @@ public interface ProcessModeler {
      *
      * @return the current progress of the conversation.
      */
-    default DoubleProperty getProgress(){
-       DoubleProperty d = new SimpleDoubleProperty();
-       d.setValue(0.0);
-       return d;
-    }
+     DoubleProperty getProgress();
 }

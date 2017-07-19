@@ -1,7 +1,5 @@
 package ai4.master.project.output;
 
-import org.apache.commons.lang3.ObjectUtils;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
