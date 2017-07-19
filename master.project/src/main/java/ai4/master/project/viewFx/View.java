@@ -2,6 +2,8 @@ package ai4.master.project.viewFx;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -33,6 +35,8 @@ public class View extends Application {
 
 	private Controller controller;
 
+	private static final IntegerProperty loadingCounter = new SimpleIntegerProperty(0);
+	
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
@@ -90,7 +94,6 @@ public class View extends Application {
 		Task<Parent> service = new Task<Parent>() {
 			@Override
 			protected Parent call() throws Exception {
-				Configurations.load();
 				Font.loadFont(getClass().getResource("/fonts/HelveticaNeue.ttf").toExternalForm(), 20);
 				FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/view.fxml"));
 				Parent parent = null;
@@ -109,69 +112,88 @@ public class View extends Application {
 		};
 
 		service.setOnSucceeded(e -> {
-			primaryStage.setScene(new Scene(service.getValue()));
-			primaryStage.setWidth(Configurations.VIEW_WIDTH.get());
-			primaryStage.setHeight(Configurations.VIEW_HEIGHT.get());
-			Configurations.VIEW_WIDTH.bind(primaryStage.widthProperty());
-			Configurations.VIEW_HEIGHT.bind(primaryStage.heightProperty());
-			
-			primaryStage.initStyle(StageStyle.DECORATED);
-			primaryStage.setOnCloseRequest(r -> {
-				if (controller.kwdbHasChanged()) {
-					Alert alert = new Alert(AlertType.CONFIRMATION, null, ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
-					alert.setTitle("Save Changes");
-					alert.setHeaderText("The database has been changed!");
-					alert.setContentText("Do you want to save the changes?");
-					((Button) alert.getDialogPane().lookupButton(ButtonType.YES)).setDefaultButton(false);
-					Optional<ButtonType> result = alert.showAndWait();
-					result.ifPresent(button -> {
-						if (button == ButtonType.YES) {
-							File dbFile = Configurations.LIB_LOCATION.get();
-							if (!dbFile.exists()) {
-								try {
-									dbFile.createNewFile();
-								} catch (IOException ex) {
-									Alert fileNotFoundOrCorruptedAlert = new Alert(AlertType.ERROR);
-									fileNotFoundOrCorruptedAlert.setHeaderText("Error");
-									fileNotFoundOrCorruptedAlert.setHeaderText("Can't create file at specified location!");
-									fileNotFoundOrCorruptedAlert.showAndWait();
-									
-									ex.printStackTrace();
-								}
-							}
-
-							if (dbFile.exists()) {
-								try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dbFile), "UTF-8"))) {
-									writer.write(controller.getKeyWordDatabase().toXML());
-									writer.flush();
-								} catch (IOException ex) {
-									Alert fileNotFoundOrCorruptedAlert = new Alert(AlertType.ERROR);
-									fileNotFoundOrCorruptedAlert.setHeaderText("Error");
-									fileNotFoundOrCorruptedAlert.setHeaderText("Can't access file!");
-									fileNotFoundOrCorruptedAlert.showAndWait();
-									
-									ex.printStackTrace();
-								}
-							}
-						} else if (button == ButtonType.CANCEL) {
-							r.consume();
-						}
-					});
-				}
-				Configurations.save();
-			});
-			//http://www.chefkoch.de/rezepte/3361661499859558/Zarte-Schokokuechlein.html Produziert eine IndexOutofBounds beim Parsen
-			
-			primaryStage.show();
-			splashScreen.hide();
+			if(loadingCounter.get() == 0) {
+				startView(primaryStage, splashScreen, service);
+			} else {
+				loadingCounter.addListener((b, o, n) -> {
+					if((int) n == 0) {
+						startView(primaryStage, splashScreen, service);
+					}
+				});
+			}
 		});
 
 		Thread thread = new Thread(service);
 		thread.start();
 	}
+	
+	public void startView(Stage primaryStage, Stage splashScreen, Task<Parent> service) {
+		primaryStage.setScene(new Scene(service.getValue()));
+		primaryStage.setWidth(Configurations.VIEW_WIDTH.get());
+		primaryStage.setHeight(Configurations.VIEW_HEIGHT.get());
+		Configurations.VIEW_WIDTH.bind(primaryStage.widthProperty());
+		Configurations.VIEW_HEIGHT.bind(primaryStage.heightProperty());
+		
+		primaryStage.initStyle(StageStyle.DECORATED);
+		primaryStage.setOnCloseRequest(r -> {
+			if (controller.kwdbHasChanged()) {
+				Alert alert = new Alert(AlertType.CONFIRMATION, null, ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
+				alert.setTitle("Save Changes");
+				alert.setHeaderText("The database has been changed!");
+				alert.setContentText("Do you want to save the changes?");
+				((Button) alert.getDialogPane().lookupButton(ButtonType.YES)).setDefaultButton(false);
+				Optional<ButtonType> result = alert.showAndWait();
+				result.ifPresent(button -> {
+					if (button == ButtonType.YES) {
+						File dbFile = Configurations.LIB_LOCATION.get();
+						if (!dbFile.exists()) {
+							try {
+								dbFile.createNewFile();
+							} catch (IOException ex) {
+								Alert fileNotFoundOrCorruptedAlert = new Alert(AlertType.ERROR);
+								fileNotFoundOrCorruptedAlert.setHeaderText("Error");
+								fileNotFoundOrCorruptedAlert.setHeaderText("Can't create file at specified location!");
+								fileNotFoundOrCorruptedAlert.showAndWait();
+								
+								ex.printStackTrace();
+							}
+						}
+
+						if (dbFile.exists()) {
+							try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dbFile), "UTF-8"))) {
+								writer.write(controller.getKeyWordDatabase().toXML());
+								writer.flush();
+							} catch (IOException ex) {
+								Alert fileNotFoundOrCorruptedAlert = new Alert(AlertType.ERROR);
+								fileNotFoundOrCorruptedAlert.setHeaderText("Error");
+								fileNotFoundOrCorruptedAlert.setHeaderText("Can't access file!");
+								fileNotFoundOrCorruptedAlert.showAndWait();
+								
+								ex.printStackTrace();
+							}
+						}
+					} else if (button == ButtonType.CANCEL) {
+						r.consume();
+					}
+				});
+			}
+			Configurations.save();
+		});
+		//http://www.chefkoch.de/rezepte/3361661499859558/Zarte-Schokokuechlein.html Produziert eine IndexOutofBounds beim Parsen
+		
+		primaryStage.show();
+		splashScreen.hide();
+	}
 
 	public static void main(String args[]) {
 		launch(args);
 		System.exit(1);
+	}
+
+	public static void blockLoading() {
+		loadingCounter.set(loadingCounter.get() + 1);
+	}
+	public static void unblockLoading() {
+		loadingCounter.set(loadingCounter.get() - 1);		
 	}
 }

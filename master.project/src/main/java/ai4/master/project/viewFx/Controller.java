@@ -58,6 +58,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
@@ -144,18 +145,53 @@ public class Controller implements Initializable {
 	private WebEngine engine;
 
 	public Controller() {
-		parser = new Parser(Configurations.PARSER_CONFIGURATION.get().getAbsolutePath());
 		recipe = new SimpleObjectProperty<Recipe>(new Recipe(LANG_FLAG.DE));
-		kwdb = new SimpleObjectProperty<KeyWordDatabase>(
-				XMLLoader.load(Configurations.LIB_LOCATION.get().getAbsolutePath()));
+		kwdb = new SimpleObjectProperty<KeyWordDatabase>();
 		selectedObject = new SimpleObjectProperty<BaseNamedObject<?, ?>>();
 		recipeParsed = new SimpleBooleanProperty(false);
-		parser.setKwdb(kwdb.get());
 		bpmnCode = new SimpleStringProperty();
-		Configurations.PARSER_CONFIGURATION.addListener((b, o, n) -> {
-			parser = new Parser(n.getAbsolutePath());
-		});
 
+		kwdb.addListener((b, o, n) -> {
+			if(parser != null) {
+				parser.setKwdb(n);
+			}
+		});
+		
+		ButtonType resetButton = new ButtonType("Reset", ButtonData.OTHER);
+		
+		Configurations.PARSER_CONFIGURATION.addListener((b, o, n) -> {
+			try {
+				View.blockLoading();
+				parser = new Parser(n.getAbsolutePath());
+				parser.setKwdb(kwdb.get());
+				View.unblockLoading();
+			} catch(Exception e) {
+				Platform.runLater(() -> {
+					Alert alert = new Alert(AlertType.ERROR, null, ButtonType.OK, resetButton, ButtonType.CANCEL);
+					alert.setTitle("ERROR");
+					alert.setHeaderText("Error while loading Parser-Tagger!");
+					alert.setContentText("Please select a valid Tagger-File.");
+					
+					alert.showAndWait().ifPresent(buttonType -> {
+						if(buttonType == ButtonType.OK) {
+							FileChooser fileChooser = new FileChooser();
+							fileChooser.getExtensionFilters().add(new ExtensionFilter("Tagger-File (*.tagger)", "*.tagger"));
+							File file = fileChooser.showOpenDialog(null);
+							
+							if(file != null) {
+								Configurations.PARSER_CONFIGURATION.set(file);
+							}
+						} else if(buttonType == resetButton) {
+							Configurations.PARSER_CONFIGURATION.set(new File(Configurations.DEFAULT_PARSER_CONFIGURATION));
+						} else if(parser == null) {
+							System.exit(0);
+						}
+						View.unblockLoading();
+					});
+				});
+				e.printStackTrace();
+			}
+		});
 		Configurations.LIB_LOCATION.addListener((b, o, n) -> {
 			if (kwdbHasChanged()) {
 				Alert alert = new Alert(AlertType.CONFIRMATION, null, ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
@@ -180,8 +216,7 @@ public class Controller implements Initializable {
 						}
 
 						if (dbFile.exists()) {
-							try (BufferedWriter writer = new BufferedWriter(
-									new OutputStreamWriter(new FileOutputStream(dbFile), "UTF-8"))) {
+							try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dbFile), "UTF-8"))) {
 								writer.write(getKeyWordDatabase().toXML());
 								writer.flush();
 							} catch (IOException ex) {
@@ -198,16 +233,47 @@ public class Controller implements Initializable {
 						kwdbHasChanged = true;
 						return;
 					}
-					kwdb.set(XMLLoader.load(n.getAbsolutePath()));
 				});
-			} else {
-				kwdb.set(XMLLoader.load(n.getAbsolutePath()));
 			}
+						
+			try {
+				View.blockLoading();
+				kwdb.set(XMLLoader.load(n.getAbsolutePath()));
+				View.unblockLoading();
+			} catch(Exception e) {
+				Platform.runLater(() -> {
+					Alert alert = new Alert(AlertType.ERROR, null, ButtonType.OK, resetButton, ButtonType.CANCEL);
+					alert.setTitle("ERROR");
+					alert.setHeaderText("Error while loading KeyWordDatabase!");
+					alert.setContentText("Please select a valid KeyWordDatabase-File.");
+					
+					alert.showAndWait().ifPresent(buttonType -> {
+						if(buttonType == ButtonType.OK) {
+							FileChooser fileChooser = new FileChooser();
+							fileChooser.getExtensionFilters().add(new ExtensionFilter("KeyWordDatabase (*.xml)", "*.xml"));
+							File file = fileChooser.showOpenDialog(null);
+							
+							if(file != null) {
+								Configurations.LIB_LOCATION.set(file);
+							}
+						} else if(buttonType == resetButton) {
+							Configurations.LIB_LOCATION.set(new File(Configurations.DEFAULT_LIB_LOCATION));
+						} else if(kwdb.get() == null) {
+							System.exit(0);
+						}
+
+						View.unblockLoading();						
+					});
+				});
+				e.printStackTrace();
+			}			
 		});
 
 		identifiedTools = FXCollections.observableArrayList();
 		identifiedIngredients = FXCollections.observableArrayList();
 		identifiedActions = FXCollections.observableArrayList();
+		
+		Configurations.load();
 	}
 
 	@Override

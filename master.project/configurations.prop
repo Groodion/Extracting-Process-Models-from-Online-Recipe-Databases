@@ -1,8 +1,7 @@
-#Wed Jul 19 15:11:27 CEST 2017
 parserConfiguration=D\:\\Dropbox\\workspace\\Extracting-Process-Models-from-Online-Recipe-Databases\\master.project\\lib\\models\\german-fast.tagger
-viewHeight=916.0
-viewWidth=1616.0
-bpmnLocation=D\:\\Dropbox\\workspace\\Extracting-Process-Models-from-Online-Recipe-Databases\\master.project
+viewHeight=684.0
+viewWidth=1007.0
+bpmnLocation=D\:\\Dropb\\workspace\\Extracting-Process-Models-from-Online-Recipe-Databases\\master.project
 toolColor=0x0000ffff
 ingredientColor=0x008000ff
 libLocation=D\:\\Dropbox\\workspace\\Extracting-Process-Models-from-Online-Recipe-Databases\\master.project\\resources\\Lib.xml

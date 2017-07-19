@@ -15,15 +15,15 @@ import javafx.scene.paint.Color;
 
 public final class Configurations {
 	
-	private static final String DEFAULT_LIB_LOCATION = "resources/Lib.xml";
-	private static final String DEFAULT_PARSER_CONFIGURATION = "lib/models/german-fast.tagger";
-	private static final String DEFAULT_BPMN_LOCATION = "";
-	private static final Color DEFAULT_INGREDIENT_COLOR = Color.GREEN;
-	private static final Color DEFAULT_GROUPS_COLOR = Color.GREENYELLOW;
-	private static final Color DEFAULT_TOOL_COLOR = Color.BLUE;
-	private static final Color DEFAULT_COOKING_ACTION_COLOR = Color.RED;
-	private static final double DEFAULT_VIEW_WIDTH = 1024d;
-	private static final double DEFAULT_VIEW_HEIGHT = 720d;
+	public static final String DEFAULT_LIB_LOCATION = "resources/Lib.xml";
+	public static final String DEFAULT_PARSER_CONFIGURATION = "lib/models/german-fast.tagger";
+	public static final String DEFAULT_BPMN_LOCATION = "";
+	public static final Color DEFAULT_INGREDIENT_COLOR = Color.GREEN;
+	public static final Color DEFAULT_GROUPS_COLOR = Color.GREENYELLOW;
+	public static final Color DEFAULT_TOOL_COLOR = Color.BLUE;
+	public static final Color DEFAULT_COOKING_ACTION_COLOR = Color.RED;
+	public static final double DEFAULT_VIEW_WIDTH = 1024d;
+	public static final double DEFAULT_VIEW_HEIGHT = 720d;
 	
 	public static final ObjectProperty<File> LIB_LOCATION = new SimpleObjectProperty<File>();
 	public static final ObjectProperty<File> PARSER_CONFIGURATION = new SimpleObjectProperty<File>();
@@ -37,6 +37,7 @@ public final class Configurations {
 
 	public static final DoubleProperty VIEW_WIDTH = new SimpleDoubleProperty();
 	public static final DoubleProperty VIEW_HEIGHT = new SimpleDoubleProperty();
+	
 	
 	public static void save() {
 		Properties properties = new Properties();
@@ -61,7 +62,6 @@ public final class Configurations {
 			e.printStackTrace();
 		}
 	}
-	
 	public static void load() {
 		File file = new File("configurations.prop");
 		if(file.exists()) {
@@ -74,24 +74,24 @@ public final class Configurations {
 				e.printStackTrace();
 			}
 			
-			if(properties.containsKey("libLocation"))	LIB_LOCATION.set(new File(properties.getProperty("libLocation")));
-			else 										LIB_LOCATION.set(new File(DEFAULT_LIB_LOCATION));
+			if(properties.containsKey("libLocation"))			LIB_LOCATION.set(new File(properties.getProperty("libLocation")));
+			else 												LIB_LOCATION.set(new File(DEFAULT_LIB_LOCATION));
 			if(properties.containsKey("parserConfiguration"))	PARSER_CONFIGURATION.set(new File(properties.getProperty("parserConfiguration")));
 			else												PARSER_CONFIGURATION.set(new File(DEFAULT_PARSER_CONFIGURATION));
-			if(properties.containsKey("bpmnLocation"))	BPMN_LOCATION.set(new File(properties.getProperty("bpmnLocation")));
-			else										BPMN_LOCATION.set(new File(DEFAULT_BPMN_LOCATION));
-			if(properties.containsKey("ingredientColor"))	INGREDIENT_COLOR.set(Color.valueOf(properties.getProperty("ingredientColor")));
-			else											INGREDIENT_COLOR.set(DEFAULT_INGREDIENT_COLOR);
-			if(properties.containsKey("groupsColor"))	GROUPS_COLOR.set(Color.valueOf(properties.getProperty("groupsColor")));
-			else										GROUPS_COLOR.set(DEFAULT_GROUPS_COLOR);
-			if(properties.containsKey("toolColor"))	TOOL_COLOR.set(Color.valueOf(properties.getProperty("toolColor")));
-			else									TOOL_COLOR.set(DEFAULT_TOOL_COLOR);
+			if(properties.containsKey("bpmnLocation"))			BPMN_LOCATION.set(new File(properties.getProperty("bpmnLocation")));
+			else												BPMN_LOCATION.set(new File(DEFAULT_BPMN_LOCATION));
+			if(properties.containsKey("ingredientColor"))		INGREDIENT_COLOR.set(Color.valueOf(properties.getProperty("ingredientColor")));
+			else												INGREDIENT_COLOR.set(DEFAULT_INGREDIENT_COLOR);
+			if(properties.containsKey("groupsColor"))			GROUPS_COLOR.set(Color.valueOf(properties.getProperty("groupsColor")));
+			else												GROUPS_COLOR.set(DEFAULT_GROUPS_COLOR);
+			if(properties.containsKey("toolColor"))				TOOL_COLOR.set(Color.valueOf(properties.getProperty("toolColor")));
+			else												TOOL_COLOR.set(DEFAULT_TOOL_COLOR);
 			if(properties.containsKey("cookingActionColor"))	COOKING_ACTION_COLOR.set(Color.valueOf(properties.getProperty("cookingActionColor")));
 			else												COOKING_ACTION_COLOR.set(DEFAULT_COOKING_ACTION_COLOR);
-			if(properties.containsKey("viewWidth"))	VIEW_WIDTH.set(Double.parseDouble(properties.getProperty("viewWidth")));
-			else									VIEW_WIDTH.set(DEFAULT_VIEW_WIDTH);
-			if(properties.containsKey("viewHeight"))	VIEW_HEIGHT.set(Double.parseDouble(properties.getProperty("viewHeight")));
-			else										VIEW_HEIGHT.set(DEFAULT_VIEW_HEIGHT);
+			if(properties.containsKey("viewWidth"))				VIEW_WIDTH.set(Double.parseDouble(properties.getProperty("viewWidth")));
+			else												VIEW_WIDTH.set(DEFAULT_VIEW_WIDTH);
+			if(properties.containsKey("viewHeight"))			VIEW_HEIGHT.set(Double.parseDouble(properties.getProperty("viewHeight")));
+			else												VIEW_HEIGHT.set(DEFAULT_VIEW_HEIGHT);
 		} else {
 			try {
 				file.createNewFile();
@@ -115,11 +115,8 @@ public final class Configurations {
 		VIEW_HEIGHT.set(DEFAULT_VIEW_HEIGHT);
 		
 		save();
-		
 	}
-	private Configurations() {
-		
-	}
+	
+	
+	private Configurations() { }
 }
-
-

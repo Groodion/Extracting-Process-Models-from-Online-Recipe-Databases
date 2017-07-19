@@ -106,8 +106,7 @@ public class SettingsDialog extends Dialog<String> {
 		
 		fileLayout.add(new Label("Parser"), 0, 0);
 		
-		
-		///
+
 		TextField parserPath = new TextField();
 		parserPath.setMaxWidth(Double.MAX_VALUE);
 		
@@ -116,12 +115,20 @@ public class SettingsDialog extends Dialog<String> {
 		parserPath.setPromptText("Parser");
 		parserPath.setOnMouseClicked(e -> {
 			FileChooser fileChooser = new FileChooser();
-			fileChooser.setInitialDirectory(Configurations.PARSER_CONFIGURATION.get().getParentFile());
-			fileChooser.setTitle("Select File");
-	
 			fileChooser.setInitialDirectory(Configurations.PARSER_CONFIGURATION.get());
+			fileChooser.setTitle("Select File");
+			
+			fileChooser.setInitialDirectory(Configurations.PARSER_CONFIGURATION.get().getParentFile());
 	
-			File file = fileChooser.showOpenDialog(null);
+			File file = null;
+			
+			try {
+				file = fileChooser.showOpenDialog(null);
+			} catch(Exception ex) {
+				fileChooser.setInitialDirectory(null);
+				file = fileChooser.showOpenDialog(null);
+				ex.printStackTrace();
+			}
 	
 			if (file != null) {
 				Configurations.PARSER_CONFIGURATION.set(file);

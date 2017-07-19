@@ -13,6 +13,7 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.input.sax.XMLReaders;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 
@@ -51,15 +52,12 @@ public class XMLLoader {
 	public static final String ATTRIBUTE_CHARGE_TOOLS = "chargeTools";
 
 	
-	public static KeyWordDatabase load(String path) {
+	public static KeyWordDatabase load(String path) throws MalformedURLException, JDOMException, IOException {
 		KeyWordDatabase kwdb = null;
 		
-		try {
-			kwdb = new XMLLoader().load(new URL("file", "", path));
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
+		kwdb = new XMLLoader().load(new URL("file", "", path));
 		
+		System.out.println(kwdb);
 		
 		return kwdb;
 	}
@@ -79,7 +77,7 @@ public class XMLLoader {
 		Document document = builder.build(url);
 		
 		Element root = document.getRootElement();
-		
+				
 		for(Element child : root.getChildren()) {
 			if(child.getName().equals(ELEMENT_TOOLS)) {
 				readTools(child, kwdb);
