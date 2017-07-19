@@ -1,10 +1,10 @@
-#Wed Jul 19 17:30:38 CEST 2017
-parserConfiguration=D\:\\Dropbox\\workspace\\Extracting-Process-Models-from-Online-Recipe-Databases\\master.project\\lib\\models\\german-fast.tagger
-viewHeight=684.0
-viewWidth=1007.0
-bpmnLocation=D\:\\Dropb\\workspace\\Extracting-Process-Models-from-Online-Recipe-Databases\\master.project
+#Wed Jul 19 17:43:26 CEST 2017
+parserConfiguration=C\:\\Users\\Martin K\u00E4ppel\\Uni_Workspace\\Extracting-Process-Models-from-Online-Recipe-Databases\\master.project\\lib\\models\\german-fast.tagger
+viewHeight=720.0
+viewWidth=1024.0
+bpmnLocation=C\:\\Users\\Martin K\u00E4ppel\\Uni_Workspace\\Extracting-Process-Models-from-Online-Recipe-Databases\\master.project
 toolColor=0x0000ffff
 ingredientColor=0x008000ff
-libLocation=D\:\\Dropbox\\workspace\\Extracting-Process-Models-from-Online-Recipe-Databases\\master.project\\resources\\Lib.xml
+libLocation=C\:\\Users\\Martin K\u00E4ppel\\Uni_Workspace\\Extracting-Process-Models-from-Online-Recipe-Databases\\master.project\\resources\\Lib.xml
 cookingActionColor=0xff0000ff
 groupsColor=0xadff2fff
