@@ -1,50 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE root  [
 	<!ELEMENT root (tools, groups, ingredients, cookingActions, partIndicators, lastSentenceReferences, eventIndicators)>
-<!ELEMENT tools (Tool)*>
-<!ELEMENT Tool (Name)*>
-<!ATTLIST Tool
-	name CDATA #IMPLIED
->
-<!ELEMENT ingredients (Ingredient)*>
-<!ELEMENT Ingredient ((Name | Property)*, groups?)>
-<!ATTLIST Ingredient
-	name CDATA #IMPLIED
->
-<!ELEMENT groups (Group)*>
-<!ELEMENT Group (Name)*>
-<!ATTLIST Group
-	name CDATA #IMPLIED
->
-<!ELEMENT Property (#PCDATA)>
-<!ELEMENT cookingActions (CookingAction)*>
-<!ELEMENT CookingAction (Name*, Result?, regs?, transformations?, tools?)>
-<!ATTLIST CookingAction
-	name CDATA #IMPLIED
->
-<!ELEMENT transformations (Transformation*)>
-<!ELEMENT Transformation (ingredients?, (AddIngredientTag | AddQuantifierTag | Ingredient)?)>
-<!ATTLIST Transformation
-	regexRefIds CDATA #IMPLIED
->
-<!ELEMENT AddIngredientTag (#PCDATA)>
-<!ELEMENT AddQuantifierTag (#PCDATA)>
-<!ELEMENT Result (#PCDATA)>
-<!ELEMENT regs (Regex*)>
-<!ELEMENT Regex (#PCDATA)>
-<!ATTLIST Regex
-	id CDATA #IMPLIED
-	result (first|last|all|prev|no_result) "first"
-	ingredientsNeeded (true|false) "true"
-	referencePreviousProducts (true|false) "false"
-	chargeTools (true|false) "false"
->
-<!ELEMENT Name (#PCDATA)>
-<!ELEMENT partIndicators (PartIndicator)*>
-<!ELEMENT PartIndicator (#PCDATA)>
-<!ELEMENT lastSentenceReferences (LastSentenceReference)*>
-<!ELEMENT LastSentenceReference (#PCDATA)>
-<!ELEMENT eventIndicators (EventIndicator)*>
-<!ELEMENT EventIndicator (#PCDATA)>
+	<!ELEMENT tools (Tool|ItemGroup)*>
+	<!ELEMENT Tool (Name)*>
+	<!ATTLIST Tool
+		name CDATA #IMPLIED
+	>
+	<!ELEMENT ingredients (Ingredient|ItemGroup)*>
+	<!ELEMENT Ingredient ((Name | Property)*, groups?)>
+	<!ATTLIST Ingredient
+		name CDATA #IMPLIED
+	>
+	<!ELEMENT ItemGroup (Tool|Ingredient)*>
+	<!ELEMENT groups (Group)*>
+	<!ELEMENT Group (Name)*>
+	<!ATTLIST Group
+		name CDATA #IMPLIED
+	>
+	<!ELEMENT Property (#PCDATA)>
+	<!ELEMENT cookingActions (CookingAction)*>
+	<!ELEMENT CookingAction (Name*, Result?, regs?, transformations?, tools?, ingredients?)>
+	<!ATTLIST CookingAction
+		name CDATA #IMPLIED
+	>
+	<!ELEMENT transformations (Transformation*)>
+	<!ELEMENT Transformation (ingredients?, (AddIngredientTag | AddQuantifierTag | Ingredient)?)>
+	<!ATTLIST Transformation
+		regexRefIds CDATA #IMPLIED
+	>
+	<!ELEMENT AddIngredientTag (#PCDATA)>
+	<!ELEMENT AddQuantifierTag (#PCDATA)>
+	<!ELEMENT Result (#PCDATA)>
+	<!ELEMENT regs (Regex*)>
+	<!ELEMENT Regex (#PCDATA)>
+	<!ATTLIST Regex
+		id CDATA #IMPLIED
+		result (first|last|all|prev|no_result) "first"
+		ingredientsNeeded (true|false) "true"
+		referencePreviousProducts (true|false) "false"
+		chargeTools (true|false) "false"
+	>
+	<!ELEMENT Name (#PCDATA)>
+	<!ELEMENT partIndicators (PartIndicator)*>
+	<!ELEMENT PartIndicator (#PCDATA)>
+	<!ELEMENT lastSentenceReferences (LastSentenceReference)*>
+	<!ELEMENT LastSentenceReference (#PCDATA)>
+	<!ELEMENT eventIndicators (EventIndicator)*>
+	<!ELEMENT EventIndicator (#PCDATA)>
 ]>
 <root>
 	<tools>
@@ -813,8 +814,10 @@
 				</Transformation>
 			</transformations>
 			<tools>
-				<Tool name="Schneebesen" />
-				<Tool name="Löffel" />
+				<ItemGroup>
+					<Tool name="Schneebesen" />
+					<Tool name="Löffel" />
+				</ItemGroup>
 			</tools>
 		</CookingAction>
 		<CookingAction name="einwickeln">
@@ -856,8 +859,10 @@
 				</Transformation>
 			</transformations>
 			<tools>
-				<Tool name="Elektroherd" />
-				<Tool name="Mikro" />
+				<ItemGroup>
+					<Tool name="Elektroherd" />
+					<Tool name="Mikro" />
+				</ItemGroup>
 			</tools>
 		</CookingAction>
 		<CookingAction name="frittieren">
@@ -1103,8 +1108,10 @@
 				</Transformation>
 			</transformations>
 			<tools>
-				<Tool name="Schneebesen" />
-				<Tool name="Löffel" />
+				<ItemGroup>
+					<Tool name="Schneebesen" />
+					<Tool name="Löffel" />
+				</ItemGroup>
 			</tools>
 		</CookingAction>
 		<CookingAction name="schmelzen">
@@ -1247,8 +1254,10 @@
 				</Transformation>
 			</transformations>
 			<tools>
-				<Tool name="Schneebesen" />
-				<Tool name="Löffel" />
+				<ItemGroup>
+					<Tool name="Schneebesen" />
+					<Tool name="Löffel" />
+				</ItemGroup>
 			</tools>
 		</CookingAction>
 		<CookingAction name="verteilen">
@@ -1284,8 +1293,10 @@
 				</Transformation>
 			</transformations>
 			<tools>
-				<Tool name="Pfannenwender" />
-				<Tool name="Gabel" />
+				<ItemGroup>
+					<Tool name="Pfannenwender" />
+					<Tool name="Gabel" />
+				</ItemGroup>
 			</tools>
 		</CookingAction>
 		<CookingAction name="würfeln">

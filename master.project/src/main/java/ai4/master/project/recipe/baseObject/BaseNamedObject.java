@@ -78,6 +78,7 @@ public abstract class BaseNamedObject<N extends NamedObject<B>, B extends BaseNa
 	public abstract N toObject();
 
 	public abstract String toXML();
-
+	public abstract String toRefXML();
+	
 	public abstract B clone(KeyWordDatabase kwdb);
 }

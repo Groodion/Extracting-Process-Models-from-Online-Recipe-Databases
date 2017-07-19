@@ -259,7 +259,7 @@ public class Word extends PartialObject<Word> {
 	}
 
 	public void init(KeyWordDatabase kwdb) {
-		conditionIndicator = kwdb.isConditionIndicator(getText());
+		conditionIndicator = kwdb.isEventIndicator(getText());
 		
 		if(kwdb.isLastSentenceRefernece(getText())) {
 			lastProductReference = true;
@@ -444,7 +444,8 @@ public class Word extends PartialObject<Word> {
 					word.select(Role.INGREDIENT, kwdb);
 				}
 			}
-		} else if(block == null && conditionIndicator) {			
+		}
+		/*else if(block == null && conditionIndicator) {			
 			Word start = this;
 			Word end = this;
 						
@@ -458,7 +459,7 @@ public class Word extends PartialObject<Word> {
 			}
 			
 			conditionBlock.setRole(BlockRole.CONDITION);
-		}
+		}*/
 	}
 	
 	private void select(Role role, KeyWordDatabase kwdb) {

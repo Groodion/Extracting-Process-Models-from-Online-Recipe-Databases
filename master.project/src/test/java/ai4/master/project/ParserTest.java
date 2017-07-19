@@ -19,7 +19,7 @@ public class ParserTest {
 	//15XX not working with tool compare
 	static String[] ids = {
         "43611014899035", "997991205154456", "150681066371674", "982031203667502"
-};
+	};
     public static void main(String[] args) throws Exception {
 //    	testParser();
    	testProcessModeler();

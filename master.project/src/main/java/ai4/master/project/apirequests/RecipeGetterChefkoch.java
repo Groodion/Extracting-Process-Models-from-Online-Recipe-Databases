@@ -16,7 +16,6 @@ import org.json.simple.parser.ParseException;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Scanner;
-import java.util.regex.Pattern;
 
 /**
  * Created by Rene Bärnreuther on 04.05.2017.
@@ -30,7 +29,6 @@ public class RecipeGetterChefkoch implements RecipeGetter {
     private static final String BASE_API_STRING = "http://api.chefkoch.de/api/1.1/api-recipe-search.php?Suchbegriff=";
     private static final String REZEPTE_API_STRING = "http://api.chefkoch.de/api/1.1/api-recipe.php?ID=";
 
-    private static RecipeGetterChefkoch recipeGetterChefkoch = null;
 
     public RecipeGetterChefkoch() {}
 

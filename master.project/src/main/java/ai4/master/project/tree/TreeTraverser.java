@@ -41,7 +41,7 @@ public class TreeTraverser<T> {
             list.add(root);
         }
 
-        for (Node node :
+        for (Node<T> node :
                 root.getChildren()) {
             actuallyPreOrder(node, list);
         }

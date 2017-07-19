@@ -1,14 +1,15 @@
 <!ELEMENT root (tools, groups, ingredients, cookingActions, partIndicators, lastSentenceReferences, eventIndicators)>
-<!ELEMENT tools (Tool)*>
+<!ELEMENT tools (Tool|ItemGroup)*>
 <!ELEMENT Tool (Name)*>
 <!ATTLIST Tool
 	name CDATA #IMPLIED
 >
-<!ELEMENT ingredients (Ingredient)*>
+<!ELEMENT ingredients (Ingredient|ItemGroup)*>
 <!ELEMENT Ingredient ((Name | Property)*, groups?)>
 <!ATTLIST Ingredient
 	name CDATA #IMPLIED
 >
+<!ELEMENT ItemGroup (Tool|Ingredient)*>
 <!ELEMENT groups (Group)*>
 <!ELEMENT Group (Name)*>
 <!ATTLIST Group
@@ -16,7 +17,7 @@
 >
 <!ELEMENT Property (#PCDATA)>
 <!ELEMENT cookingActions (CookingAction)*>
-<!ELEMENT CookingAction (Name*, Result?, regs?, transformations?, tools?)>
+<!ELEMENT CookingAction (Name*, Result?, regs?, transformations?, tools?, ingredients?)>
 <!ATTLIST CookingAction
 	name CDATA #IMPLIED
 >

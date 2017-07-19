@@ -41,6 +41,16 @@ public class BaseTool extends BaseNamedObject<Tool, BaseTool> {
 		
 		return sB.toString();
 	}
+	@Override
+	public String toRefXML() {
+		StringBuilder sB = new StringBuilder();
+		
+		sB.append("<Tool name=\"");
+		sB.append(getFirstName());
+		sB.append("\" />");
+		
+		return sB.toString();
+	}
 
 	@Override
 	public BaseTool clone(KeyWordDatabase kwdb) {

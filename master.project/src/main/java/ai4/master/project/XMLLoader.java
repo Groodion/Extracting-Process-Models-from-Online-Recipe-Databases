@@ -1,6 +1,8 @@
 package ai4.master.project;
 
 import ai4.master.project.recipe.baseObject.*;
+import ai4.master.project.recipe.object.Ingredient;
+import ai4.master.project.recipe.object.Tool;
 import ai4.master.project.recipe.object.ingredientTag.IngredientTag;
 import ai4.master.project.recipe.object.ingredientTag.QuantifierTag;
 import org.jdom2.Attribute;
@@ -34,6 +36,7 @@ public class XMLLoader {
 	public static final String ELEMENT_REGEX = "Regex";
 	public static final String ELEMENT_GROUPS = "groups";
 	public static final String ELEMENT_GROUP = "Group";
+	public static final String ELEMENT_ITEM_GROUP = "ItemGroup";
 	public static final String ATTRIBUTE_NAME = "name";
 	public static final String ATTRIBUTE_RESULT_FINDER = "resultFinder";
 	public static final String ATTRIBUTE_RESULT = "result";
@@ -251,6 +254,8 @@ public class XMLLoader {
 				readTransformations(child, kwdb, cookingAction);
 			} else if(child.getName().equals(ELEMENT_TOOLS)) {
 				readTools(child, kwdb, cookingAction);
+			} else if(child.getName().equals(ELEMENT_INGREDIENTS)) {
+				readIngredients(child, kwdb, cookingAction);
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}
@@ -261,15 +266,56 @@ public class XMLLoader {
 	private void readTools(Element element, KeyWordDatabase kwdb, BaseCookingAction cookingAction) {
 		for(Element child : element.getChildren()) {
 			if(child.getName().equals(ELEMENT_TOOL)) {
-				readTool(child, kwdb, cookingAction);
+				readSimpleToolGroup(child, kwdb, cookingAction);
+			} else if(child.getName().equals(ELEMENT_ITEM_GROUP)) {
+				readToolGroup(child, kwdb, cookingAction);
 			} else {
 				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
 			}
 		}
 	}
-	private void readTool(Element element, KeyWordDatabase kwdb, BaseCookingAction cookingAction) {
-		BaseTool tool = kwdb.findTool(element.getAttributeValue("name"));
-		cookingAction.getImplicitTools().add(tool);
+	private void readSimpleToolGroup(Element element, KeyWordDatabase kwdb, BaseCookingAction cookingAction) {
+		ItemGroup<BaseTool, Tool> toolGroup = new ItemGroup<BaseTool, Tool>();
+		
+		toolGroup.getItems().add(kwdb.findTool(element.getAttributeValue("name")));
+		
+		cookingAction.getImplicitTools().add(toolGroup);
+	}
+	private void readToolGroup(Element element, KeyWordDatabase kwdb, BaseCookingAction cookingAction) {
+		ItemGroup<BaseTool, Tool> toolGroup = new ItemGroup<BaseTool, Tool>();
+		
+		for(Element child : element.getChildren(ELEMENT_TOOL)) {
+			toolGroup.getItems().add(kwdb.findTool(child.getAttributeValue("name")));
+		}
+		
+		cookingAction.getImplicitTools().add(toolGroup);
+	}
+	private void readIngredients(Element element, KeyWordDatabase kwdb, BaseCookingAction cookingAction) {
+		for(Element child : element.getChildren()) {
+			if(child.getName().equals(ELEMENT_INGREDIENT)) {
+				readSimpleIngredientGroup(child, kwdb, cookingAction);
+			} else if(child.getName().equals(ELEMENT_ITEM_GROUP)) {
+				readIngredientGroup(child, kwdb, cookingAction);
+			} else {
+				System.err.println("Unknown Child " + child.getName() + " in " + element.getName());
+			}
+		}
+	}
+	private void readSimpleIngredientGroup(Element element, KeyWordDatabase kwdb, BaseCookingAction cookingAction) {
+		ItemGroup<BaseIngredient, Ingredient> ingredientGroup = new ItemGroup<BaseIngredient, Ingredient>();
+		
+		ingredientGroup.getItems().add(kwdb.findIngredient(element.getAttributeValue("name")));
+		
+		cookingAction.getImplicitIngredients().add(ingredientGroup);
+	}
+	private void readIngredientGroup(Element element, KeyWordDatabase kwdb, BaseCookingAction cookingAction) {
+		ItemGroup<BaseIngredient, Ingredient> ingredientGroup = new ItemGroup<BaseIngredient, Ingredient>();
+		
+		for(Element child : element.getChildren(ELEMENT_INGREDIENT)) {
+			ingredientGroup.getItems().add(kwdb.findIngredient(child.getAttributeValue("name")));
+		}
+		
+		cookingAction.getImplicitIngredients().add(ingredientGroup);
 	}
 	private void readTransformations(Element element, KeyWordDatabase kwdb, BaseCookingAction cookingAction) {
 		for(Element child : element.getChildren()) {

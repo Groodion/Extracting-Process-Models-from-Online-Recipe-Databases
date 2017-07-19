@@ -2,61 +2,25 @@ package ai4.master.project.viewFx.components;
 
 import java.io.File;
 
-import org.controlsfx.control.textfield.CustomTextField;
-
-import ai4.master.project.KeyWordDatabase;
-import ai4.master.project.recipe.baseObject.BaseCookingAction;
-import ai4.master.project.recipe.baseObject.BaseIngredient;
-import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
-import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.viewFx.Configurations;
 import ai4.master.project.viewFx.Controller;
-import ai4.master.project.viewFx.components.editorViews.CookingActionsEditorView;
-import ai4.master.project.viewFx.components.editorViews.EditorView;
-import ai4.master.project.viewFx.components.editorViews.EventIndicatorsEditorView;
-import ai4.master.project.viewFx.components.editorViews.IngredientGroupsEditorView;
-import ai4.master.project.viewFx.components.editorViews.IngredientsEditorView;
-import ai4.master.project.viewFx.components.editorViews.LastSentenceReferencesEditorView;
-import ai4.master.project.viewFx.components.editorViews.PartIndicatorsEditorView;
-import ai4.master.project.viewFx.components.editorViews.ToolsEditorView;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import javafx.beans.property.ObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
-import javafx.event.Event;
-import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ColorPicker;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.control.Tooltip;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.SVGPath;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
 public class SettingsDialog extends Dialog<String> {
 	private TextField savePath;
-	private Button search;
 
 	public SettingsDialog() {
 		this.getDialogPane().getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());

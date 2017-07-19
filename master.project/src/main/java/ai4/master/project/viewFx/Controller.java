@@ -41,8 +41,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.DoubleBinding;
-import javafx.beans.binding.DoubleExpression;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -79,7 +77,6 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -321,7 +318,6 @@ public class Controller implements Initializable {
 					@Override
 					public void changed(ObservableValue<? extends String> observable, String oldValue,
 							String newValue) {
-						// TODO Auto-generated method stub
 						System.out.println("selected ObjID: " + newValue);
 					}
 				});
@@ -337,7 +333,6 @@ public class Controller implements Initializable {
 					@Override
 					public void changed(ObservableValue<? extends Worker.State> observable, Worker.State oldState,
 							Worker.State newState) {
-						// TODO Auto-generated method stub
 						System.out.println("changed: old " + oldState + " new " + newState);
 						if (newState == Worker.State.SUCCEEDED) {
 							JSObject win = (JSObject) engine.executeScript("window");
