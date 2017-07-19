@@ -25,8 +25,8 @@ public class BPMNLayouter {
     private int currentX = 0;
     private int currentY = 250;
 
-    private int incrementX = 300;
-    private int incrementY = 400;
+    private int incrementX = 175;
+    private int incrementY = 200;
 
     private int baseY = 250;
     private int baseX = 0;
