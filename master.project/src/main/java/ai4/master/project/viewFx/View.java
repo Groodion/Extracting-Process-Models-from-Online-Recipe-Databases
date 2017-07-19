@@ -1,5 +1,12 @@
 package ai4.master.project.viewFx;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.Optional;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
@@ -9,10 +16,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -22,37 +29,38 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.io.*;
-import java.util.Optional;
-
 public class View extends Application {
 
 	private Text welcome;
 	private Text subtitle;
 	private Text copyright;
+	private Text loadingComment;
 	private Label close;
 	private ImageView loading;
 
-	private Controller controller;
 
-	private static final IntegerProperty loadingCounter = new SimpleIntegerProperty(0);
+	private Controller controller;
 	
+	private static final IntegerProperty loadingCounter = new SimpleIntegerProperty(0);
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		Stage splashScreen = new Stage();
 		welcome = new Text("Welcome");
 		subtitle = new Text("Parsing recipes from online databases");
-		copyright = new Text("AI4 Universitï¿½t Bayreuth");
-
+		copyright = new Text("AI4 Universität Bayreuth");
+		loadingComment = new Text("Bla bala");
+		
 		welcome.setStyle("-fx-fill: #ffffff");
 		subtitle.setStyle("-fx-fill: #ffffff");
 		copyright.setStyle("-fx-fill: #ffffff");
-
+		loadingComment.setStyle("-fx-fill: #ffffff");
+		
 		welcome.setFont(new Font("Segoe UI", 48));
 		subtitle.setFont(new Font("Segoe UI", 18));
 		copyright.setFont(new Font("Segoe UI", 12));
-
+		loadingComment.setFont(new Font("Segoe UI", 12));
+		
 		welcome.setLayoutX(45);
 		welcome.setLayoutY(96);
 
@@ -61,6 +69,9 @@ public class View extends Application {
 
 		copyright.setLayoutX(14);
 		copyright.setLayoutY(288);
+		
+		loadingComment.setLayoutX(14);
+		loadingComment.setLayoutY(310);
 
 		close = new Label("X");
 		close.setLayoutX(474);
@@ -82,7 +93,7 @@ public class View extends Application {
 
 		AnchorPane pane = new AnchorPane();
 		pane.setStyle("-fx-background-color: #008B61");
-		pane.getChildren().addAll(loading, welcome, subtitle, copyright, close);
+		pane.getChildren().addAll(loading, welcome, subtitle, copyright, close, loadingComment);
 		Scene scene = new Scene(pane);
 
 		splashScreen.initStyle(StageStyle.UNDECORATED);
@@ -94,7 +105,11 @@ public class View extends Application {
 		Task<Parent> service = new Task<Parent>() {
 			@Override
 			protected Parent call() throws Exception {
+				loadingComment.setText("Loading configurations...");
+				Configurations.load();
+				loadingComment.setText("Loading fonts...");
 				Font.loadFont(getClass().getResource("/fonts/HelveticaNeue.ttf").toExternalForm(), 20);
+				loadingComment.setText("Loading styles...");
 				FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/view.fxml"));
 				Parent parent = null;
 				try {
@@ -103,7 +118,10 @@ public class View extends Application {
 					e.printStackTrace();
 					
 					//TODO ALERT
-					
+					Alert loaderException = new Alert(AlertType.ERROR);
+					loaderException.setTitle("Error");
+					loaderException.setHeaderText("Fatal Error: Could not load the main GUI.");
+					loaderException.showAndWait();
 					System.exit(0);
 				}
 				controller = loader.getController();
@@ -112,84 +130,72 @@ public class View extends Application {
 		};
 
 		service.setOnSucceeded(e -> {
-			if(loadingCounter.get() == 0) {
-				startView(primaryStage, splashScreen, service);
-			} else {
-				loadingCounter.addListener((b, o, n) -> {
-					if((int) n == 0) {
-						startView(primaryStage, splashScreen, service);
-					}
-				});
-			}
+			primaryStage.setScene(new Scene(service.getValue()));
+			primaryStage.setWidth(Configurations.VIEW_WIDTH.get());
+			primaryStage.setHeight(Configurations.VIEW_HEIGHT.get());
+			primaryStage.setTitle("Extracting BPMN Models from recipes");
+			Configurations.VIEW_WIDTH.bind(primaryStage.widthProperty());
+			Configurations.VIEW_HEIGHT.bind(primaryStage.heightProperty());
+			
+			primaryStage.initStyle(StageStyle.DECORATED);
+			primaryStage.setOnCloseRequest(r -> {
+				if (controller.kwdbHasChanged()) {
+					Alert alert = new Alert(AlertType.CONFIRMATION, null, ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
+					alert.setTitle("Save Changes");
+					alert.setHeaderText("The database has been changed!");
+					alert.setContentText("Do you want to save the changes?");
+					((Button) alert.getDialogPane().lookupButton(ButtonType.YES)).setDefaultButton(false);
+					Optional<ButtonType> result = alert.showAndWait();
+					result.ifPresent(button -> {
+						if (button == ButtonType.YES) {
+							File dbFile = Configurations.LIB_LOCATION.get();
+							if (!dbFile.exists()) {
+								try {
+									dbFile.createNewFile();
+								} catch (IOException ex) {
+									Alert fileNotFoundOrCorruptedAlert = new Alert(AlertType.ERROR);
+									fileNotFoundOrCorruptedAlert.setHeaderText("Error");
+									fileNotFoundOrCorruptedAlert.setHeaderText("Can't create file at specified location!");
+									fileNotFoundOrCorruptedAlert.showAndWait();
+									
+									ex.printStackTrace();
+								}
+							}
+
+							if (dbFile.exists()) {
+								try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dbFile), "UTF-8"))) {
+									writer.write(controller.getKeyWordDatabase().toXML());
+									writer.flush();
+								} catch (IOException ex) {
+									Alert fileNotFoundOrCorruptedAlert = new Alert(AlertType.ERROR);
+									fileNotFoundOrCorruptedAlert.setHeaderText("Error");
+									fileNotFoundOrCorruptedAlert.setHeaderText("Can't access file!");
+									fileNotFoundOrCorruptedAlert.showAndWait();
+									
+									ex.printStackTrace();
+								}
+							}
+						} else if (button == ButtonType.CANCEL) {
+							r.consume();
+						}
+					});
+				}
+				Configurations.save();
+			});
+			
+			primaryStage.show();
+			splashScreen.hide();
 		});
 
 		Thread thread = new Thread(service);
 		thread.start();
-	}
-	
-	public void startView(Stage primaryStage, Stage splashScreen, Task<Parent> service) {
-		primaryStage.setScene(new Scene(service.getValue()));
-		primaryStage.setWidth(Configurations.VIEW_WIDTH.get());
-		primaryStage.setHeight(Configurations.VIEW_HEIGHT.get());
-		Configurations.VIEW_WIDTH.bind(primaryStage.widthProperty());
-		Configurations.VIEW_HEIGHT.bind(primaryStage.heightProperty());
-		
-		primaryStage.initStyle(StageStyle.DECORATED);
-		primaryStage.setOnCloseRequest(r -> {
-			if (controller.kwdbHasChanged()) {
-				Alert alert = new Alert(AlertType.CONFIRMATION, null, ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
-				alert.setTitle("Save Changes");
-				alert.setHeaderText("The database has been changed!");
-				alert.setContentText("Do you want to save the changes?");
-				((Button) alert.getDialogPane().lookupButton(ButtonType.YES)).setDefaultButton(false);
-				Optional<ButtonType> result = alert.showAndWait();
-				result.ifPresent(button -> {
-					if (button == ButtonType.YES) {
-						File dbFile = Configurations.LIB_LOCATION.get();
-						if (!dbFile.exists()) {
-							try {
-								dbFile.createNewFile();
-							} catch (IOException ex) {
-								Alert fileNotFoundOrCorruptedAlert = new Alert(AlertType.ERROR);
-								fileNotFoundOrCorruptedAlert.setHeaderText("Error");
-								fileNotFoundOrCorruptedAlert.setHeaderText("Can't create file at specified location!");
-								fileNotFoundOrCorruptedAlert.showAndWait();
-								
-								ex.printStackTrace();
-							}
-						}
-
-						if (dbFile.exists()) {
-							try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dbFile), "UTF-8"))) {
-								writer.write(controller.getKeyWordDatabase().toXML());
-								writer.flush();
-							} catch (IOException ex) {
-								Alert fileNotFoundOrCorruptedAlert = new Alert(AlertType.ERROR);
-								fileNotFoundOrCorruptedAlert.setHeaderText("Error");
-								fileNotFoundOrCorruptedAlert.setHeaderText("Can't access file!");
-								fileNotFoundOrCorruptedAlert.showAndWait();
-								
-								ex.printStackTrace();
-							}
-						}
-					} else if (button == ButtonType.CANCEL) {
-						r.consume();
-					}
-				});
-			}
-			Configurations.save();
-		});
-		//http://www.chefkoch.de/rezepte/3361661499859558/Zarte-Schokokuechlein.html Produziert eine IndexOutofBounds beim Parsen
-		
-		primaryStage.show();
-		splashScreen.hide();
 	}
 
 	public static void main(String args[]) {
 		launch(args);
 		System.exit(1);
 	}
-
+	
 	public static void blockLoading() {
 		loadingCounter.set(loadingCounter.get() + 1);
 	}

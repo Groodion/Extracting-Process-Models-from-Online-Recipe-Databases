@@ -38,6 +38,8 @@ import ai4.master.project.viewFx.components.OnlineDatabaseButton;
 import ai4.master.project.viewFx.components.OnlineDatabaseButton.SearchType;
 import ai4.master.project.viewFx.components.ProcessTracker;
 import ai4.master.project.viewFx.components.SettingsDialog;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -73,6 +75,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -126,7 +129,10 @@ public class Controller implements Initializable {
 	private Pane blockingPane;
 	@FXML
 	private ProgressBar progressBar;
-
+	@FXML
+	private TitledPane databases;
+	@FXML 
+	private TitledPane importFromFile;
 	@FXML
 	private BorderPane diagrammView;
 
@@ -358,6 +364,8 @@ public class Controller implements Initializable {
 				new OnlineDatabaseButton("Kochbar", "www.kochbar.de", "German", "/img/kochbar.jpg", new RecipeGetterKochbar(), recipe, SearchType.LINK),
 				new OnlineDatabaseButton("Food2Fork", "www.food2fork.com", "English", "/img/food2fork.jpg", null, recipe, SearchType.ID, SearchType.LINK)
 		);
+		databases.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.DOWNLOAD));
+		importFromFile.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.DOWNLOAD));
 	}
 	public void initializeDiagrammViewer() {
 		System.out.println("1");
@@ -366,16 +374,9 @@ public class Controller implements Initializable {
 			try {
 
 				webView = new WebView();
-				webView.heightProperty().addListener((b, o, n) -> {
-					System.out.println("height:" + n);
-				});
-				webView.widthProperty().addListener((b, o, n) -> {
-					System.out.println("width:" + n);
-				});
+
 				webView.setContextMenuEnabled(false);
 				ScrollPane scrollPane = new ScrollPane(webView);
-				// webView.setMaxSize(Double.MIN_VALUE, Double.MAX_VALUE);
-				// scrollPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
 				engine = webView.getEngine();
 
@@ -409,7 +410,6 @@ public class Controller implements Initializable {
 							// injection of bridgeSize into javascript
 							win.setMember("bridgeSize", bridgeSize);
 							win.setMember("java", this);
-							System.out.println("Bridge and BridgeSize are injected");
 
 							Timeline t = new Timeline();
 							t.getKeyFrames().add(new KeyFrame(Duration.ONE, e -> {
@@ -429,8 +429,12 @@ public class Controller implements Initializable {
 				});
 
 				ContextMenu cmDiagrammSave = new ContextMenu();
+
 				MenuItem saveAsSVG = new MenuItem("Save as svg");
+				saveAsSVG.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SAVE));
 				MenuItem saveAsBPMN = new MenuItem("Save as bpmn");
+				saveAsBPMN.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SAVE));
+
 				saveAsSVG.setOnAction(e -> {
 					String temp = engine
 							.executeScript("var svgCode; bpmnViewer.saveSVG(function(a, svg) {svgCode = svg}); svgCode")
@@ -618,13 +622,21 @@ public class Controller implements Initializable {
 				ContextMenu cm = new ContextMenu();
 
 				MenuItem addToTools = new MenuItem("add to Tools");
+				addToTools.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 				MenuItem addAsSynonymToTools = new MenuItem("add as synonym to Tools");
+				addAsSynonymToTools.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 				MenuItem addToIngredients = new MenuItem("add to Ingredients");
+				addToIngredients.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 				MenuItem addAsSynonymToIngredients = new MenuItem("add as synonym to Ingredients");
+				addAsSynonymToIngredients.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 				MenuItem addToGroups = new MenuItem("add to Groups");
+				addToGroups.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 				MenuItem addAsSynonymToGroups = new MenuItem("add as synonym to Groups");
+				addAsSynonymToGroups.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 				MenuItem addToCookingActions = new MenuItem("add to CookingActions");
+				addToCookingActions.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 				MenuItem addAsSynonymToCookingActions = new MenuItem("add as synonym to CookingActions");
+				addAsSynonymToCookingActions.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 
 				Alert objectAdded = new Alert(AlertType.INFORMATION);
 				objectAdded.setHeaderText("Object added");
@@ -901,6 +913,10 @@ public class Controller implements Initializable {
 	}
 
 	public void finish() {
+		
+	}
+	
+	public void resetParsing() {
 		
 	}
 	

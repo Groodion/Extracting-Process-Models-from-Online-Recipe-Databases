@@ -38,6 +38,20 @@
 	-fx-background-color: #222222;
 }
 
+.button-type-2 {
+	-fx-font-family: "Helvetica Neue";
+	-fx-font-size: 12;
+	-fx-font-weight: bold;
+	-fx-text-fill: white;
+	-fx-background-color: #000000;
+	-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0), 5, 0.0, 0, 1);
+	-fx-border-radius: 10 10 10 10;
+
+}
+.button-type-2:hover {
+	-fx-background-color: #222222;
+}
+
 .database-label {
 	-fx-background-color: #FFFFFF;
 	-fx-font-family: "Helvetica Neue";
@@ -121,6 +135,14 @@
 	src: url('resources/fonts/HelveticaNeue.tff');
 }
 
-.root dialog-pane .content {
-	-fx-font: 20px "Arial" !important;
+.myDialog{
+}
+.myDialog > *.button-bar > *.container{
+}
+.myDialog > *.label.content{
+}
+.myDialog:header *.header-panel{
+}
+.myDialog:header *.header-panel *.label{
+    -fx-font-size: 24px;
 }

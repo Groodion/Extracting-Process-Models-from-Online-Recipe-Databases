@@ -180,11 +180,13 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 		setHeaderText("Library Editor");
 		setResizable(true);
 		getDialogPane().setPrefSize(1024, 720);
+		getDialogPane().getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+		getDialogPane().getStyleClass().add("myDialog");
 		setGraphic(new ImageView(this.getClass().getResource("/img/editorIcon.png").toString()));
 		setOnCloseRequest(e -> close());
 
-		ButtonType okayButtonType = new ButtonType("Okay", ButtonData.OK_DONE);
-		ButtonType cancelButtonType = new ButtonType("Abbrechen", ButtonData.CANCEL_CLOSE);
+		ButtonType okayButtonType = new ButtonType("OK", ButtonData.OK_DONE);
+		ButtonType cancelButtonType = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
 		
 		getDialogPane().getButtonTypes().addAll(okayButtonType, cancelButtonType);
 
