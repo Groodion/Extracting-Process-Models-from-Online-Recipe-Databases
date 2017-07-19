@@ -35,6 +35,7 @@ import ai4.master.project.viewFx.components.BridgeObjID;
 import ai4.master.project.viewFx.components.BridgeSize;
 import ai4.master.project.viewFx.components.LibEditor;
 import ai4.master.project.viewFx.components.OnlineDatabaseButton;
+import ai4.master.project.viewFx.components.OnlineDatabaseButton.SearchType;
 import ai4.master.project.viewFx.components.ProcessTracker;
 import ai4.master.project.viewFx.components.SettingsDialog;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
@@ -44,8 +45,10 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -94,6 +97,7 @@ import netscape.javascript.JSObject;
 public class Controller implements Initializable {
 
 	public static final ObservableList<String> MESSAGES = FXCollections.observableArrayList();
+	private static final IntegerProperty onlineDatabaseProgress = new SimpleIntegerProperty(0);
 	private static Pane bPane;
 
 	@FXML
@@ -150,6 +154,7 @@ public class Controller implements Initializable {
 	private WebView webView;
 	private WebEngine engine;
 
+	
 	public Controller() {
 		recipe = new SimpleObjectProperty<Recipe>(new Recipe(LANG_FLAG.DE));
 		kwdb = new SimpleObjectProperty<KeyWordDatabase>();
@@ -168,6 +173,7 @@ public class Controller implements Initializable {
 		Configurations.PARSER_CONFIGURATION.addListener((b, o, n) -> {
 			try {
 				View.blockLoading();
+				View.setLoadingText("Loading configurations... Parser");
 				parser = new Parser(n.getAbsolutePath());
 				parser.setKwdb(kwdb.get());
 				View.unblockLoading();
@@ -244,6 +250,7 @@ public class Controller implements Initializable {
 						
 			try {
 				View.blockLoading();
+				View.setLoadingText("Loading configurations... Library");
 				kwdb.set(XMLLoader.load(n.getAbsolutePath()));
 				View.unblockLoading();
 			} catch(Exception e) {
@@ -278,20 +285,16 @@ public class Controller implements Initializable {
 		identifiedTools = FXCollections.observableArrayList();
 		identifiedIngredients = FXCollections.observableArrayList();
 		identifiedActions = FXCollections.observableArrayList();
-		
-		Configurations.load();
 	}
 
 	@Override
 	public void initialize(URL url, ResourceBundle rB) {
 		bPane = blockingPane;
+
 		/*
 		 * Logik
 		 */
-		kwdb.addListener((b, o, n) -> {
-			parser.setKwdb(n);
-		});
-
+		
 		toolsListView.setItems(identifiedTools);
 		ingredientsListView.setItems(identifiedIngredients);
 		actionsListView.setItems(identifiedActions);
@@ -343,30 +346,23 @@ public class Controller implements Initializable {
 				preparationTA.setText(n.getPreparation());
 			}
 		});
-		kwdb.addListener((b, o, n) -> {
-
-		});
 
 		progressBar.setProgress(0);
+		progressBar.progressProperty().bind(onlineDatabaseProgress);
 
 		initializeDiagrammViewer();
 		/*
 		 * Layout
 		 */
 
-		recipeDatabasesPane.getChildren()
-				.addAll(new OnlineDatabaseButton("Chefkoch", "www.chefkoch.de", "German", "/img/chefkoch.png",
-						new RecipeGetterChefkoch(), recipe, true),
-						new OnlineDatabaseButton("Kochbar", "www.kochbar.de", "German", "/img/kochbar.jpg",
-								new RecipeGetterKochbar(), recipe, false),
-						new OnlineDatabaseButton("Food2Fork", "www.food2fork.com", "English", "/img/food2fork.jpg",
-								null, recipe, false));
-		
+		recipeDatabasesPane.getChildren().addAll(
+				new OnlineDatabaseButton("Chefkoch", "www.chefkoch.de", "German", "/img/chefkoch.png", new RecipeGetterChefkoch(), recipe, SearchType.ID, SearchType.LINK, SearchType.CATEGORY),
+				new OnlineDatabaseButton("Kochbar", "www.kochbar.de", "German", "/img/kochbar.jpg", new RecipeGetterKochbar(), recipe, SearchType.LINK),
+				new OnlineDatabaseButton("Food2Fork", "www.food2fork.com", "English", "/img/food2fork.jpg", null, recipe, SearchType.ID, SearchType.LINK)
+		);
 		databases.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.DOWNLOAD));
 		importFromFile.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.DOWNLOAD));
-
 	}
-
 	public void initializeDiagrammViewer() {
 		System.out.println("1");
 
@@ -835,13 +831,14 @@ public class Controller implements Initializable {
 		progressBar.setProgress(0);
 
 		switch ((int) processTracker.getActiveStep()) {
-		case 0: {
-			break;
-		}
-		case 1: {
-			progressBar.progressProperty().bind(parser.progressProperty());
-			break;
-		}
+			case 0: {
+				progressBar.progressProperty().bind(onlineDatabaseProgress);
+				break;
+			}
+			case 1: {
+				progressBar.progressProperty().bind(parser.progressProperty());
+				break;
+			}
 		}
 	}
 
@@ -916,7 +913,9 @@ public class Controller implements Initializable {
 	}
 	
 	public void resetParsing() {
+		recipe.get().getSteps().clear();
 		
+		updateRecipeSteps();
 	}
 	
 	public KeyWordDatabase getKeyWordDatabase() {
@@ -940,8 +939,11 @@ public class Controller implements Initializable {
 	public static void blockView() {
 		bPane.setVisible(true);
 	}
-
 	public static void unblockView() {
 		bPane.setVisible(false);
+	}
+	
+	public static IntegerProperty onlineDatabaseProgressProperty() {
+		return onlineDatabaseProgress;
 	}
 }

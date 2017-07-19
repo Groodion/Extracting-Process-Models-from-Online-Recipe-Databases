@@ -34,7 +34,7 @@ public class View extends Application {
 	private Text welcome;
 	private Text subtitle;
 	private Text copyright;
-	private Text loadingComment;
+	private static Text loadingComment;
 	private Label close;
 	private ImageView loading;
 
@@ -105,19 +105,16 @@ public class View extends Application {
 		Task<Parent> service = new Task<Parent>() {
 			@Override
 			protected Parent call() throws Exception {
-				loadingComment.setText("Loading configurations...");
-				Configurations.load();
-				loadingComment.setText("Loading fonts...");
+				setLoadingText("Loading fonts...");
 				Font.loadFont(getClass().getResource("/fonts/HelveticaNeue.ttf").toExternalForm(), 20);
-				loadingComment.setText("Loading styles...");
+				setLoadingText("Loading gui...");
 				FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/view.fxml"));
 				Parent parent = null;
 				try {
-					parent = loader.load();					
+					parent = loader.load();
 				} catch(Exception e) {
 					e.printStackTrace();
 					
-					//TODO ALERT
 					Alert loaderException = new Alert(AlertType.ERROR);
 					loaderException.setTitle("Error");
 					loaderException.setHeaderText("Fatal Error: Could not load the main GUI.");
@@ -125,6 +122,10 @@ public class View extends Application {
 					System.exit(0);
 				}
 				controller = loader.getController();
+				
+				setLoadingText("Loading configurations...");
+				Configurations.load();
+				
 				return parent;
 			}
 		};
@@ -201,5 +202,8 @@ public class View extends Application {
 	}
 	public static void unblockLoading() {
 		loadingCounter.set(loadingCounter.get() - 1);		
+	}
+	public static void setLoadingText(String text) {
+		loadingComment.setText(text);
 	}
 }

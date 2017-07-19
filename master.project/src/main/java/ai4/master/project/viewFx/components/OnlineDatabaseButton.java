@@ -5,8 +5,10 @@ import java.util.Optional;
 import ai4.master.project.apirequests.RecipeGetter;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.viewFx.Controller;
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.VPos;
@@ -30,7 +32,7 @@ public class OnlineDatabaseButton extends HBox {
 	};
 
 	public OnlineDatabaseButton(String name, String link, String language, String logoPath, RecipeGetter recipeGetter,
-			ObjectProperty<Recipe> recipe, boolean searchCategory) {
+			ObjectProperty<Recipe> recipe, SearchType ...searchTypes) {
 		setOnMouseClicked(e -> {
 			if (recipeGetter != null) {
 				Controller.blockView();
@@ -45,13 +47,9 @@ public class OnlineDatabaseButton extends HBox {
 				dialog.setHeaderText(name);
 
 				ComboBox<SearchType> type = new ComboBox<SearchType>(
-						FXCollections.observableArrayList(SearchType.values()));
+						FXCollections.observableArrayList(searchTypes));
 				type.getSelectionModel().selectFirst();
 				
-				if(!searchCategory) {
-					type.getItems().remove(SearchType.CATEGORY);
-				}
-
 				TextField input = new TextField();
 				input.promptTextProperty().bind(type.getSelectionModel().selectedItemProperty().asString());
 				layout.getChildren().addAll(type, input);
@@ -71,21 +69,32 @@ public class OnlineDatabaseButton extends HBox {
 				
 				result.ifPresent(r -> {
 					if(r != null) {
-						switch(type.getValue()) {
-							case ID:
-								recipe.set(recipeGetter.getRecipeByID(r));
-								break;
-							case LINK:
-								recipe.set(recipeGetter.getRecipeByLink(r));
-								break;
-							case CATEGORY:
-								recipe.set(recipeGetter.getRecipeByCategory(r));
-								break;
-						}
+						Controller.onlineDatabaseProgressProperty().set(-1);
+						Task<Recipe> task = new Task<Recipe>() {
+							@Override
+							protected Recipe call() throws Exception {
+								switch(type.getValue()) {
+								case ID:		return recipeGetter.getRecipeByID(r);
+								case LINK:		return recipeGetter.getRecipeByLink(r);
+								case CATEGORY:	return recipeGetter.getRecipeByCategory(r);
+								default:		return null;
+								}
+							}
+						};
+						task.setOnSucceeded(ev -> {
+							Platform.runLater(() -> {
+								try {
+									recipe.set(task.get());
+								} catch (Exception ex) {
+									ex.printStackTrace();
+								}
+								Controller.onlineDatabaseProgressProperty().set(0);
+								Controller.unblockView();
+							});
+						});
+						new Thread(task).start();
 					}
-				});
-				
-				Controller.unblockView();
+				});				
 			}
 		});
 

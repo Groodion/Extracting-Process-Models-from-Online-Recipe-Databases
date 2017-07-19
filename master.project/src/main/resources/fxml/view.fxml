@@ -157,14 +157,14 @@
 										</TitledPane>
 										<StackPane GridPane.rowIndex="1" GridPane.columnIndex="1">
 											<children>
-											<HBox>
-												<children>
-																									<Button minHeight="40" text="Parse / Reparse" onAction="#parseRecipe" />
-																									<Button minHeight="40" text="Reset" onAction="#resetParsing" />
-													
-												</children>
-											
-											</HBox>
+												<HBox prefHeight="-Infinity" maxHeight="-Infinity" spacing="10">
+													<children>
+														<Pane maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+														<Button minHeight="40" text="Parse / Reparse" onAction="#parseRecipe" />
+														<Button minHeight="40" text="Reset" onAction="#resetParsing" />									
+														<Pane maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+													</children>
+												</HBox>
 											</children>
 										</StackPane>
 									</children>

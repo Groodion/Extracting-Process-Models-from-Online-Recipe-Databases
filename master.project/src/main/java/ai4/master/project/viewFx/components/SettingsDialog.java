@@ -155,8 +155,14 @@ public class SettingsDialog extends Dialog<String> {
 			directoryChooser.setTitle("Select Directory");
 
 			directoryChooser.setInitialDirectory(Configurations.BPMN_LOCATION.get());
-
-			File directory = directoryChooser.showDialog(null);
+			
+			File directory = null;
+			try {
+				directory = directoryChooser.showDialog(null);				
+			} catch(Exception ex) {
+				directoryChooser.setInitialDirectory(null);				
+				directory = directoryChooser.showDialog(null);				
+			}
 
 			if (directory != null) {
 				Configurations.BPMN_LOCATION.set(directory);
