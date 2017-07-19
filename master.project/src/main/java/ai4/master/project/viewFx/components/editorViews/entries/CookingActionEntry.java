@@ -3,9 +3,13 @@ package ai4.master.project.viewFx.components.editorViews.entries;
 import java.util.Map;
 
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
+import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.BaseTool;
+import ai4.master.project.recipe.baseObject.ItemGroup;
 import ai4.master.project.recipe.baseObject.Regex;
 import ai4.master.project.recipe.baseObject.Transformation;
+import ai4.master.project.recipe.object.Ingredient;
+import ai4.master.project.recipe.object.Tool;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -18,7 +22,8 @@ public class CookingActionEntry {
 	private ObservableList<String> synonyms;
 	private ObservableList<Regex> regex;
 	private ObservableList<Transformation> transformations;	
-	private ObservableList<BaseTool> tools;	
+	private ObservableList<ItemGroup<BaseTool, Tool>> tools;	
+	private ObservableList<ItemGroup<BaseIngredient, Ingredient>> ingredients;	
 	
 
 	public CookingActionEntry(BaseCookingAction cookingAction, ObservableList<BaseCookingAction> cookingActions, Map<Object, ObservableList<String>> regexIdMap) {
@@ -31,8 +36,9 @@ public class CookingActionEntry {
 		
 		regex = FXCollections.observableArrayList(cookingAction.getRegexList());
 		transformations = FXCollections.observableArrayList(cookingAction.getTransformations());
-		tools = FXCollections.observableArrayList();//TODO
-				
+		tools = FXCollections.observableArrayList(cookingAction.getImplicitTools());
+		ingredients = FXCollections.observableArrayList(cookingAction.getImplicitIngredients());
+		
 		name.addListener((b, o, n) -> {
 			if(n == null || n.length() == 0) {
 				if(synonyms.isEmpty()) {
@@ -51,6 +57,7 @@ public class CookingActionEntry {
 		regex.addListener(lcListener);
 		transformations.addListener(lcListener);
 		tools.addListener(lcListener);
+		ingredients.addListener(lcListener);
 		
 		for(Regex regex : regex) {
 			regexIdMap.put(regex, regexIds);
@@ -98,8 +105,11 @@ public class CookingActionEntry {
 	public ObservableList<Transformation> getTransformations() {
 		return transformations;
 	}
-	public ObservableList<BaseTool> getTools() {
+	public ObservableList<ItemGroup<BaseTool, Tool>> getTools() {
 		return tools;
+	}
+	public ObservableList<ItemGroup<BaseIngredient, Ingredient>> getIngredients() {
+		return ingredients;
 	}
 	
 	private static void update(BaseCookingAction cookingAction, CookingActionEntry entry) {
@@ -109,6 +119,7 @@ public class CookingActionEntry {
 		cookingAction.getRegexList().clear();
 		cookingAction.getTransformations().clear();
 		cookingAction.getImplicitTools().clear();
+		cookingAction.getImplicitIngredients().clear();
 		
 		entry.synonyms.removeIf(synonym -> synonym.replace(" ", "").length() == 0);
 		
@@ -119,5 +130,8 @@ public class CookingActionEntry {
 		
 		cookingAction.getRegexList().addAll(entry.getRegex());
 		cookingAction.getTransformations().addAll(entry.getTransformations());
+		
+		cookingAction.getImplicitTools().addAll(entry.getTools());
+		cookingAction.getImplicitIngredients().addAll(entry.getIngredients());
 	}
 }

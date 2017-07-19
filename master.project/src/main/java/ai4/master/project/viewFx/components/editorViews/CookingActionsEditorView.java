@@ -1,15 +1,20 @@
 package ai4.master.project.viewFx.components.editorViews;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.baseObject.BaseCookingAction;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.BaseTool;
+import ai4.master.project.recipe.baseObject.ItemGroup;
 import ai4.master.project.recipe.baseObject.Regex;
 import ai4.master.project.recipe.baseObject.Regex.Result;
 import ai4.master.project.recipe.baseObject.Transformation;
+import ai4.master.project.recipe.object.Ingredient;
+import ai4.master.project.recipe.object.Tool;
 import ai4.master.project.recipe.object.ingredientTag.IngredientTag;
 import ai4.master.project.recipe.object.ingredientTag.QuantifierTag;
 import ai4.master.project.viewFx.components.editorViews.entries.CookingActionEntry;
@@ -40,6 +45,9 @@ import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 public class CookingActionsEditorView extends EditorView {
 
@@ -53,6 +61,8 @@ public class CookingActionsEditorView extends EditorView {
 		Map<Object, ObservableList<String>> regexIdMap = new HashMap<Object, ObservableList<String>>();
 
 		this.kwdb = kwdb;
+		ingredientsList.set(ingredients);
+		toolsList.set(tools);
 
 		setSpacing(10);
 
@@ -62,8 +72,15 @@ public class CookingActionsEditorView extends EditorView {
 
 		tableView = new TableView<CookingActionEntry>();
 		tableView.setEditable(true);
-		tableView.getColumns().addAll(nameColumn(), synoymsColumn(), regexColumn(regexIdMap),
-				transformationsColumn(regexIdMap, ingredients), toolsColumn(tools));
+		tableView.getColumns().addAll(
+				nameColumn(), 
+				synoymsColumn(), 
+				regexColumn(regexIdMap),
+				transformationsColumn(regexIdMap, ingredients), 
+				toolsColumn(tools),
+				ingredientsColumn(ingredients)
+		);
+		VBox.setVgrow(tableView, Priority.ALWAYS);
 
 		/*
 		 * Context Menu
@@ -110,50 +127,42 @@ public class CookingActionsEditorView extends EditorView {
 		nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 		return nameColumn;
 	}
-
 	private TableColumn<CookingActionEntry, ObservableList<String>> synoymsColumn() {
-		TableColumn<CookingActionEntry, ObservableList<String>> synoymsColumn = new TableColumn<CookingActionEntry, ObservableList<String>>(
-				"Synonyme");
-		synoymsColumn
-				.setCellValueFactory(new PropertyValueFactory<CookingActionEntry, ObservableList<String>>("synonyms"));
+		TableColumn<CookingActionEntry, ObservableList<String>> synoymsColumn = new TableColumn<CookingActionEntry, ObservableList<String>>("Synonyme");
+		synoymsColumn.setCellValueFactory(new PropertyValueFactory<CookingActionEntry, ObservableList<String>>("synonyms"));
 		synoymsColumn.setCellFactory(column -> new SynonymsCell());
 
 		return synoymsColumn;
 	}
-
-	private TableColumn<CookingActionEntry, ObservableList<Regex>> regexColumn(
-			Map<Object, ObservableList<String>> regexIdMap) {
-		TableColumn<CookingActionEntry, ObservableList<Regex>> regexColumn = new TableColumn<CookingActionEntry, ObservableList<Regex>>(
-				"Regex");
+	private TableColumn<CookingActionEntry, ObservableList<Regex>> regexColumn(Map<Object, ObservableList<String>> regexIdMap) {
+		TableColumn<CookingActionEntry, ObservableList<Regex>> regexColumn = new TableColumn<CookingActionEntry, ObservableList<Regex>>("Regex");
 		regexColumn.setCellValueFactory(new PropertyValueFactory<CookingActionEntry, ObservableList<Regex>>("regex"));
 		regexColumn.setCellFactory(column -> new RegexCell(regexIdMap));
 
 		return regexColumn;
 	}
-
-	private TableColumn<CookingActionEntry, ObservableList<Transformation>> transformationsColumn(
-			Map<Object, ObservableList<String>> regexIdMap, ObservableList<BaseIngredient> ingredients) {
-		TableColumn<CookingActionEntry, ObservableList<Transformation>> transformationsColumn = new TableColumn<CookingActionEntry, ObservableList<Transformation>>(
-				"Transformations");
-		transformationsColumn.setCellValueFactory(
-				new PropertyValueFactory<CookingActionEntry, ObservableList<Transformation>>("transformations"));
+	private TableColumn<CookingActionEntry, ObservableList<Transformation>> transformationsColumn(Map<Object, ObservableList<String>> regexIdMap, ObservableList<BaseIngredient> ingredients) {
+		TableColumn<CookingActionEntry, ObservableList<Transformation>> transformationsColumn = new TableColumn<CookingActionEntry, ObservableList<Transformation>>("Transformations");
+		transformationsColumn.setCellValueFactory(new PropertyValueFactory<CookingActionEntry, ObservableList<Transformation>>("transformations"));
 		transformationsColumn.setCellFactory(column -> new TransformationCell(regexIdMap));
 		return transformationsColumn;
 	}
-
-	private TableColumn<CookingActionEntry, ObservableList<BaseTool>> toolsColumn(ObservableList<BaseTool> tools) {
-		TableColumn<CookingActionEntry, ObservableList<BaseTool>> toolsColumn = new TableColumn<CookingActionEntry, ObservableList<BaseTool>>(
-				"Implied Tools");
-		toolsColumn
-				.setCellValueFactory(new PropertyValueFactory<CookingActionEntry, ObservableList<BaseTool>>("tools"));
-		toolsColumn.setCellFactory(column -> new ImpliedToolsCell(tools));
+	private TableColumn<CookingActionEntry, ObservableList<ItemGroup<BaseTool, Tool>>> toolsColumn(ObservableList<BaseTool> tools) {
+		TableColumn<CookingActionEntry, ObservableList<ItemGroup<BaseTool, Tool>>> toolsColumn = new TableColumn<CookingActionEntry, ObservableList<ItemGroup<BaseTool, Tool>>>("Implied Tools");
+		toolsColumn.setCellValueFactory(new PropertyValueFactory<CookingActionEntry, ObservableList<ItemGroup<BaseTool, Tool>>>("tools"));
+		toolsColumn.setCellFactory(column -> new ImpliedToolsCell());
 		return toolsColumn;
+	}
+	private TableColumn<CookingActionEntry, ObservableList<ItemGroup<BaseIngredient, Ingredient>>> ingredientsColumn(ObservableList<BaseIngredient> ingredients) {
+		TableColumn<CookingActionEntry, ObservableList<ItemGroup<BaseIngredient, Ingredient>>> ingredientsColumn = new TableColumn<CookingActionEntry, ObservableList<ItemGroup<BaseIngredient, Ingredient>>>("Implied Ingredients");
+		ingredientsColumn.setCellValueFactory(new PropertyValueFactory<CookingActionEntry, ObservableList<ItemGroup<BaseIngredient, Ingredient>>>("ingredients"));
+		ingredientsColumn.setCellFactory(column -> new ImpliedIngredientsCell());
+		return ingredientsColumn;
 	}
 
 	public boolean contains(String word) {
 		return kwdb.get().findCookingAction(word) != null;
 	}
-
 	public void scrollTo(String word) {
 		for (CookingActionEntry entry : tableView.getItems()) {
 			if (entry.getName().equals(word) || entry.getSynonyms().contains(word)) {
@@ -163,7 +172,7 @@ public class CookingActionsEditorView extends EditorView {
 			}
 		}
 	}
-
+	
 	private class SynonymsCell extends TableCell<CookingActionEntry, ObservableList<String>> {
 		@Override
 		public void updateItem(ObservableList<String> synonyms, boolean empty) {
@@ -202,7 +211,6 @@ public class CookingActionsEditorView extends EditorView {
 			setGraphic(synonymsView);
 		}
 	}
-
 	private class RegexCell extends TableCell<CookingActionEntry, ObservableList<Regex>> {
 
 		private ObservableList<Regex.Result> results;
@@ -274,15 +282,12 @@ public class CookingActionsEditorView extends EditorView {
 			removeRegex.disableProperty().bind(regexListView.getSelectionModel().selectedItemProperty().isNull());
 			removeRegex.setOnAction(e -> regexList.remove(regexListView.getSelectionModel().getSelectedIndex()));
 			regexListView.setOnMouseClicked(e -> {
+				regexTableCM.hide();
 				if (e.getButton() == MouseButton.SECONDARY) {
 					regexTableCM.show(regexListView, e.getScreenX(), e.getScreenY());
-				} else {
-					regexTableCM.hide();
-
-					if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
-						showRegexEditorDialog(regexListView.getSelectionModel().getSelectedItem(), regexIdMap);
-						regexListView.refresh();
-					}
+				} else if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2 && regexListView.getSelectionModel().getSelectedItem() != null) {
+					showRegexEditorDialog(regexListView.getSelectionModel().getSelectedItem(), regexIdMap);
+					regexListView.refresh();
 				}
 			});
 			regexTableCM.getItems().addAll(
@@ -297,7 +302,6 @@ public class CookingActionsEditorView extends EditorView {
 			setGraphic(regexListView);
 		}
 	}
-
 	private class TransformationCell extends TableCell<CookingActionEntry, ObservableList<Transformation>> {
 
 		private Map<Object, ObservableList<String>> regexIdMap;
@@ -316,6 +320,39 @@ public class CookingActionsEditorView extends EditorView {
 			transformationsListView.setMinHeight(0);
 
 			ContextMenu transformationsTableCM = new ContextMenu();
+			MenuItem editTransformation = new MenuItem("Edit Transformation");
+			editTransformation.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.EDIT));
+			editTransformation.disableProperty().bind(transformationsListView.getSelectionModel().selectedItemProperty().isNull());
+			editTransformation.setOnAction(e -> {
+				showTransfomrationEditorDialog(transformationsListView.getSelectionModel().getSelectedItem(), regexIdMap);
+			});
+			MenuItem moveTransformationUp = new MenuItem("MoveUp");
+			moveTransformationUp.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.ARROW_UP));
+			moveTransformationUp.disableProperty().bind(
+					transformationsListView.getSelectionModel().selectedItemProperty().isNull()
+				.or(transformationsListView.getSelectionModel().selectedIndexProperty().isEqualTo(0))
+			);
+			moveTransformationUp.setOnAction(e -> {
+				Transformation transformation = transformationsListView.getSelectionModel().getSelectedItem();
+				int index = transformationsListView.getItems().indexOf(transformation);
+				
+				transformationsListView.getItems().set(index, transformationsListView.getItems().get(index - 1));
+				transformationsListView.getItems().set(index - 1, transformation);
+			});
+			MenuItem moveTransformationDown = new MenuItem("MoveDown");
+			moveTransformationDown.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.ARROW_DOWN));
+			moveTransformationDown.disableProperty().bind(
+					transformationsListView.getSelectionModel().selectedItemProperty().isNull()
+				.or(transformationsListView.getSelectionModel().selectedIndexProperty().isEqualTo(
+						new SimpleListProperty<Transformation>(transformationsListView.getItems()).sizeProperty().subtract(1)))
+			);
+			moveTransformationDown.setOnAction(e -> {
+				Transformation transformation = transformationsListView.getSelectionModel().getSelectedItem();
+				int index = transformationsListView.getItems().indexOf(transformation);
+				
+				transformationsListView.getItems().set(index, transformationsListView.getItems().get(index + 1));
+				transformationsListView.getItems().set(index + 1, transformation);
+			});
 			MenuItem addTransformation = new MenuItem("Add new Transformation");
 			addTransformation.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 			addTransformation.setOnAction(e -> {
@@ -328,16 +365,20 @@ public class CookingActionsEditorView extends EditorView {
 			removeTransformation.disableProperty().bind(transformationsListView.getSelectionModel().selectedItemProperty().isNull());
 			removeTransformation.setOnAction(e -> transformations.remove(transformationsListView.getSelectionModel().getSelectedIndex()));
 			transformationsListView.setOnMouseClicked(e -> {
+				transformationsTableCM.hide();
 				if (e.getButton() == MouseButton.SECONDARY) {
 					transformationsTableCM.show(transformationsListView, e.getScreenX(), e.getScreenY());
 				} else {
-					transformationsTableCM.hide();
-					if(e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
+					if(e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2 && transformationsListView.getSelectionModel().getSelectedItem() != null) {
 						showTransfomrationEditorDialog(transformationsListView.getSelectionModel().getSelectedItem(), regexIdMap);
+						transformationsListView.refresh();
 					}
 				}
 			});
 			transformationsTableCM.getItems().addAll(
+					editTransformation,
+					moveTransformationUp,
+					moveTransformationDown,
 					addTransformation,
 					removeTransformation
 			);
@@ -345,74 +386,140 @@ public class CookingActionsEditorView extends EditorView {
 			setGraphic(transformationsListView);
 		}
 	}
-
-	private class ImpliedToolsCell extends TableCell<CookingActionEntry, ObservableList<BaseTool>> {
-
-		ObservableList<BaseTool> tools;
-
-		public ImpliedToolsCell(ObservableList<BaseTool> tools) {
-			this.tools = tools;
-		}
-
+	private class ImpliedToolsCell extends TableCell<CookingActionEntry, ObservableList<ItemGroup<BaseTool, Tool>>> {
 		@Override
-		public void updateItem(ObservableList<BaseTool> tools, boolean empty) {
-			super.updateItem(tools, empty);
-			ListView<BaseTool> toolsView = new ListView<BaseTool>();
-			toolsView.setCellFactory(ComboBoxListCell.forListView(this.tools));
+		public void updateItem(ObservableList<ItemGroup<BaseTool, Tool>> toolGroups, boolean empty) {
+			super.updateItem(toolGroups, empty);
+			ListView<ItemGroup<BaseTool, Tool>> toolsView = new ListView<ItemGroup<BaseTool, Tool>>();
 			toolsView.setMinHeight(0);
 			toolsView.setPrefHeight(50);
-			toolsView.setEditable(true);
 
 			ContextMenu toolsViewCM = new ContextMenu();
-			MenuItem addTool = new MenuItem("Add new Tool");
+			MenuItem editTool = new MenuItem("Edit ToolGroup");
+			editTool.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.EDIT));
+			editTool.disableProperty().bind(toolsView.getSelectionModel().selectedItemProperty().isNull());
+			editTool.setOnAction(e -> {
+				showImpliedToolsEditorDialog(toolsView.getSelectionModel().getSelectedItem());
+			});
+			MenuItem addTool = new MenuItem("Add new ToolGroup");
 			addTool.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 			addTool.setOnAction(e -> {
-				tools.add(null);
+				toolGroups.add(new ItemGroup<BaseTool, Tool>());
 				toolsView.requestFocus();
-				toolsView.edit(tools.size() - 1);
 			});
-			toolsViewCM.getItems().add(addTool);
 			MenuItem removeTool = new MenuItem("Remove Tool");
 			removeTool.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
 			removeTool.disableProperty().bind(toolsView.getSelectionModel().selectedItemProperty().isNull());
 			removeTool.setOnAction(e -> {
-				tools.remove(toolsView.getSelectionModel().getSelectedItem());
+				toolGroups.remove(toolsView.getSelectionModel().getSelectedItem());
 				toolsView.requestFocus();
 			});
 
-			toolsViewCM.getItems().add(removeTool);
+			toolsViewCM.getItems().addAll(
+					editTool,
+					addTool,
+					removeTool
+			);
 			toolsView.setOnMouseClicked(e -> {
+				toolsViewCM.hide();
 				if (e.getButton() == MouseButton.SECONDARY) {
 					toolsViewCM.show(toolsView, e.getScreenX(), e.getScreenY());
-				} else {
-					toolsViewCM.hide();
+				} else if(e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2 && toolsView.getSelectionModel().getSelectedItem() != null) {
+					showImpliedToolsEditorDialog(toolsView.getSelectionModel().getSelectedItem());
+					toolsView.refresh();
 				}
 			});
 
-			if (tools != null) {
-				toolsView.setItems(tools);
+			if (toolGroups != null) {
+				toolsView.setItems(toolGroups);
 			}
 
 			setGraphic(toolsView);
 		}
 	}
+	private class ImpliedIngredientsCell extends TableCell<CookingActionEntry, ObservableList<ItemGroup<BaseIngredient, Ingredient>>> {
+		@Override
+		public void updateItem(ObservableList<ItemGroup<BaseIngredient, Ingredient>> ingredientGroups, boolean empty) {
+			super.updateItem(ingredientGroups, empty);
+			ListView<ItemGroup<BaseIngredient, Ingredient>> ingredientsView = new ListView<ItemGroup<BaseIngredient, Ingredient>>();
+			ingredientsView.setMinHeight(0);
+			ingredientsView.setPrefHeight(50);
 
+			ContextMenu ingredientsViewCM = new ContextMenu();
+			MenuItem editIngredient = new MenuItem("Edit IngredientGroup");
+			editIngredient.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.EDIT));
+			editIngredient.disableProperty().bind(ingredientsView.getSelectionModel().selectedItemProperty().isNull());
+			editIngredient.setOnAction(e -> {
+				showImpliedIngredientsEditorDialog(ingredientsView.getSelectionModel().getSelectedItem());
+			});
+			MenuItem addIngredient = new MenuItem("Add new IngredientGroup");
+			addIngredient.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
+			addIngredient.setOnAction(e -> {
+				ingredientGroups.add(new ItemGroup<BaseIngredient, Ingredient>());
+				ingredientsView.requestFocus();
+			});
+			MenuItem removeIngredient = new MenuItem("Remove Ingredient");
+			removeIngredient.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
+			removeIngredient.disableProperty().bind(ingredientsView.getSelectionModel().selectedItemProperty().isNull());
+			removeIngredient.setOnAction(e -> {
+				ingredientGroups.remove(ingredientsView.getSelectionModel().getSelectedItem());
+				ingredientsView.requestFocus();
+			});
+
+			ingredientsViewCM.getItems().addAll(
+					editIngredient,
+					addIngredient,
+					removeIngredient
+			);
+			ingredientsView.setOnMouseClicked(e -> {
+				ingredientsViewCM.hide();
+				if (e.getButton() == MouseButton.SECONDARY) {
+					ingredientsViewCM.show(ingredientsView, e.getScreenX(), e.getScreenY());
+				} else if(e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2 && ingredientsView.getSelectionModel().getSelectedItem() != null) {
+					showImpliedIngredientsEditorDialog(ingredientsView.getSelectionModel().getSelectedItem());
+					ingredientsView.refresh();
+				}
+			});
+
+			if (ingredientGroups != null) {
+				ingredientsView.setItems(ingredientGroups);
+			}
+
+			setGraphic(ingredientsView);
+		}
+	}
+
+	
 	private static ObjectProperty<Regex> regex;
 	private static ObjectProperty<Transformation> transformation;
+	private static ObjectProperty<ItemGroup<BaseTool, Tool>> toolGroup;
+	private static ObjectProperty<ItemGroup<BaseIngredient, Ingredient>> ingredientGroup;
 	private static ListProperty<String> regexIdsList;
-	private static ListProperty<BaseIngredient> ingreidensList;
+	private static ListProperty<BaseIngredient> ingredientsList;
+	private static ListProperty<BaseTool> toolsList;
 	private static Dialog<ButtonType> regexEditorDlg;
 	private static Dialog<ButtonType> transformationEditorDlg;
+	private static Dialog<ButtonType> impliedToolsEditorDlg;
+	private static Dialog<ButtonType> impliedIngredientsEditorDlg;
 
 	static {
 		regex = new SimpleObjectProperty<Regex>();
 		transformation = new SimpleObjectProperty<Transformation>();
+		toolGroup = new SimpleObjectProperty<ItemGroup<BaseTool, Tool>>();
+		ingredientGroup = new SimpleObjectProperty<ItemGroup<BaseIngredient, Ingredient>>();
 		regexIdsList = new SimpleListProperty<String>();
+		ingredientsList = new SimpleListProperty<BaseIngredient>();
+		toolsList = new SimpleListProperty<BaseTool>();
+		
 		regexEditorDlg = new Dialog<ButtonType>();
 		transformationEditorDlg = new Dialog<ButtonType>();
+		impliedToolsEditorDlg = new Dialog<ButtonType>();
+		impliedIngredientsEditorDlg = new Dialog<ButtonType>();
 		
 		initRegexEditorPane();
 		initTransformationEditorPane();
+		initImpliedToolsEditorPane();
+		initImpliedIngredientsEditorPane();
 	}
 	private static void initRegexEditorPane() {
 		regexEditorDlg.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
@@ -482,20 +589,66 @@ public class CookingActionsEditorView extends EditorView {
 		refIdsListView.setMinHeight(0);
 		refIdsListView.setPrefHeight(100);
 		refIdsListView.setCellFactory(ComboBoxListCell.forListView(regexIdsList));
+		ContextMenu rcm = new ContextMenu();
+		MenuItem addRef = new MenuItem("Add Regex-ID reference");
+		addRef.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
+		addRef.setOnAction(e -> refIdsListView.getItems().add(null));
+		MenuItem removeRef = new MenuItem("Remove Regex-ID reference");
+		removeRef.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
+		removeRef.disableProperty().bind(refIdsListView.getSelectionModel().selectedIndexProperty().isEqualTo(-1));
+		removeRef.setOnAction(e -> refIdsListView.getItems().remove(refIdsListView.getSelectionModel().getSelectedItem()));
+		rcm.getItems().addAll(
+				addRef,
+				removeRef
+		);
+		refIdsListView.setOnMouseClicked(e -> {
+			if(e.getButton() == MouseButton.SECONDARY) {
+				rcm.show(refIdsListView, e.getScreenX(), e.getScreenY());
+			} else {
+				rcm.hide();
+			}
+		});
 		ListView<BaseIngredient> mandatoryIngredientsListView = new ListView<BaseIngredient>();
+		mandatoryIngredientsListView.setEditable(true);
 		mandatoryIngredientsListView.setMinHeight(0);
 		mandatoryIngredientsListView.setPrefHeight(100);
+		mandatoryIngredientsListView.setCellFactory(ComboBoxListCell.forListView(ingredientsList));
+		ContextMenu icm = new ContextMenu();
+		MenuItem addIngredient = new MenuItem("Add mandatory Ingredient");
+		addIngredient.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
+		addIngredient.setOnAction(e -> mandatoryIngredientsListView.getItems().add(null));
+		MenuItem removeIngredient = new MenuItem("Remove mandatory Ingredient");
+		removeIngredient.disableProperty().bind(mandatoryIngredientsListView.getSelectionModel().selectedIndexProperty().isEqualTo(-1));
+		removeIngredient.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
+		removeIngredient.setOnAction(e -> mandatoryIngredientsListView.getItems().remove(mandatoryIngredientsListView.getSelectionModel().getSelectedItem()));
+		icm.getItems().addAll(
+				addIngredient,
+				removeIngredient
+		);
+		mandatoryIngredientsListView.setOnMouseClicked(e -> {
+			if(e.getButton() == MouseButton.SECONDARY) {
+				icm.show(refIdsListView, e.getScreenX(), e.getScreenY());
+			} else {
+				icm.hide();
+			}
+		});
 		ComboBox<BaseIngredient> productCB = new ComboBox<BaseIngredient>();
-		productCB.setItems(ingreidensList);
+		productCB.setItems(ingredientsList);
 		TextField ingredientTagTF = new TextField();
 		TextField quantifierTagTF = new TextField();
 		
 		ListChangeListener<String> refIdsChanged = change -> {
-			
+			transformation.get().getRegexIds().clear();
+			transformation.get().getRegexIds().addAll(refIdsListView.getItems());
 		};
 		refIdsListView.getItems().addListener(refIdsChanged);
 		ListChangeListener<BaseIngredient> mandatoryIngredientsChanged = change -> {
-			
+			transformation.get().getMandatoryIngredients().clear();
+			mandatoryIngredientsListView.getItems().forEach(bI -> {
+				if(bI != null) {
+					transformation.get().getMandatoryIngredients().add(bI.toObject());
+				}
+			});
 		};
 		refIdsListView.getItems().addListener(refIdsChanged);
 		mandatoryIngredientsListView.getItems().addListener(mandatoryIngredientsChanged);
@@ -503,7 +656,7 @@ public class CookingActionsEditorView extends EditorView {
 			if(n != null) {
 				ingredientTagTF.setText(null);
 				quantifierTagTF.setText(null);
-				transformation.get().setProduct(n.toObject());			
+				transformation.get().setProduct(n.toObject());
 			} else {
 				transformation.get().setProduct(null);	
 			}
@@ -513,8 +666,6 @@ public class CookingActionsEditorView extends EditorView {
 				productCB.getSelectionModel().select(null);
 				quantifierTagTF.setText(null);
 				transformation.get().setTag(new IngredientTag(n));
-			} else {
-				transformation.get().setTag(null);	
 			}
 		});
 		quantifierTagTF.textProperty().addListener((b, o, n) -> {
@@ -522,16 +673,17 @@ public class CookingActionsEditorView extends EditorView {
 				productCB.getSelectionModel().select(null);
 				ingredientTagTF.setText(null);
 				transformation.get().setTag(new QuantifierTag(n));
-			} else {
-				transformation.get().setTag(null);	
 			}
 		});
 
 		transformation.addListener((b, o, n) -> {
 			if (n != null) {
 				refIdsListView.getItems().setAll(n.getRegexIds());
-				mandatoryIngredientsListView.getItems().clear();
-				n.getMandatoryIngredients().forEach(i -> mandatoryIngredientsListView.getItems().add(i.getBaseObject()));
+				List<BaseIngredient> manIngredients = new ArrayList<BaseIngredient>();
+				n.getMandatoryIngredients().forEach(i -> {
+					manIngredients.add(i.getBaseObject());
+				});
+				mandatoryIngredientsListView.getItems().setAll(manIngredients);
 				ingredientTagTF.setText(null);
 				quantifierTagTF.setText(null);
 				if(n.getTag() != null) {
@@ -562,6 +714,118 @@ public class CookingActionsEditorView extends EditorView {
 
 		transformationEditorDlg.getDialogPane().setContent(contentPane);
 	}
+	private static void initImpliedToolsEditorPane() {
+		impliedToolsEditorDlg.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+		HBox contentPane = new HBox();
+		contentPane.setSpacing(10);
+
+		ListView<BaseTool> toolsListView = new ListView<BaseTool>();
+		toolsListView.setEditable(true);
+		toolsListView.setMinHeight(0);
+		toolsListView.setPrefHeight(100);
+		toolsListView.setCellFactory(ComboBoxListCell.forListView(toolsList));
+		
+		ContextMenu cm = new ContextMenu();
+		MenuItem moveToolItem = new MenuItem("Move to top");
+		moveToolItem.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.ARROW_UP));
+		moveToolItem.disableProperty().bind(toolsListView.getSelectionModel().selectedIndexProperty().lessThan(1));
+		moveToolItem.setOnAction(e -> toolsListView.getItems().set(
+				toolsListView.getSelectionModel().getSelectedIndex(), 
+				toolsListView.getItems().set(
+						0, 
+						toolsListView.getSelectionModel().getSelectedItem()
+				)
+		));
+		MenuItem addToolItem = new MenuItem("Add Tool");
+		addToolItem.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
+		addToolItem.setOnAction(e -> toolsListView.getItems().add(null));
+		MenuItem removeToolItem = new MenuItem("Remove Tool");
+		removeToolItem.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
+		removeToolItem.disableProperty().bind(toolsListView.getSelectionModel().selectedItemProperty().isNull());
+		removeToolItem.setOnAction(e -> toolsListView.getItems().remove(toolsListView.getSelectionModel().getSelectedItem()));
+		cm.getItems().addAll(
+				moveToolItem,
+				addToolItem,
+				removeToolItem
+		);
+		toolsListView.setOnMouseClicked(e -> {
+			if(e.getButton() == MouseButton.SECONDARY) {
+				cm.show(toolsListView, e.getScreenX(), e.getScreenY());
+			} else {
+				cm.hide();
+			}
+		});
+		
+		ListChangeListener<BaseTool> toolsChanged = change -> {
+			toolGroup.get().getItems().clear();
+			toolGroup.get().getItems().addAll(toolsListView.getItems());			
+		};
+		toolsListView.getItems().addListener(toolsChanged);
+
+		contentPane.getChildren().addAll(
+				toolsListView
+		);
+		
+		toolGroup.addListener((b, o, n) -> toolsListView.getItems().setAll(n.getItems()));
+		
+		impliedToolsEditorDlg.getDialogPane().setContent(contentPane);
+	}
+	private static void initImpliedIngredientsEditorPane() {
+		impliedIngredientsEditorDlg.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+		HBox contentPane = new HBox();
+		contentPane.setSpacing(10);
+
+		ListView<BaseIngredient> ingredientsListView = new ListView<BaseIngredient>();
+		ingredientsListView.setEditable(true);
+		ingredientsListView.setMinHeight(0);
+		ingredientsListView.setPrefHeight(100);
+		ingredientsListView.setCellFactory(ComboBoxListCell.forListView(ingredientsList));
+		
+		ContextMenu cm = new ContextMenu();
+		MenuItem moveIngredientItem = new MenuItem("Move to top");
+		moveIngredientItem.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.ARROW_UP));
+		moveIngredientItem.disableProperty().bind(ingredientsListView.getSelectionModel().selectedIndexProperty().lessThan(1));
+		moveIngredientItem.setOnAction(e -> ingredientsListView.getItems().set(
+				ingredientsListView.getSelectionModel().getSelectedIndex(), 
+				ingredientsListView.getItems().set(
+						0, 
+						ingredientsListView.getSelectionModel().getSelectedItem()
+				)
+		));
+		MenuItem addIngredientItem = new MenuItem("Add Ingredient");
+		addIngredientItem.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
+		addIngredientItem.setOnAction(e -> ingredientsListView.getItems().add(null));
+		MenuItem removeIngredientItem = new MenuItem("Remove Ingredient");
+		removeIngredientItem.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
+		removeIngredientItem.disableProperty().bind(ingredientsListView.getSelectionModel().selectedItemProperty().isNull());
+		removeIngredientItem.setOnAction(e -> ingredientsListView.getItems().remove(ingredientsListView.getSelectionModel().getSelectedItem()));
+		cm.getItems().addAll(
+				moveIngredientItem,
+				addIngredientItem,
+				removeIngredientItem
+		);
+		ingredientsListView.setOnMouseClicked(e -> {
+			if(e.getButton() == MouseButton.SECONDARY) {
+				cm.show(ingredientsListView, e.getScreenX(), e.getScreenY());
+			} else {
+				cm.hide();
+			}
+		});
+		
+		ListChangeListener<BaseIngredient> ingredientsChanged = change -> {
+			ingredientGroup.get().getItems().clear();
+			ingredientGroup.get().getItems().addAll(ingredientsListView.getItems());			
+		};
+		ingredientsListView.getItems().addListener(ingredientsChanged);
+
+		contentPane.getChildren().addAll(
+				ingredientsListView
+		);
+		
+		ingredientGroup.addListener((b, o, n) -> ingredientsListView.getItems().setAll(n.getItems()));
+		
+		impliedIngredientsEditorDlg.getDialogPane().setContent(contentPane);
+	}
 	
 	private static void showRegexEditorDialog(Regex regex, Map<Object, ObservableList<String>>regexIdMap) {
 		CookingActionsEditorView.regex.set(regex);
@@ -572,5 +836,13 @@ public class CookingActionsEditorView extends EditorView {
 		CookingActionsEditorView.transformation.set(transformation);
 		CookingActionsEditorView.regexIdsList.set(regexIdMap.get(transformation));
 		transformationEditorDlg.showAndWait();
+	}
+	private static void showImpliedToolsEditorDialog(ItemGroup<BaseTool, Tool> toolGroup) {
+		CookingActionsEditorView.toolGroup.set(toolGroup);
+		impliedToolsEditorDlg.showAndWait();
+	}
+	private static void showImpliedIngredientsEditorDialog(ItemGroup<BaseIngredient, Ingredient> ingredientGroup) {
+		CookingActionsEditorView.ingredientGroup.set(ingredientGroup);
+		impliedIngredientsEditorDlg.showAndWait();
 	}
 }

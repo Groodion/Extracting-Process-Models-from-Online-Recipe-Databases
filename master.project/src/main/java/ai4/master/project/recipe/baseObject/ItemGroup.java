@@ -58,7 +58,16 @@ public class ItemGroup<T extends BaseNamedObject<N, T>, N extends ImplicitNamedO
 	
 	@Override
 	public String toString() {
-		return "ItemGroup [items=" + items + "]";
+		StringBuilder sB = new StringBuilder();
+		
+		for(int i = 0; i < items.size(); i++) {
+			if(i != 0) {
+				sB.append(", ");
+			}
+			sB.append(items.get(i).getFirstName());
+		}
+		
+		return sB.toString();
 	}
 	
 	public String toXML() {

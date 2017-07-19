@@ -58,16 +58,15 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 
 	
 	public LibEditor(ObjectProperty<KeyWordDatabase> kwdb) {
-		this.getDialogPane().getStylesheets().add(
-				   getClass().getResource("/css/style.css").toExternalForm());
-		tools =  FXCollections.observableArrayList();
-		ingredients =  FXCollections.observableArrayList();			
-		ingredientGroups =  FXCollections.observableArrayList();
-		cookingActions =  FXCollections.observableArrayList();
-		eventIndicators =  FXCollections.observableArrayList();
-		lastSentenceReferences =  FXCollections.observableArrayList();
-		partIndicators =  FXCollections.observableArrayList();
-		allIngredients =  FXCollections.observableArrayList();
+		this.getDialogPane().getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+		tools = FXCollections.observableArrayList();
+		ingredients = FXCollections.observableArrayList();			
+		ingredientGroups = FXCollections.observableArrayList();
+		cookingActions = FXCollections.observableArrayList();
+		eventIndicators = FXCollections.observableArrayList();
+		lastSentenceReferences = FXCollections.observableArrayList();
+		partIndicators = FXCollections.observableArrayList();
+		allIngredients = FXCollections.observableArrayList();
 
 		
 		ListChangeListener<BaseTool> toolsChanged = change -> {
@@ -159,6 +158,9 @@ public class LibEditor extends Dialog<KeyWordDatabase> {
 			lastSentenceReferences.addAll(this.kwdb.getLastSentenceReferences());
 			eventIndicators.addAll(this.kwdb.getEventIndicators());
 			partIndicators.addAll(this.kwdb.getPartIndicators());
+
+			allIngredients.addAll(this.kwdb.getIngredients());
+			allIngredients.addAll(this.kwdb.getIngredientGroups());
 
 			editorInitialized = true;
 		});
