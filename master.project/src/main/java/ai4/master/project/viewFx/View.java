@@ -105,15 +105,13 @@ public class View extends Application {
 		Task<Parent> service = new Task<Parent>() {
 			@Override
 			protected Parent call() throws Exception {
-				loadingComment.setText("Loading configurations...");
-				Configurations.load();
 				loadingComment.setText("Loading fonts...");
 				Font.loadFont(getClass().getResource("/fonts/HelveticaNeue.ttf").toExternalForm(), 20);
-				loadingComment.setText("Loading styles...");
+				loadingComment.setText("Loading gui...");
 				FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/view.fxml"));
 				Parent parent = null;
 				try {
-					parent = loader.load();					
+					parent = loader.load();
 				} catch(Exception e) {
 					e.printStackTrace();
 					
@@ -125,6 +123,10 @@ public class View extends Application {
 					System.exit(0);
 				}
 				controller = loader.getController();
+				
+				loadingComment.setText("Loading configurations...");
+				Configurations.load();
+				
 				return parent;
 			}
 		};

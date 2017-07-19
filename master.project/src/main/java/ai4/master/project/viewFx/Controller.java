@@ -283,8 +283,6 @@ public class Controller implements Initializable {
 		identifiedTools = FXCollections.observableArrayList();
 		identifiedIngredients = FXCollections.observableArrayList();
 		identifiedActions = FXCollections.observableArrayList();
-		
-		Configurations.load();
 	}
 
 	@Override
@@ -295,10 +293,6 @@ public class Controller implements Initializable {
 		 * Logik
 		 */
 		
-		kwdb.addListener((b, o, n) -> {
-			parser.setKwdb(n);
-		});
-
 		toolsListView.setItems(identifiedTools);
 		ingredientsListView.setItems(identifiedIngredients);
 		actionsListView.setItems(identifiedActions);
