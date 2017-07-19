@@ -3,6 +3,8 @@ package ai4.master.project.viewFx.components.editorViews;
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.baseObject.BaseTool;
 import ai4.master.project.viewFx.components.editorViews.entries.ToolEntry;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -123,6 +125,7 @@ public class ToolsEditorView extends EditorView {
 		ContextMenu cm = new ContextMenu();
 		
 		MenuItem remove = new MenuItem("Remove Tool");
+		remove.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
 		remove.disableProperty().bind(toolsTable.getSelectionModel().selectedItemProperty().isNull());
 		remove.setOnAction(e -> tools.remove(toolsTable.getSelectionModel().getSelectedIndex()));
 		
@@ -193,7 +196,9 @@ public class ToolsEditorView extends EditorView {
 
 			ContextMenu synonymCm = new ContextMenu();
 			MenuItem removeSynonymItem = new MenuItem("Remove synonym");
+			removeSynonymItem.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
 			MenuItem addSynonymItem = new MenuItem("Add new synonym");
+			addSynonymItem.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 			synonymCm.getItems().addAll(removeSynonymItem, addSynonymItem);
 			
 			removeSynonymItem.disableProperty().bind(synonymsView.getSelectionModel().selectedItemProperty().isNull());

@@ -22,7 +22,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -33,11 +32,12 @@ public class View extends Application {
 	private Text welcome;
 	private Text subtitle;
 	private Text copyright;
+	private Text loadingComment;
 	private Label close;
 	private ImageView loading;
 
-	private Controller controller;
 
+	private Controller controller;
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
@@ -45,15 +45,18 @@ public class View extends Application {
 		welcome = new Text("Welcome");
 		subtitle = new Text("Parsing recipes from online databases");
 		copyright = new Text("AI4 Universität Bayreuth");
-
+		loadingComment = new Text("Bla bala");
+		
 		welcome.setStyle("-fx-fill: #ffffff");
 		subtitle.setStyle("-fx-fill: #ffffff");
 		copyright.setStyle("-fx-fill: #ffffff");
-
+		loadingComment.setStyle("-fx-fill: #ffffff");
+		
 		welcome.setFont(new Font("Segoe UI", 48));
 		subtitle.setFont(new Font("Segoe UI", 18));
 		copyright.setFont(new Font("Segoe UI", 12));
-
+		loadingComment.setFont(new Font("Segoe UI", 12));
+		
 		welcome.setLayoutX(45);
 		welcome.setLayoutY(96);
 
@@ -62,6 +65,9 @@ public class View extends Application {
 
 		copyright.setLayoutX(14);
 		copyright.setLayoutY(288);
+		
+		loadingComment.setLayoutX(14);
+		loadingComment.setLayoutY(310);
 
 		close = new Label("X");
 		close.setLayoutX(474);
@@ -83,7 +89,7 @@ public class View extends Application {
 
 		AnchorPane pane = new AnchorPane();
 		pane.setStyle("-fx-background-color: #008B61");
-		pane.getChildren().addAll(loading, welcome, subtitle, copyright, close);
+		pane.getChildren().addAll(loading, welcome, subtitle, copyright, close, loadingComment);
 		Scene scene = new Scene(pane);
 
 		splashScreen.initStyle(StageStyle.UNDECORATED);
@@ -95,8 +101,11 @@ public class View extends Application {
 		Task<Parent> service = new Task<Parent>() {
 			@Override
 			protected Parent call() throws Exception {
+				loadingComment.setText("Loading configurations...");
 				Configurations.load();
+				loadingComment.setText("Loading fonts...");
 				Font.loadFont(getClass().getResource("/fonts/HelveticaNeue.ttf").toExternalForm(), 20);
+				loadingComment.setText("Loading styles...");
 				FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/view.fxml"));
 				Parent parent = null;
 				try {
@@ -105,7 +114,10 @@ public class View extends Application {
 					e.printStackTrace();
 					
 					//TODO ALERT
-					
+					Alert loaderException = new Alert(AlertType.ERROR);
+					loaderException.setTitle("Error");
+					loaderException.setHeaderText("Fatal Error: Could not load the main GUI.");
+					loaderException.showAndWait();
 					System.exit(0);
 				}
 				controller = loader.getController();
@@ -117,6 +129,7 @@ public class View extends Application {
 			primaryStage.setScene(new Scene(service.getValue()));
 			primaryStage.setWidth(Configurations.VIEW_WIDTH.get());
 			primaryStage.setHeight(Configurations.VIEW_HEIGHT.get());
+			primaryStage.setTitle("Extracting BPMN Models from recipes");
 			Configurations.VIEW_WIDTH.bind(primaryStage.widthProperty());
 			Configurations.VIEW_HEIGHT.bind(primaryStage.heightProperty());
 			
@@ -165,7 +178,6 @@ public class View extends Application {
 				}
 				Configurations.save();
 			});
-			//http://www.chefkoch.de/rezepte/3361661499859558/Zarte-Schokokuechlein.html Produziert eine IndexOutofBounds beim Parsen
 			
 			primaryStage.show();
 			splashScreen.hide();

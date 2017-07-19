@@ -14,6 +14,8 @@ import ai4.master.project.recipe.object.ingredientTag.IngredientTag;
 import ai4.master.project.recipe.object.ingredientTag.QuantifierTag;
 import ai4.master.project.viewFx.components.editorViews.entries.CookingActionEntry;
 import ai4.master.project.viewFx.components.editorViews.entries.TransformationEntry;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -40,6 +42,8 @@ import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 public class CookingActionsEditorView extends EditorView {
 
@@ -65,12 +69,15 @@ public class CookingActionsEditorView extends EditorView {
 		tableView.getColumns().addAll(nameColumn(), synoymsColumn(), regexColumn(regexIdMap),
 				transformationsColumn(regexIdMap, ingredients), toolsColumn(tools));
 
+		VBox.setVgrow(tableView, Priority.ALWAYS);
+
 		/*
 		 * Context Menu
 		 */
 
 		ContextMenu cookingActionTableCM = new ContextMenu();
 		MenuItem removeCookingAction = new MenuItem("Remove CookingAction");
+		removeCookingAction.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
 		removeCookingAction.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
 		removeCookingAction.setOnAction(e -> {
 			cookingActions.remove(tableView.getSelectionModel().getSelectedIndex());
@@ -176,9 +183,12 @@ public class CookingActionsEditorView extends EditorView {
 
 			ContextMenu synonymsViewCM = new ContextMenu();
 			MenuItem addSynonym = new MenuItem("Add new Synonym");
+			addSynonym.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 
+			
 			addSynonym.setOnAction(e -> synonyms.add("synonym" + synonyms.size()));
 			MenuItem removeSynonym = new MenuItem("Remove Synonym");
+			removeSynonym.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
 			removeSynonym.disableProperty().bind(synonymsView.getSelectionModel().selectedItemProperty().isNull());
 			removeSynonym.setOnAction(
 					e -> synonymsView.getItems().remove(synonymsView.getSelectionModel().getSelectedIndex()));
@@ -225,12 +235,14 @@ public class CookingActionsEditorView extends EditorView {
 
 			ContextMenu regexTableCM = new ContextMenu();
 			MenuItem editRegex = new MenuItem("Edit");
+			editRegex.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.EDIT));
 			editRegex.disableProperty().bind(regexListView.getSelectionModel().selectedItemProperty().isNull());
 			editRegex.setOnAction(e -> {
 				showRegexEditorDialog(regexListView.getSelectionModel().getSelectedItem(), regexIdMap);
 				regexListView.refresh();
 			});
 			MenuItem moveRegexUp = new MenuItem("MoveUp");
+			moveRegexUp.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.ARROW_UP));
 			moveRegexUp.disableProperty().bind(
 					regexListView.getSelectionModel().selectedItemProperty().isNull()
 				.or(regexListView.getSelectionModel().selectedIndexProperty().isEqualTo(0))
@@ -243,6 +255,7 @@ public class CookingActionsEditorView extends EditorView {
 				regexListView.getItems().set(index - 1, regex);
 			});
 			MenuItem moveRegexDown = new MenuItem("MoveDown");
+			moveRegexDown.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.ARROW_DOWN));
 			moveRegexDown.disableProperty().bind(
 					regexListView.getSelectionModel().selectedItemProperty().isNull()
 				.or(regexListView.getSelectionModel().selectedIndexProperty().isEqualTo(
@@ -256,12 +269,14 @@ public class CookingActionsEditorView extends EditorView {
 				regexListView.getItems().set(index + 1, regex);
 			});
 			MenuItem addRegex = new MenuItem("Add new Regex");
+			addRegex.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 			addRegex.setOnAction(e -> {
 				Regex regex = new Regex(".*", Result.ALL);
 				showRegexEditorDialog(regex, regexIdMap);
 				regexList.add(regex);
 			});
 			MenuItem removeRegex = new MenuItem("Remove Regex");
+			removeRegex.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
 			removeRegex.disableProperty().bind(regexListView.getSelectionModel().selectedItemProperty().isNull());
 			removeRegex.setOnAction(e -> regexList.remove(regexListView.getSelectionModel().getSelectedIndex()));
 			regexListView.setOnMouseClicked(e -> {
@@ -312,11 +327,13 @@ public class CookingActionsEditorView extends EditorView {
 
 			ContextMenu transformationsTableCM = new ContextMenu();
 			MenuItem addTransformation = new MenuItem("Add new Transformation");
+			addTransformation.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 			addTransformation.setOnAction(e -> {
 				Transformation transformation = new Transformation();
 				transformations.add(transformation);
 			});
 			MenuItem removeTransformation = new MenuItem("Remove Transformation");
+			removeTransformation.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
 			removeTransformation.disableProperty().bind(transformationsListView.getSelectionModel().selectedItemProperty().isNull());
 			removeTransformation.setOnAction(e -> transformations.remove(transformationsListView.getSelectionModel().getSelectedIndex()));
 			transformationsListView.setOnMouseClicked(e -> {
@@ -404,12 +421,14 @@ public class CookingActionsEditorView extends EditorView {
 
 				ContextMenu transformationsTableCM = new ContextMenu();
 				MenuItem addTransformation = new MenuItem("Add RegexId");
+				addTransformation.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 				addTransformation.setOnAction(e -> {
 					refIds.add(null);
 					refIdsView.requestFocus();
 				});
 				transformationsTableCM.getItems().add(addTransformation);
 				MenuItem removeTransformation = new MenuItem("Remove RegexId");
+				removeTransformation.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
 				removeTransformation.disableProperty()
 						.bind(refIdsView.getSelectionModel().selectedItemProperty().isNull());
 				removeTransformation.setOnAction(e -> {
@@ -453,12 +472,14 @@ public class CookingActionsEditorView extends EditorView {
 
 				ContextMenu transformationsTableCM = new ContextMenu();
 				MenuItem addTransformation = new MenuItem("Add Ingredient");
+				addTransformation.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 				addTransformation.setOnAction(e -> {
 					ingredients.add(null);
 					ingredientsView.requestFocus();
 				});
 				transformationsTableCM.getItems().add(addTransformation);
 				MenuItem removeTransformation = new MenuItem("Remove Ingredient");
+				removeTransformation.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
 				removeTransformation.disableProperty()
 						.bind(ingredientsView.getSelectionModel().selectedItemProperty().isNull());
 				removeTransformation
@@ -500,6 +521,7 @@ public class CookingActionsEditorView extends EditorView {
 
 			ContextMenu toolsViewCM = new ContextMenu();
 			MenuItem addTool = new MenuItem("Add new Tool");
+			addTool.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 			addTool.setOnAction(e -> {
 				tools.add(null);
 				toolsView.requestFocus();
@@ -507,6 +529,7 @@ public class CookingActionsEditorView extends EditorView {
 			});
 			toolsViewCM.getItems().add(addTool);
 			MenuItem removeTool = new MenuItem("Remove Tool");
+			removeTool.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
 			removeTool.disableProperty().bind(toolsView.getSelectionModel().selectedItemProperty().isNull());
 			removeTool.setOnAction(e -> {
 				tools.remove(toolsView.getSelectionModel().getSelectedItem());

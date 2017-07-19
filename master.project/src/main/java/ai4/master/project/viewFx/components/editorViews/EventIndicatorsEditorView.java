@@ -2,6 +2,8 @@ package ai4.master.project.viewFx.components.editorViews;
 
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.viewFx.components.editorViews.entries.EventIndicatorEntry;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -108,6 +110,7 @@ public class EventIndicatorsEditorView extends EditorView {
 		ContextMenu cm = new ContextMenu();
 		
 		MenuItem remove = new MenuItem("Remove");
+		remove.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
 		remove.disableProperty().bind(eventIndicatorsTable.getSelectionModel().selectedItemProperty().isNull());
 		remove.setOnAction(e -> {
 			eventIndicators.remove(eventIndicatorsTable.getSelectionModel().getSelectedIndex());

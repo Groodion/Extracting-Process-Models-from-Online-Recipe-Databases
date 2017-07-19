@@ -78,11 +78,13 @@ public class SettingsDialog extends Dialog<String> {
 		setHeaderText("Settings");
 		setResizable(true);
 		getDialogPane().setPrefSize(700, 500);
+		getDialogPane().getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+				getDialogPane().getStyleClass().add("myDialog");
 		setGraphic(new ImageView(this.getClass().getResource("/img/preferences.png").toString()));
 		setOnCloseRequest(e -> close());
 
-		ButtonType okayButtonType = new ButtonType("Okay", ButtonData.OK_DONE);
-		ButtonType cancelButtonType = new ButtonType("Abbrechen", ButtonData.CANCEL_CLOSE);
+		ButtonType okayButtonType = new ButtonType("OK", ButtonData.OK_DONE);
+		ButtonType cancelButtonType = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
 
 		setResultConverter(button -> {
 			if (button == okayButtonType) {
@@ -118,7 +120,7 @@ public class SettingsDialog extends Dialog<String> {
 		mainLayout.getColumnConstraints().addAll(column0, column1);
 		
 		RowConstraints row0 = new RowConstraints();
-		row0.setPercentHeight(100);
+		row0.setPercentHeight(90);
 		mainLayout.getRowConstraints().addAll(row0);
 		
 		TitledPane parserSettings = new TitledPane();
@@ -140,7 +142,7 @@ public class SettingsDialog extends Dialog<String> {
 		mainLayout.add(parserSettings, 0, 0);
 		mainLayout.add(layoutSettings, 1, 0);
 		
-		fileLayout.add(new Label("Parser"), 0, 0);
+		fileLayout.add(new Label("Parser:"), 0, 0);
 		
 		
 		///
@@ -211,10 +213,10 @@ public class SettingsDialog extends Dialog<String> {
 		GridPane styleLayout = new GridPane();styleLayout.setHgap(10);styleLayout.setVgap(10);
 	
 		layoutSettings.setContent(styleLayout);
-		Label unknownIngredient = new Label("Unknown Ingredient: ");
-		Label unknownGroup = new Label("Unknown Group: ");
-		Label unknownTool = new Label("Unknown Tool: ");
-		Label unknownCookingAction = new Label("Unknown CookingAction: ");
+		Label unknownIngredient = new Label("Ingredient color: ");
+		Label unknownGroup = new Label("Group color: ");
+		Label unknownTool = new Label("Tool color: ");
+		Label unknownCookingAction = new Label("CookingAction color: ");
 	
 		styleLayout.add(unknownIngredient,0,0);styleLayout.add(unknownGroup,0,1);styleLayout.add(unknownTool,0,2);styleLayout.add(unknownCookingAction,0,3);
 	
@@ -226,6 +228,15 @@ public class SettingsDialog extends Dialog<String> {
 	
 		ColorPicker colorPicker4 = new ColorPicker();colorPicker4.valueProperty().bindBidirectional(Configurations.COOKING_ACTION_COLOR);styleLayout.add(colorPicker4,1,3);
 	
+		HBox container = new HBox();
+		Pane pane = new Pane();
+		HBox.setHgrow(pane, Priority.ALWAYS);
+		Button restoreDefaults = new Button("Restore defaults");
+		restoreDefaults.setOnAction(e -> {
+			Configurations.restoreDefaultValues();
+		});
+		container.getChildren().addAll(pane, restoreDefaults);
+		mainLayout.add(container, 1, 1);
 		getDialogPane().setContent(mainLayout);
 	}
 }

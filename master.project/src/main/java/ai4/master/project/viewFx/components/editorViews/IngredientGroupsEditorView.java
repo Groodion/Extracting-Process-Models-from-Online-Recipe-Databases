@@ -3,6 +3,8 @@ package ai4.master.project.viewFx.components.editorViews;
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
 import ai4.master.project.viewFx.components.editorViews.entries.IngredientGroupEntry;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -124,6 +126,7 @@ public class IngredientGroupsEditorView extends EditorView {
 		ContextMenu cm = new ContextMenu();
 		
 		MenuItem remove = new MenuItem("Remove IngredientGroup");
+		remove.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
 		remove.disableProperty().bind(ingredientGroupsTable.getSelectionModel().selectedItemProperty().isNull());
 		remove.setOnAction(e -> ingredientGroups.remove(ingredientGroupsTable.getSelectionModel().getSelectedIndex()));
 		
@@ -193,7 +196,9 @@ public class IngredientGroupsEditorView extends EditorView {
 
 			ContextMenu synonymCm = new ContextMenu();
 			MenuItem removeSynonymItem = new MenuItem("Remove synonym");
+			removeSynonymItem.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
 			MenuItem addSynonymItem = new MenuItem("Add new synonym");
+			addSynonymItem.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 			synonymCm.getItems().addAll(removeSynonymItem, addSynonymItem);
 			
 			removeSynonymItem.disableProperty().bind(synonymsView.getSelectionModel().selectedItemProperty().isNull());
