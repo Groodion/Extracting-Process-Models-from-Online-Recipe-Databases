@@ -40,6 +40,7 @@ public class ProcessModelerImpl implements ProcessModeler {
     private Map<BoundaryEvent, CookingEvent> timerEvents = new HashMap<>();
     private List<BoundaryEvent> timers = new ArrayList<>();
     private List<DataInputAssociation> dataInputAssociations = new ArrayList<>();
+    private List<DataOutputAssociation> dataOutputAssociations = new ArrayList<>();
     private Map<DataInputAssociation, UserTask> dataObjectAssoc = new HashMap<>();
     private StartEvent startEvent = null;
     private EndEvent endEvent = null;
@@ -306,7 +307,12 @@ public class ProcessModelerImpl implements ProcessModeler {
                     //userTask.builder().camundaInputParameter("Ingredient", ingredient.getName());
                     DataObjectReference dor = createDataObject(process, createIdOf("dataObject_I" + i + createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getName(), plane, true);
                     dataObjects.add(dor);
-                    DataInputAssociation dia = createDataAssociation(process, dor, userTask, plane);
+
+                    // TODO: DataOutputAssociation erstellen, wenn ein Ingredient vom vorherigen usertask zum dataObjectReference, wenn Ingredient bei beiden gleich
+
+                    //DataOutputAssociation doa = createDataOutputAssociation(process,dor,userTask,plane);
+                    DataInputAssociation dia = createDataInputAssociation(process, dor, userTask, plane);
+                    //dataOutputAssociations.add(doa);
                     dataInputAssociations.add(dia);
                     i++;
                 }
@@ -316,7 +322,7 @@ public class ProcessModelerImpl implements ProcessModeler {
                     userTask.builder().camundaInputParameter("Tool", tool.getName());
                     DataObjectReference dor = createDataObject(process, createIdOf("dataObject_I" + i + createIdOf(tool.getName()) + createIdOf(node.getData().getText())), tool.getName(), plane, true);
                     dataObjects.add(dor);
-                    DataInputAssociation dia = createDataAssociation(process, dor, userTask, plane);
+                    DataInputAssociation dia = createDataInputAssociation(process, dor, userTask, plane);
                     dataInputAssociations.add(dia);
                 }
                 userTasks.add(userTask);
@@ -324,6 +330,24 @@ public class ProcessModelerImpl implements ProcessModeler {
             }
         }
 
+    }
+
+    private DataOutputAssociation createDataOutputAssociation(Process process, DataObjectReference dor, UserTask userTask, BpmnPlane plane) {
+        String identifier = dor.getId() + "-" + userTask.getId();
+        DataOutputAssociation dataOutputAssociation = modelInstance.newInstance(DataOutputAssociation.class);
+        dataOutputAssociation.setAttributeValue("id", identifier, true);
+
+        TargetRef targetRef = modelInstance.newInstance(TargetRef.class);
+        targetRef.setTextContent(dor.getId());
+
+        SourceRef sourceRef = modelInstance.newInstance(SourceRef.class);
+        sourceRef.setTextContent(userTask.getId());
+
+        dataOutputAssociation.addChildElement(targetRef);
+        dataOutputAssociation.addChildElement(sourceRef);
+        userTask.getDataOutputAssociations().add(dataOutputAssociation);
+
+        return dataOutputAssociation;
     }
 
     /*
@@ -413,7 +437,7 @@ public class ProcessModelerImpl implements ProcessModeler {
     /*
     Creates a DataInputAssociation to a UserTask
      */
-    private DataInputAssociation createDataAssociation(Process process, DataObjectReference dataObjectReference, UserTask userTask, BpmnPlane plane) {
+    private DataInputAssociation createDataInputAssociation(Process process, DataObjectReference dataObjectReference, UserTask userTask, BpmnPlane plane) {
         String identifier = dataObjectReference.getId() + "-" + userTask.getId();
 
         DataInputAssociation dataInputAssociation = modelInstance.newInstance(DataInputAssociation.class);
