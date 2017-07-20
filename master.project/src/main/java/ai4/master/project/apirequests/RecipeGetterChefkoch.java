@@ -190,7 +190,7 @@ public class RecipeGetterChefkoch implements RecipeGetter {
 
 
     @Override
-    public Recipe getRecipeByLink(String link) {
+    public Recipe getRecipeByLink(String link) throws ServerOfflineException {
         Scanner scanner = new Scanner(link);
         String id = scanner.findInLine("[0-9]+");
         scanner.close();
@@ -199,7 +199,7 @@ public class RecipeGetterChefkoch implements RecipeGetter {
     }
 
     @Override
-    public Recipe getRecipeByCategory(String category) {
+    public Recipe getRecipeByCategory(String category) throws ServerOfflineException {
         return getRecipe(getRecipeIDs(category, 1));
     }
 

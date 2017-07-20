@@ -1,5 +1,6 @@
 package ai4.master.project.apirequests;
 
+import ai4.master.project.apirequests.exceptions.ServerOfflineException;
 import ai4.master.project.recipe.LANG_FLAG;
 import ai4.master.project.recipe.Recipe;
 
@@ -11,7 +12,7 @@ import ai4.master.project.recipe.Recipe;
 public interface RecipeGetter {
 
 
-    default Recipe getRecipe(String id){
+    default Recipe getRecipe(String id) throws ServerOfflineException {
         Recipe recipe = new Recipe(getLanguage());
         getRecipeIngredients(id, recipe);
         getRecipePreparation(id, recipe);
@@ -24,7 +25,7 @@ public interface RecipeGetter {
      * @param recipe the recipe class to save the informations in
      * @return a string containing the preparation for debug purposes especially
      */
-    String getRecipePreparation(String id, Recipe recipe);
+    String getRecipePreparation(String id, Recipe recipe) throws ServerOfflineException;
 
     /**
      *Returns the ingredients for a specific recipe from any given website
@@ -32,16 +33,16 @@ public interface RecipeGetter {
      * @param recipe the recipe class to save the informations in
      * @return a string containing the ingredients for debug purposes especially
      */
-    String getRecipeIngredients(String id, Recipe recipe);
+    String getRecipeIngredients(String id, Recipe recipe) throws ServerOfflineException;
 
 
     default LANG_FLAG getLanguage(){return LANG_FLAG.DE;}
 
-	default Recipe getRecipeByID(String id) {
+	default Recipe getRecipeByID(String id) throws ServerOfflineException {
 		return getRecipe(id);
 	}
 
-	Recipe getRecipeByLink(String link);
+	Recipe getRecipeByLink(String link) throws ServerOfflineException;
 
-	Recipe getRecipeByCategory(String category);
+	Recipe getRecipeByCategory(String category) throws ServerOfflineException;
 }
