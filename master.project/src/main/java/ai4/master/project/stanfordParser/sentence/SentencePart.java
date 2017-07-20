@@ -14,6 +14,7 @@ import ai4.master.project.recipe.object.Tool;
 import ai4.master.project.stanfordParser.STTSTag;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -167,6 +168,8 @@ public class SentencePart extends PartialObject<SentencePart> {
 	 */
 	public boolean matches(String reg, boolean ignorePunctuationMarks, Set<String> usedTags) {
 		String[] combinations = textComb(ignorePunctuationMarks, usedTags);
+		
+		System.out.println(usedTags + " " + Arrays.toString(combinations));
 		
 		for(String combination : combinations) {
 			if(combination.matches(reg)) {

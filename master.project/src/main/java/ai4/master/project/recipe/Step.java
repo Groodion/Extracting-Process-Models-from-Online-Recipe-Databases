@@ -19,6 +19,8 @@ public class Step {
 	
 	private List<CookingEvent> events;
 	
+	private int usedRegex;
+	private int usedTransformation;
 	
 	public Step() {
 		ingredients = new ArrayList<Ingredient>();
@@ -44,6 +46,19 @@ public class Step {
 		return products;
 	}
 
+	public int getUsedRegex() {
+		return usedRegex;
+	}
+	public void setUsedRegex(int usedRegex) {
+		this.usedRegex = usedRegex;
+	}
+	public int getUsedTransformation() {
+		return usedTransformation;
+	}
+	public void setUsedTransformation(int usedTransformation) {
+		this.usedTransformation = usedTransformation;
+	}
+	
 	public String getText() {
 		return text;
 	}
@@ -93,8 +108,10 @@ public class Step {
 			sB.append("\t\t" + e + "\n");
 		}
 		sB.append("\t],\n");
-		sB.append("\t'" + text + "'\n");
-		sB.append("]");
+		sB.append("\t'" + text + "',\n");
+		sB.append("\tusedRegex: ");
+		sB.append(usedRegex);
+		sB.append("\n]");
 		
 		return sB.toString();
 	}

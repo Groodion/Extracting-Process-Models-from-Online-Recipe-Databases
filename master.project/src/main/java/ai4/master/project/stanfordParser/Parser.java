@@ -239,7 +239,7 @@ public class Parser {
 						if (sP.matches(regex.getExpression(), false, step.getCookingAction().getBaseObject().getUsedRegexTags())) {
 							ingredientsNeeded = regex.isIngredientsNeeded();
 							mRegex = regex;
-							
+							step.setUsedRegex(action.getRegexList().indexOf(regex));
 							if (regex.isReferencePreviousProducts()) {
 								step.getIngredients().addAll(lastStep.getProducts());
 							}

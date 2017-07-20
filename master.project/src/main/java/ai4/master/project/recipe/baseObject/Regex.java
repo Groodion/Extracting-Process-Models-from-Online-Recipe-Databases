@@ -5,6 +5,8 @@ import java.util.Scanner;
 import java.util.Set;
 
 import ai4.master.project.KeyWordDatabase;
+import ai4.master.project.stanfordParser.STTSTag;
+import ai4.master.project.stanfordParser.sentence.Role;
 
 public class Regex {
 	public enum Result {
@@ -44,13 +46,19 @@ public class Regex {
 		this.expression = expression;
 		
 		usedTags.clear();
-		Scanner scanner = new Scanner(expression);
-		scanner.useDelimiter(" ");
-		String pattern = "[_~][A-Z]+";
-		while(scanner.hasNext(pattern)) {
-			usedTags.add(scanner.next(pattern));
+		
+		for(Role role : Role.values()) {
+			String tag = "~" + role.toString();
+			if(expression.contains(tag)) {
+				usedTags.add(tag);
+			}
 		}
-		scanner.close();
+		for(STTSTag sTag : STTSTag.values()) {
+			String tag = "_" + sTag.toString();
+			if(expression.contains(tag)) {
+				usedTags.add(tag);
+			}
+		}
 	}
 	public Set<String> getUsedTags() {
 		return usedTags;

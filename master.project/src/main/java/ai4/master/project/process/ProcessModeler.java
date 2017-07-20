@@ -5,6 +5,8 @@ import javafx.beans.property.DoubleProperty;
 
 import java.io.File;
 
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+
 
 /**
  * Created by René Bärnreuther on 15.05.2017.
@@ -40,4 +42,6 @@ public interface ProcessModeler {
      * @return the current progress of the conversation.
      */
      DoubleProperty getProgress();
+
+	BpmnModelInstance getModelInstance();
 }

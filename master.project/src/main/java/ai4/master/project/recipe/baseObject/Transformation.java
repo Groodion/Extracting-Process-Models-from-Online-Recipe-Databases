@@ -65,6 +65,7 @@ public class Transformation {
 	 * @return Testresultat
 	 */
 	public boolean matches(Ingredient ingredient, List<Ingredient> list) {
+		System.out.println(mandatoryIngredients);
 		if(mandatoryIngredients.isEmpty()) {
 			return true;
 		}
@@ -139,7 +140,14 @@ public class Transformation {
 	public String toXML() {
 		StringBuilder sB = new StringBuilder();
 		
-		sB.append("<Transformation>");
+		sB.append("<Transformation regexRefIds=\"");
+		for(int i = 0; i < regexIds.size(); i++) {
+			if(i != 0) {
+				sB.append(',');
+			}
+			sB.append(regexIds.get(i));
+		}
+		sB.append("\">");
 		sB.append("<ingredients>");
 		for(Ingredient ingredient : mandatoryIngredients) {
 			sB.append("<Ingredient name=\"");

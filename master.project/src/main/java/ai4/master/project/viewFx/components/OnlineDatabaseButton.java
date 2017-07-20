@@ -60,7 +60,7 @@ public class OnlineDatabaseButton extends HBox {
 					if (buttonType == ButtonType.OK) {
 						return input.getText();
 					} else {
-						return null;
+						return "";
 					}
 				});
 				
@@ -68,7 +68,7 @@ public class OnlineDatabaseButton extends HBox {
 				Optional<String> result = dialog.showAndWait();
 				
 				result.ifPresent(r -> {
-					if(r != null) {
+					if(r.length() != 0) {
 						Controller.onlineDatabaseProgressProperty().set(-1);
 						Task<Recipe> task = new Task<Recipe>() {
 							@Override
@@ -93,6 +93,8 @@ public class OnlineDatabaseButton extends HBox {
 							});
 						});
 						new Thread(task).start();
+					} else {
+						Controller.unblockView();		
 					}
 				});				
 			}

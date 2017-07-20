@@ -121,13 +121,13 @@ public class ProcessModelerImpl implements ProcessModeler {
         progress.setValue(0.80);
         this.setFileName(this.fileName + "_layouted");
         definitions.addChildElement(diagram);
-        BPMNLayouter layouter = new BPMNLayouter(this);
-        layouter.layout();
+        BPMNLayouter layouter = new BPMNLayouterNewImpl();
+        layouter.layout(this);
         progress.setValue(0.98);
 
         // validate and write model to file
-        Bpmn.validateModel(modelInstance);
-        createXml();
+        //Bpmn.validateModel(modelInstance);
+//        createXml();
         createXmlFromFile();
         progress.setValue(1.00);
 
@@ -548,7 +548,7 @@ public class ProcessModelerImpl implements ProcessModeler {
      * Creates a XML-Instance of the given model
      */
     public void createXml() {
-        Bpmn.validateModel(modelInstance);
+    	Bpmn.validateModel(modelInstance);
         System.out.println("Writing to: " + file.getAbsolutePath());
         XMLWriter xmlWriter = new XMLWriter(fileName);
         xmlWriter.writeTo(Bpmn.convertToString(modelInstance));
@@ -592,7 +592,7 @@ public class ProcessModelerImpl implements ProcessModeler {
     Creates a xml-file from the currently saved file.
      */
     public void createXmlFromFile() {
-        Bpmn.validateModel(modelInstance);
+//      Bpmn.validateModel(modelInstance);
         XMLWriter xmlWriter = new XMLWriter(fileName);
         xmlWriter.writeTo(file, getXml());
     }

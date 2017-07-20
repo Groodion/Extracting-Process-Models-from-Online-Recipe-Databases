@@ -5,33 +5,20 @@ import ai4.master.project.process.ProcessModeler;
 import ai4.master.project.process.ProcessModelerImpl;
 import ai4.master.project.recipe.LANG_FLAG;
 import ai4.master.project.recipe.Recipe;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.sun.javafx.tk.Toolkit;
 
 /**
  * Created by René Bärnreuther on 15.05.2017.
  */
 public class Main {
 
-    public static void main(String[] args) {
-
-        RecipeGetterChefkoch recipeGetter = new RecipeGetterChefkoch();
-        String ids = recipeGetter.getRecipeIDs("Käse",1);
-
-        String[] id = ids.split(",");
-        List<Recipe> recipes = new ArrayList<Recipe>();
-        for(int i = 0; i < id.length;  i++){
-            System.out.println(id[i]);
-            Recipe r = new Recipe(LANG_FLAG.DE);
-            recipeGetter.getRecipeIngredients(id[i],r);
-            recipeGetter.getRecipePreparation(id[i],r);
-            recipes.add(r);
-        }
-
-        ProcessModeler processModeler = new ProcessModelerImpl();
-
-        //processModeler.convertToProcess(new Recipe());
-
-    }
+	public static void main(String[] args) {
+		Toolkit.getToolkit().getFontLoader().computeStringWidth("Hallo", Font.getDefault());
+	}
 }
