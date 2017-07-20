@@ -1,5 +1,6 @@
 package ai4.master.project.apirequests;
 
+import ai4.master.project.apirequests.exceptions.ServerOfflineException;
 import ai4.master.project.recipe.Recipe;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 public class RecipeGetterKochbar implements RecipeGetter {
     public RecipeGetterKochbar(){}
 
-    public String getRecipePreparation(String id, Recipe recipe) {
+    public String getRecipePreparation(String id, Recipe recipe) throws ServerOfflineException {
         String prep = "";
         Document document = setup(id);
         Elements divElemente = document.select("div[class*=recipe-steps-right]");
@@ -26,7 +27,7 @@ public class RecipeGetterKochbar implements RecipeGetter {
         return recipe.getPreparation();
     }
 
-    public String getRecipeIngredients(String id, Recipe recipe) {
+    public String getRecipeIngredients(String id, Recipe recipe) throws ServerOfflineException {
         ArrayList<String> names = new ArrayList<String>();
         ArrayList<String> sizes = new ArrayList<String>();
         Document document = setup(id);
@@ -46,12 +47,12 @@ public class RecipeGetterKochbar implements RecipeGetter {
         return fullIngredient;
     }
 
-    private Document setup(String link){
+    private Document setup(String link) throws ServerOfflineException {
         Document doc = null;
         try {
             doc = Jsoup.connect(link).get();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ServerOfflineException("Couldn't access kochbar server.");
         }
         return doc;
     }
