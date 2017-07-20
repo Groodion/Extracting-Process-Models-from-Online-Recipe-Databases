@@ -113,8 +113,7 @@ public class CookingActionEntry {
 	}
 	
 	private static void update(BaseCookingAction cookingAction, CookingActionEntry entry) {
-		cookingAction.getNames().clear();
-		cookingAction.getStemmedNames().clear();
+		cookingAction.clearNames();
 		
 		cookingAction.getRegexList().clear();
 		cookingAction.getTransformations().clear();

@@ -47,6 +47,9 @@ public class ProcessTracker extends HBox {
 		activeStep.set(activeStep.get() - 1);
 	}
 
+	public void reset() {
+		activeStep.set(0);
+	}
 	
 	public long getActiveStep() {
 		return activeStep.get();

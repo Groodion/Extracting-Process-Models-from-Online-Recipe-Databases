@@ -55,6 +55,11 @@ public abstract class BaseNamedObject<N extends NamedObject<B>, B extends BaseNa
 			}
 		}
 	}
+	public void clearNames() {
+		getNames().clear();
+		getStemmedNames().clear();
+		firstName = null;
+	}
 	
 	@Override
 	public int compareTo(B other) {

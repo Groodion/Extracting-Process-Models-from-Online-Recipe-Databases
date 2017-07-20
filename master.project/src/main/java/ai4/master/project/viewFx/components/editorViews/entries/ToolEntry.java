@@ -36,13 +36,13 @@ public class ToolEntry {
 		synonyms.addListener(lcListener);
 	}
 
-	public String getToolName() {
+	public String getName() {
 		return toolName.get();
 	}
-	public void setToolName(String toolName) {
+	public void setName(String toolName) {
 		this.toolName.set(toolName);
 	}
-	public StringProperty toolNameProperty() {
+	public StringProperty nameProperty() {
 		return toolName;
 	}
 
@@ -51,12 +51,11 @@ public class ToolEntry {
 	}
 
 	private static void updateTool(BaseTool tool, ToolEntry entry) {		
-		tool.getNames().clear();
-		tool.getStemmedNames().clear();
+		tool.clearNames();
 
 		entry.synonyms.removeIf(synonym -> synonym.replace(" ", "").length() == 0);
 
-		tool.addName(entry.getToolName());
+		tool.addName(entry.getName());
 		for (String name : entry.getSynonyms()) {
 			tool.addName(name);
 		}		

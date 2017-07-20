@@ -98,13 +98,7 @@ public class XMLLoader {
 			}
 		}
 		
-		Collections.sort(kwdb.getTools());
-		Collections.sort(kwdb.getIngredients());
-		Collections.sort(kwdb.getIngredientGroups());
-		Collections.sort(kwdb.getCookingActions());
-		Collections.sort(kwdb.getEventIndicators());
-		Collections.sort(kwdb.getPartIndicators());
-		Collections.sort(kwdb.getLastSentenceReferences());
+		kwdb.sort();
 		
 		return kwdb;
 	}

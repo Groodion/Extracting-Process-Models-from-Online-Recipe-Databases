@@ -2,6 +2,7 @@ package ai4.master.project.viewFx.components.editorViews;
 
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.baseObject.BaseTool;
+import ai4.master.project.viewFx.components.editorViews.entries.IngredientEntry;
 import ai4.master.project.viewFx.components.editorViews.entries.ToolEntry;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
@@ -15,6 +16,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -153,7 +155,7 @@ public class ToolsEditorView extends EditorView {
 	private TableColumn<ToolEntry, String> nameColumn() {
 		TableColumn<ToolEntry, String> nameColumn = new TableColumn<ToolEntry, String>("Name");
 		
-		nameColumn.setCellValueFactory(new PropertyValueFactory<ToolEntry, String>("toolName"));
+		nameColumn.setCellValueFactory(new PropertyValueFactory<ToolEntry, String>("name"));
 		nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 		
 		return nameColumn;
@@ -172,7 +174,7 @@ public class ToolsEditorView extends EditorView {
 	}
 	public void scrollTo(String word) {
 		for(ToolEntry entry : toolsTable.getItems()) {
-			if(entry.getToolName().equals(word) || entry.getSynonyms().contains(word)) {
+			if(entry.getName().equals(word) || entry.getSynonyms().contains(word)) {
 				toolsTable.scrollTo(entry);
 				toolsTable.getSelectionModel().select(entry);
 				break;
@@ -195,11 +197,22 @@ public class ToolsEditorView extends EditorView {
 			layout.getChildren().add(synonymsView);
 
 			ContextMenu synonymCm = new ContextMenu();
+			MenuItem changeToName = new MenuItem("Change to name");
+			changeToName.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.EXCHANGE));
+			changeToName.disableProperty().bind(synonymsView.getSelectionModel().selectedItemProperty().isNull());
+			changeToName.setOnAction(e -> {
+				@SuppressWarnings("unchecked")
+				TableRow<ToolEntry> row = (TableRow<ToolEntry>) getParent();
+				ToolEntry entry = row.getItem();
+				entry.getSynonyms().add(entry.getName());
+				entry.setName(synonymsView.getSelectionModel().getSelectedItem());
+				entry.getSynonyms().remove(entry.getName());
+			});
 			MenuItem removeSynonymItem = new MenuItem("Remove synonym");
 			removeSynonymItem.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
 			MenuItem addSynonymItem = new MenuItem("Add new synonym");
 			addSynonymItem.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
-			synonymCm.getItems().addAll(removeSynonymItem, addSynonymItem);
+			synonymCm.getItems().addAll(changeToName, removeSynonymItem, addSynonymItem);
 			
 			removeSynonymItem.disableProperty().bind(synonymsView.getSelectionModel().selectedItemProperty().isNull());
 			removeSynonymItem.setOnAction(e -> {

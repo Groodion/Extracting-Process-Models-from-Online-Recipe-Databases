@@ -9,6 +9,7 @@ import ai4.master.project.stanfordParser.sentence.Role;
 import ai4.master.project.stanfordParser.sentence.Word;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -283,6 +284,18 @@ public class KeyWordDatabase {
 		clone.getLastSentenceReferences().addAll(lastSentenceReferences);
 		clone.getEventIndicators().addAll(eventIndicators);
 		
+		clone.sort();
+		
 		return clone;
+	}
+
+	public void sort() {
+		Collections.sort(getTools());
+		Collections.sort(getIngredients());
+		Collections.sort(getIngredientGroups());
+		Collections.sort(getCookingActions());
+		Collections.sort(getEventIndicators());
+		Collections.sort(getPartIndicators());
+		Collections.sort(getLastSentenceReferences());
 	}
 }

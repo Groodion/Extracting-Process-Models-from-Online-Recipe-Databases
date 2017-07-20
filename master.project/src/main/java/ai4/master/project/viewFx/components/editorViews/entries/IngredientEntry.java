@@ -59,8 +59,7 @@ public class IngredientEntry {
 	}
 
 	private static void update(BaseIngredient ingredient, IngredientEntry entry) {		
-		ingredient.getNames().clear();
-		ingredient.getStemmedNames().clear();
+		ingredient.clearNames();
 
 		ingredient.getIngredientGroups().clear();
 		

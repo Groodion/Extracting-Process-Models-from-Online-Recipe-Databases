@@ -37,6 +37,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.ComboBoxListCell;
@@ -185,6 +186,17 @@ public class CookingActionsEditorView extends EditorView {
 			synonymsView.setEditable(true);
 
 			ContextMenu synonymsViewCM = new ContextMenu();
+			MenuItem changeToName = new MenuItem("Change to name");
+			changeToName.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.EXCHANGE));
+			changeToName.disableProperty().bind(synonymsView.getSelectionModel().selectedItemProperty().isNull());
+			changeToName.setOnAction(e -> {
+				@SuppressWarnings("unchecked")
+				TableRow<CookingActionEntry> row = (TableRow<CookingActionEntry>) getParent();
+				CookingActionEntry entry = row.getItem();
+				entry.getSynonyms().add(entry.getName());
+				entry.setName(synonymsView.getSelectionModel().getSelectedItem());
+				entry.getSynonyms().remove(entry.getName());
+			});
 			MenuItem addSynonym = new MenuItem("Add new Synonym");
 			addSynonym.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
 
@@ -195,7 +207,10 @@ public class CookingActionsEditorView extends EditorView {
 			removeSynonym.disableProperty().bind(synonymsView.getSelectionModel().selectedItemProperty().isNull());
 			removeSynonym.setOnAction(
 					e -> synonymsView.getItems().remove(synonymsView.getSelectionModel().getSelectedIndex()));
-			synonymsViewCM.getItems().addAll(addSynonym, removeSynonym);
+			synonymsViewCM.getItems().addAll(
+					changeToName,
+					addSynonym, 
+					removeSynonym);
 			synonymsView.setOnMouseClicked(e -> {
 				if (e.getButton() == MouseButton.SECONDARY) {
 					synonymsViewCM.show(synonymsView, e.getScreenX(), e.getScreenY());

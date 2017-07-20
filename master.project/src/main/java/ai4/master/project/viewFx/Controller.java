@@ -909,12 +909,43 @@ public class Controller implements Initializable {
 	}
 
 	public void finish() {
-		
+		Alert alert = new Alert(AlertType.CONFIRMATION, "", ButtonType.OK, ButtonType.NO, ButtonType.CANCEL);
+		alert.setTitle("Information");
+		alert.setHeaderText("Not saved files would not be stored!");
+		alert.setContentText("Do you want to save your files?");
+
+		Optional<ButtonType> result = alert.showAndWait();
+		result.ifPresent(buttonType -> {
+			if(buttonType == ButtonType.CANCEL) {
+				return;
+			} else if (buttonType == ButtonType.OK){
+				FileChooser fc = new FileChooser();
+				fc.getExtensionFilters().add(new ExtensionFilter("BPMN File (*.bpmn)", ".bpmn"));
+				File bpmnFile = fc.showSaveDialog(null);
+				if (bpmnFile != null) {
+					XMLWriter writer = new XMLWriter(bpmnFile.getName());
+					writer.writeTo(bpmnFile, bpmnCode.get());
+				}
+			}
+			recipeImportFilePathTF.setText("");
+			ingredientsTA.setText("");
+			preparationTA.setText("");
+			
+			messagesListView.getItems().clear();
+			
+			prevStep();
+			prevStep();
+			
+			removeDiagram();
+			identifiedTools.clear();
+			identifiedIngredients.clear();
+			identifiedActions.clear();			
+		});
 	}
 	
 	public void resetParsing() {
 		recipe.get().getSteps().clear();
-		
+		recipeParsed.set(false);
 		updateRecipeSteps();
 	}
 	
@@ -928,12 +959,16 @@ public class Controller implements Initializable {
 
 	private void callDiagram(StringProperty bpmnUrl) {
 		if (bpmnUrl.getValue() != null) {
-			String js1 = "removeBpmnDiagram()";
-			engine.executeScript(js1);
+			removeDiagram();
 
 			String js2 = "showBpmnDiagram('" + bpmnUrl.getValue() + "');";
 			engine.executeScript(js2);
 		}
+	}
+	
+	private void removeDiagram() {
+		String js1 = "removeBpmnDiagram()";
+		engine.executeScript(js1);
 	}
 
 	public static void blockView() {

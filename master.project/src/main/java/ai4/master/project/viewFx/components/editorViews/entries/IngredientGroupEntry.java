@@ -51,8 +51,7 @@ public class IngredientGroupEntry {
 	}
 
 	private static void update(BaseIngredientGroup ingredientGroup, IngredientGroupEntry entry) {		
-		ingredientGroup.getNames().clear();
-		ingredientGroup.getStemmedNames().clear();
+		ingredientGroup.clearNames();
 
 		entry.synonyms.removeIf(synonym -> synonym.replace(" ", "").length() == 0);
 

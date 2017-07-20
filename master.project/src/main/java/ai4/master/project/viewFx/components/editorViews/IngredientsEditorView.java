@@ -4,6 +4,7 @@ import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.recipe.baseObject.BaseIngredient;
 import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
 import ai4.master.project.viewFx.components.editorViews.entries.IngredientEntry;
+import ai4.master.project.viewFx.components.editorViews.entries.IngredientGroupEntry;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.ObjectProperty;
@@ -17,6 +18,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
@@ -214,11 +216,22 @@ public class IngredientsEditorView extends EditorView {
 			layout.getChildren().add(synonymsView);
 
 			ContextMenu synonymCm = new ContextMenu();
+			MenuItem changeToName = new MenuItem("Change to name");
+			changeToName.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.EXCHANGE));
+			changeToName.disableProperty().bind(synonymsView.getSelectionModel().selectedItemProperty().isNull());
+			changeToName.setOnAction(e -> {
+				@SuppressWarnings("unchecked")
+				TableRow<IngredientEntry> row = (TableRow<IngredientEntry>) getParent();
+				IngredientEntry entry = row.getItem();
+				entry.getSynonyms().add(entry.getName());
+				entry.setName(synonymsView.getSelectionModel().getSelectedItem());
+				entry.getSynonyms().remove(entry.getName());
+			});
 			MenuItem removeSynonymItem = new MenuItem("Remove synonym");
 			removeSynonymItem.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.REMOVE));
 			MenuItem addSynonymItem = new MenuItem("Add new synonym");
 			addSynonymItem.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PLUS));
-			synonymCm.getItems().addAll(removeSynonymItem, addSynonymItem);
+			synonymCm.getItems().addAll(changeToName, removeSynonymItem, addSynonymItem);
 			
 			removeSynonymItem.disableProperty().bind(synonymsView.getSelectionModel().selectedItemProperty().isNull());
 			removeSynonymItem.setOnAction(e -> synonymsView.getItems().remove(synonymsView.getSelectionModel().getSelectedIndex()));
