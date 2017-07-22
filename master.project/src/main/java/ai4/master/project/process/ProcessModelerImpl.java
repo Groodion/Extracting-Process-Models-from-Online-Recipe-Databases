@@ -25,9 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.*;
 
-/**
- * Created by René Bärnreuther, Michi Bösch on 15.05.2017.
- */
+
 public class ProcessModelerImpl implements ProcessModeler {
 
 
@@ -67,6 +65,7 @@ public class ProcessModelerImpl implements ProcessModeler {
     private int doWidth = 36;
 
     public void createBpmn(Recipe recipe) {
+        progress = new SimpleDoubleProperty();
         progress.set(0);
         convertToProcess(recipe);
     }

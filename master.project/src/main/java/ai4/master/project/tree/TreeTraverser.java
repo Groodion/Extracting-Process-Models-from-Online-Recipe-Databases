@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by René Bärnreuther on 05.06.2017.
  * Implements a Traverser for a tree starting from the given root.
  */
 public class TreeTraverser<T> {

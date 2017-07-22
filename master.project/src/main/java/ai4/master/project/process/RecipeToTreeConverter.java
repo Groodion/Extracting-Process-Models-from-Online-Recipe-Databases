@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Michael, René on 08.06.2017.
  */
 public class RecipeToTreeConverter {
 

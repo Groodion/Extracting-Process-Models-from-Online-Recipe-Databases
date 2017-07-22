@@ -13,10 +13,10 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Created by René Bärnreuther on 11.07.2017.
  * <p>
  * Creates a simple, but at least a little bit readable layout for the BPMN-File
  */
+@Deprecated
 public class BPMNLayouterImpl implements BPMNLayouter{
 
     private BpmnModelInstance modelInstance;

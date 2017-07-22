@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.Scanner;
 
 /**
- * Created by Rene Bärnreuther on 04.05.2017.
  * <p>
  * Source for this:
  * http://www.pebra.net/blog/2012/10/31/how-to-get-recipes-fromchefkoch-dot-de/

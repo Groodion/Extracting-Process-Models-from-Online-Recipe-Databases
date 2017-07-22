@@ -5,7 +5,6 @@ import ai4.master.project.recipe.LANG_FLAG;
 import ai4.master.project.recipe.Recipe;
 
 /**
- * Created by René Bärnreuther on 16.05.2017.
  *
  * Implements a interface to retrieve data from different cooking apis.
  */

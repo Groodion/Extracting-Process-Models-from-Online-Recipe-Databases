@@ -6,12 +6,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
 
-/**s
- * Created by Michael on 08.06.2017.
+/**
  */
 public class RecipeGetterKochbar implements RecipeGetter {
     public RecipeGetterKochbar(){}

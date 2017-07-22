@@ -1,7 +1,6 @@
 package ai4.master.project.tree;
 
 /**
- * Created by René Bärnreuther on 06.06.2017.
  * Only used as a wrapper class because its better readable.
  */
 public class Tree<T> {
