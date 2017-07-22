@@ -1,6 +1,8 @@
 package ai4.master.project.process;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,7 @@ public class BPMNLayouterNewImpl implements BPMNLayouter {
 	@Override
 	public void layout(ProcessModelerImpl modeler) {
 		Element startElement = new Element(modeler.getStartEvent(), modeler.getTimers());
+		startElement.sortLanes();
 		startElement.calcSize();
 		startElement.calcLocation();
 		startElement.calcConnections(modeler);
@@ -78,6 +81,8 @@ class Element {
 	private boolean movedDown = false;
 
 	private BoundaryEvent timer;
+	
+	private int syncLevel = -1;
 	
 	
 	public Element(FlowNode node, List<BoundaryEvent> timer) {
@@ -154,6 +159,19 @@ class Element {
 	}
 	public int getOutputY() {
 		return y + height/2;
+	}
+	
+	public void sortLanes() {
+		for(int i = 1; i < next.size(); i++) {
+			if(next.get(i - 1).getSyncLevel() > next.get(i).getSyncLevel()) {
+				Collections.swap(next, i - 1, i);
+				i = Math.max(i - 2, 0);
+			}
+		}
+			
+		for(Element child : next) {
+			child.sortLanes();
+		}
 	}
 	
 	public void calcSize() {
@@ -377,7 +395,28 @@ class Element {
 		}		
 	}
 	
-	
+	public int getSyncLevel() {
+		if(syncLevel == -1) {
+			return getSyncLevel(1);
+		}
+		return syncLevel;
+	}
+	private int getSyncLevel(int s) {
+		if(node instanceof ParallelGateway) {
+			if(next.size() == 1) {
+				if(--s == 0) {
+					return level;
+				}
+			} else {
+				s++;
+			}
+		}
+		
+		if(next.isEmpty()) {
+			return level;
+		}
+		return next.get(0).getSyncLevel(s) + 1;
+	}
 
 	public void moveDown() {
 		if(!movedDown) {
