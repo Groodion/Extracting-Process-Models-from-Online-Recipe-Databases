@@ -65,7 +65,10 @@ public class ProcessModelerImpl implements ProcessModeler {
     private int doWidth = 36;
 
     public void createBpmn(Recipe recipe) {
-        progress = new SimpleDoubleProperty();
+    	if(progress == null) {
+    		progress = new SimpleDoubleProperty();
+    	}
+
         progress.set(0);
         convertToProcess(recipe);
     }

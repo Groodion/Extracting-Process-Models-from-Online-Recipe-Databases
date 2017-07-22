@@ -659,11 +659,7 @@ public class CookingActionsEditorView extends EditorView {
 		refIdsListView.getItems().addListener(refIdsChanged);
 		ListChangeListener<BaseIngredient> mandatoryIngredientsChanged = change -> {
 			transformation.get().getMandatoryIngredients().clear();
-			mandatoryIngredientsListView.getItems().forEach(bI -> {
-				if(bI != null) {
-					transformation.get().getMandatoryIngredients().add(bI.toObject());
-				}
-			});
+			transformation.get().getMandatoryIngredients().addAll(mandatoryIngredientsListView.getItems());
 		};
 		refIdsListView.getItems().addListener(refIdsChanged);
 		mandatoryIngredientsListView.getItems().addListener(mandatoryIngredientsChanged);
@@ -671,7 +667,7 @@ public class CookingActionsEditorView extends EditorView {
 			if(n != null) {
 				ingredientTagTF.setText(null);
 				quantifierTagTF.setText(null);
-				transformation.get().setProduct(n.toObject());
+				transformation.get().setProduct(n);
 			} else {
 				transformation.get().setProduct(null);	
 			}
@@ -696,7 +692,7 @@ public class CookingActionsEditorView extends EditorView {
 				refIdsListView.getItems().setAll(n.getRegexIds());
 				List<BaseIngredient> manIngredients = new ArrayList<BaseIngredient>();
 				n.getMandatoryIngredients().forEach(i -> {
-					manIngredients.add(i.getBaseObject());
+					manIngredients.add(i);
 				});
 				mandatoryIngredientsListView.getItems().setAll(manIngredients);
 				ingredientTagTF.setText(null);
@@ -709,7 +705,7 @@ public class CookingActionsEditorView extends EditorView {
 					}
 				}
 				if(n.getProduct() != null) {
-					productCB.setValue(n.getProduct().getBaseObject());
+					productCB.setValue(n.getProduct());
 				} else {
 					productCB.setValue(null);
 				}

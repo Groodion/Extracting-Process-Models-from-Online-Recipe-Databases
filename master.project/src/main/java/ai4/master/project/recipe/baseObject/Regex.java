@@ -1,7 +1,6 @@
 package ai4.master.project.recipe.baseObject;
 
 import java.util.HashSet;
-import java.util.Scanner;
 import java.util.Set;
 
 import ai4.master.project.KeyWordDatabase;
@@ -103,7 +102,9 @@ public class Regex {
 	public String toXML() {
 		StringBuilder sB = new StringBuilder();
 		
-		sB.append("<Regex result=\"");
+		sB.append("<Regex id=\"");
+		sB.append(id);
+		sB.append("\" result=\"");
 		sB.append(result.toString().toLowerCase());
 		sB.append("\" ingredientsNeeded=\"");
 		sB.append(ingredientsNeeded);

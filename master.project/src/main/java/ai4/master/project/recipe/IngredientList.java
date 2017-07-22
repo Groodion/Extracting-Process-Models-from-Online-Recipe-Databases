@@ -13,6 +13,18 @@ public class IngredientList extends ArrayList<Ingredient> {
 
 	private static final long serialVersionUID = 1L;
 
+	@Override
+	public boolean add(Ingredient ingredient) {
+		for(int i = 0; i < size(); i++) {
+			if(get(i).getBaseObject().equals(ingredient.getBaseObject())) {
+				set(i, ingredient);
+				return true;
+			}
+		}
+		
+		return super.add(ingredient);
+	}
+	
 	public List<Ingredient> get(BaseIngredient baseIngredient) {
 		List<Ingredient> ingredients = new ArrayList<Ingredient>();
 
