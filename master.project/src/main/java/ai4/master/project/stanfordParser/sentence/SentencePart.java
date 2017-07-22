@@ -204,7 +204,9 @@ public class SentencePart extends PartialObject<SentencePart> {
 	public BaseCookingAction getCookingAction() {
 		for(Word word : words) {
 			if(word.getRole() == Role.ACTION) {
-				return word.getCookingAction();
+				if(word.getCookingAction() != null) {				
+					return word.getCookingAction();
+				}
 			}
 		}
 		return null;

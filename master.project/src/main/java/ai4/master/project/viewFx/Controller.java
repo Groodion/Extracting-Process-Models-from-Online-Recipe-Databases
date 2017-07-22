@@ -155,9 +155,6 @@ public class Controller implements Initializable {
 
 	private WebView webView;
 	private WebEngine engine;
-
-	private Task<?> parseRecipe;
-	private Task<String> createModel;
 	
 	private ProcessModeler processModeler;
 	private File temp;
@@ -179,50 +176,9 @@ public class Controller implements Initializable {
 		}
 
 		processModeler.setFile(temp);
-		
-		parseRecipe = new Task<Object>() {
-			@Override
-			protected Recipe call() throws Exception {
-				parser.parseRecipe(recipe.get());
-
-				return recipe.get();
-			}
-		};
-		parseRecipe.setOnSucceeded(e -> {
-			updateRecipeSteps();
-			recipeParsed.set(true);
-		});
-		
-		createModel = new Task<String>() {
-			@Override
-			protected String call() throws Exception {
-				processModeler.createBpmn(recipe.get());
-				return processModeler.getXml();
-			}
-		};
-		createModel.setOnSucceeded(e -> {
-			try {
-				bpmnCode.set(createModel.get());
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			} catch (ExecutionException e1) {
-				e1.printStackTrace();
-			}
-			
-			callDiagram(new SimpleStringProperty(temp.toURI().toString()));
-		});
-		
 		processModeler.getProgress().addListener((b, o, n) -> {
 			setProgress((double) n);
 		});
-		
-		/*} catch (Exception e) {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Error");
-			alert.setHeaderText("Error during model creation!");
-			alert.showAndWait();
-			e.printStackTrace();
-		}*/
 		
 		kwdb.addListener((b, o, n) -> {
 			if (parser != null) {
@@ -852,17 +808,34 @@ public class Controller implements Initializable {
 	public void parseRecipe() {
 		blockingPane.setVisible(true);
 		MESSAGES.clear();
+		
+		Task<?> parseRecipe = new Task<Object>() {
+			@Override
+			protected Recipe call() throws Exception {
+				parser.parseRecipe(recipe.get());
 
-		try {
-			new Thread(parseRecipe).start();
-		} catch (Exception e) {
-			if (e instanceof SentenceContainsNoVerbException) {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setContentText("The Sentence '" + ((SentenceContainsNoVerbException) e).getSentence().getText()
-						+ "' contains no verb and can't be parsed");
+				return recipe.get();
 			}
-		}
-		blockingPane.setVisible(false);
+		};
+		parseRecipe.setOnSucceeded(e -> {
+			updateRecipeSteps();
+			recipeParsed.set(true);
+			blockingPane.setVisible(false);
+		});
+		parseRecipe.exceptionProperty().addListener((b, o, n) -> {
+			if(n != null) {
+				if(n instanceof SentenceContainsNoVerbException) {
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.setContentText("The Sentence '" + ((SentenceContainsNoVerbException) n).getSentence().getText()
+							+ "' contains no verb and can't be parsed");
+
+				}
+				
+				n.printStackTrace();
+			}
+		});
+
+		new Thread(parseRecipe).start();
 	}
 
 	public void showLibEditor() {
@@ -942,6 +915,34 @@ public class Controller implements Initializable {
 			break;
 		}
 		case 2: {
+			Task<String> createModel = new Task<String>() {
+				@Override
+				protected String call() throws Exception {
+					processModeler.createBpmn(recipe.get());
+					return processModeler.getXml();
+				}
+			};
+			createModel.setOnSucceeded(e -> {
+				try {
+					bpmnCode.set(createModel.get());
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				} catch (ExecutionException e1) {
+					e1.printStackTrace();
+				}
+				
+				callDiagram(new SimpleStringProperty(temp.toURI().toString()));
+			});
+			createModel.exceptionProperty().addListener((b, o, n) -> {
+				if(n != null) {
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.setTitle("Error");
+					alert.setHeaderText("Error during model creation!");
+					alert.showAndWait();
+					n.printStackTrace();
+				}
+			});
+			
 			new Thread(createModel).start();
 			}
 		}

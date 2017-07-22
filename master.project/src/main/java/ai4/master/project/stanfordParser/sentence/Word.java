@@ -392,7 +392,6 @@ public class Word extends PartialObject<Word> {
 		case VVPP:
 			role = Role.ACTION;
 			cookingAction = kwdb.findCookingAction(stem(getText()));
-			System.out.println(getText());
 		case VAFIN:
 		case VAIMP:
 		case VAINF:

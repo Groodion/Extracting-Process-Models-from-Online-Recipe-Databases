@@ -103,7 +103,7 @@ public class Regex {
 		StringBuilder sB = new StringBuilder();
 		
 		sB.append("<Regex id=\"");
-		sB.append(id);
+		if(id != null) sB.append(id);
 		sB.append("\" result=\"");
 		sB.append(result.toString().toLowerCase());
 		sB.append("\" ingredientsNeeded=\"");

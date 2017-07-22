@@ -65,7 +65,9 @@ public class Transformation {
 	 * @return Testresultat
 	 */
 	public boolean matches(Ingredient ingredient, List<Ingredient> list) {
+		System.out.println("Test " + ingredient);
 		if(mandatoryIngredients.isEmpty()) {
+			System.out.println("noTest");
 			return true;
 		}
 		f:for(BaseIngredient mI : mandatoryIngredients) {
@@ -78,6 +80,8 @@ public class Transformation {
 					}
 				}
 			}
+			
+			System.out.println(mI);
 			
 			return false;
 		}

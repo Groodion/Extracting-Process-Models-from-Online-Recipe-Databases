@@ -27,6 +27,7 @@ public class Step {
 		tools = new ArrayList<Tool>();
 		products = new ArrayList<>();
 		events = new ArrayList<CookingEvent>();
+		usedRegex = -1;
 	}
 	
 	/**
