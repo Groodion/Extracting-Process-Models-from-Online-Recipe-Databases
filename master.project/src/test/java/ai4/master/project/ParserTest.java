@@ -6,7 +6,6 @@ import ai4.master.project.process.ProcessModelerImpl;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
 import ai4.master.project.stanfordParser.Parser;
-import ai4.master.project.viewFx.Controller;
 
 import java.io.File;
 import java.net.URL;
@@ -19,7 +18,7 @@ public class ParserTest {
 */
 	//15XX not working with tool compare
 	static String[] ids = {
-        "150681066371674"
+        "982031203667502"
 };
     public static void main(String[] args) throws Exception {
     	//testParser();
@@ -38,7 +37,6 @@ public class ParserTest {
 		Recipe recipe = new RecipeGetterChefkoch().getRecipe("982031203667502");
 		
 		parser.parseRecipe(recipe);
-		System.err.println(Controller.MESSAGES);		
 		
 		for(Step step : recipe.getSteps()) {
 			System.out.println(step.toEasyToReadString());

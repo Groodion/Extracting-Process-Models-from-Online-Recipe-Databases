@@ -69,7 +69,7 @@ public class OnlineDatabaseButton extends HBox {
 				
 				result.ifPresent(r -> {
 					if(r.length() != 0) {
-						Controller.onlineDatabaseProgressProperty().set(-1);
+						Controller.setProgress(-1);
 						Task<Recipe> task = new Task<Recipe>() {
 							@Override
 							protected Recipe call() throws Exception {
@@ -88,7 +88,7 @@ public class OnlineDatabaseButton extends HBox {
 								} catch (Exception ex) {
 									ex.printStackTrace();
 								}
-								Controller.onlineDatabaseProgressProperty().set(0);
+								Controller.setProgress(0);
 								Controller.unblockView();
 							});
 						});

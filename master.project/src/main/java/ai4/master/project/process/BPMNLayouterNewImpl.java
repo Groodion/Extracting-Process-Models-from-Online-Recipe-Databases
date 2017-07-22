@@ -239,7 +239,7 @@ class Element {
 			}
 			maxHeight += DEFAULT_ELEMENT_SPACING_HEIGHT * (next.size() - 1);
 			sy -= maxHeight / 2 - DEFAULT_USERTASK_HEIGHT / 2;
-		} else if(node instanceof ParallelGateway) {
+		} else if(node instanceof ParallelGateway || node instanceof StartEvent) {
 			sy -= (next.get(0).height - height) / 2;
 		}
 

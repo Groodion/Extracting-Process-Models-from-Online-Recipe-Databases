@@ -1141,7 +1141,7 @@
 			<Name>reichen</Name>
 			<regs>
 				<Regex result="no_result" ingredientsNeeded="true"
-					referencePreviousProducts="true" chargeTools="false">([Uu]nd )?((([Mm])it)|(([Zz])u)).*</Regex>
+					referencePreviousProducts="true" chargeTools="false">(und)?(((M|m)it)|((Z|z)u)).*</Regex>
 				<Regex result="no_result" ingredientsNeeded="true"
 					referencePreviousProducts="false" chargeTools="false">.*</Regex>
 			</regs>

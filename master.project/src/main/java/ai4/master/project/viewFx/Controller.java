@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
 
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.XMLLoader;
@@ -45,10 +46,10 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -56,6 +57,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -96,8 +98,8 @@ import netscape.javascript.JSObject;
 
 public class Controller implements Initializable {
 
-	public static final ObservableList<String> MESSAGES = FXCollections.observableArrayList();
-	private static final IntegerProperty onlineDatabaseProgress = new SimpleIntegerProperty(0);
+	private static final ObservableList<String> MESSAGES = FXCollections.observableArrayList();
+	private static final DoubleProperty progress = new SimpleDoubleProperty(0);
 	private static Pane bPane;
 
 	@FXML
@@ -131,7 +133,7 @@ public class Controller implements Initializable {
 	private ProgressBar progressBar;
 	@FXML
 	private TitledPane databases;
-	@FXML 
+	@FXML
 	private TitledPane importFromFile;
 	@FXML
 	private BorderPane diagrammView;
@@ -154,6 +156,12 @@ public class Controller implements Initializable {
 	private WebView webView;
 	private WebEngine engine;
 
+	private Task<?> parseRecipe;
+	private Task<String> createModel;
+	
+	private ProcessModeler processModeler;
+	private File temp;
+	
 	
 	public Controller() {
 		recipe = new SimpleObjectProperty<Recipe>(new Recipe(LANG_FLAG.DE));
@@ -162,14 +170,68 @@ public class Controller implements Initializable {
 		recipeParsed = new SimpleBooleanProperty(false);
 		bpmnCode = new SimpleStringProperty();
 
+		processModeler = new ProcessModelerImpl();
+		
+		try {
+			temp = File.createTempFile("diagram", ".bpmn");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		processModeler.setFile(temp);
+		
+		parseRecipe = new Task<Object>() {
+			@Override
+			protected Recipe call() throws Exception {
+				parser.parseRecipe(recipe.get());
+
+				return recipe.get();
+			}
+		};
+		parseRecipe.setOnSucceeded(e -> {
+			updateRecipeSteps();
+			recipeParsed.set(true);
+		});
+		
+		createModel = new Task<String>() {
+			@Override
+			protected String call() throws Exception {
+				processModeler.createBpmn(recipe.get());
+				return processModeler.getXml();
+			}
+		};
+		createModel.setOnSucceeded(e -> {
+			try {
+				bpmnCode.set(createModel.get());
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			} catch (ExecutionException e1) {
+				e1.printStackTrace();
+			}
+			
+			callDiagram(new SimpleStringProperty(temp.toURI().toString()));
+		});
+		
+		processModeler.getProgress().addListener((b, o, n) -> {
+			setProgress((double) n);
+		});
+		
+		/*} catch (Exception e) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error");
+			alert.setHeaderText("Error during model creation!");
+			alert.showAndWait();
+			e.printStackTrace();
+		}*/
+		
 		kwdb.addListener((b, o, n) -> {
-			if(parser != null) {
+			if (parser != null) {
 				parser.setKwdb(n);
 			}
 		});
-		
+
 		ButtonType resetButton = new ButtonType("Reset", ButtonData.OTHER);
-		
+
 		Configurations.PARSER_CONFIGURATION.addListener((b, o, n) -> {
 			try {
 				View.blockLoading();
@@ -177,25 +239,27 @@ public class Controller implements Initializable {
 				parser = new Parser(n.getAbsolutePath());
 				parser.setKwdb(kwdb.get());
 				View.unblockLoading();
-			} catch(Exception e) {
+			} catch (Exception e) {
 				Platform.runLater(() -> {
 					Alert alert = new Alert(AlertType.ERROR, null, ButtonType.OK, resetButton, ButtonType.CANCEL);
 					alert.setTitle("ERROR");
 					alert.setHeaderText("Error while loading Parser-Tagger!");
 					alert.setContentText("Please select a valid Tagger-File.");
-					
+
 					alert.showAndWait().ifPresent(buttonType -> {
-						if(buttonType == ButtonType.OK) {
+						if (buttonType == ButtonType.OK) {
 							FileChooser fileChooser = new FileChooser();
-							fileChooser.getExtensionFilters().add(new ExtensionFilter("Tagger-File (*.tagger)", "*.tagger"));
+							fileChooser.getExtensionFilters()
+									.add(new ExtensionFilter("Tagger-File (*.tagger)", "*.tagger"));
 							File file = fileChooser.showOpenDialog(null);
-							
-							if(file != null) {
+
+							if (file != null) {
 								Configurations.PARSER_CONFIGURATION.set(file);
 							}
-						} else if(buttonType == resetButton) {
-							Configurations.PARSER_CONFIGURATION.set(new File(Configurations.DEFAULT_PARSER_CONFIGURATION));
-						} else if(parser == null) {
+						} else if (buttonType == resetButton) {
+							Configurations.PARSER_CONFIGURATION
+									.set(new File(Configurations.DEFAULT_PARSER_CONFIGURATION));
+						} else if (parser == null) {
 							System.exit(0);
 						}
 						View.unblockLoading();
@@ -228,7 +292,8 @@ public class Controller implements Initializable {
 						}
 
 						if (dbFile.exists()) {
-							try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dbFile), "UTF-8"))) {
+							try (BufferedWriter writer = new BufferedWriter(
+									new OutputStreamWriter(new FileOutputStream(dbFile), "UTF-8"))) {
 								writer.write(getKeyWordDatabase().toXML());
 								writer.flush();
 							} catch (IOException ex) {
@@ -247,39 +312,40 @@ public class Controller implements Initializable {
 					}
 				});
 			}
-						
+
 			try {
 				View.blockLoading();
 				View.setLoadingText("Loading configurations... Library");
 				kwdb.set(XMLLoader.load(n.getAbsolutePath()));
 				View.unblockLoading();
-			} catch(Exception e) {
+			} catch (Exception e) {
 				Platform.runLater(() -> {
 					Alert alert = new Alert(AlertType.ERROR, null, ButtonType.OK, resetButton, ButtonType.CANCEL);
 					alert.setTitle("ERROR");
 					alert.setHeaderText("Error while loading KeyWordDatabase!");
 					alert.setContentText("Please select a valid KeyWordDatabase-File.");
-					
+
 					alert.showAndWait().ifPresent(buttonType -> {
-						if(buttonType == ButtonType.OK) {
+						if (buttonType == ButtonType.OK) {
 							FileChooser fileChooser = new FileChooser();
-							fileChooser.getExtensionFilters().add(new ExtensionFilter("KeyWordDatabase (*.xml)", "*.xml"));
+							fileChooser.getExtensionFilters()
+									.add(new ExtensionFilter("KeyWordDatabase (*.xml)", "*.xml"));
 							File file = fileChooser.showOpenDialog(null);
-							
-							if(file != null) {
+
+							if (file != null) {
 								Configurations.LIB_LOCATION.set(file);
 							}
-						} else if(buttonType == resetButton) {
+						} else if (buttonType == resetButton) {
 							Configurations.LIB_LOCATION.set(new File(Configurations.DEFAULT_LIB_LOCATION));
-						} else if(kwdb.get() == null) {
+						} else if (kwdb.get() == null) {
 							System.exit(0);
 						}
 
-						View.unblockLoading();						
+						View.unblockLoading();
 					});
 				});
 				e.printStackTrace();
-			}			
+			}
 		});
 
 		identifiedTools = FXCollections.observableArrayList();
@@ -294,7 +360,7 @@ public class Controller implements Initializable {
 		/*
 		 * Logik
 		 */
-		
+
 		toolsListView.setItems(identifiedTools);
 		ingredientsListView.setItems(identifiedIngredients);
 		actionsListView.setItems(identifiedActions);
@@ -348,21 +414,24 @@ public class Controller implements Initializable {
 		});
 
 		progressBar.setProgress(0);
-		progressBar.progressProperty().bind(onlineDatabaseProgress);
+		progressBar.progressProperty().bind(progress);
 
 		initializeDiagrammViewer();
 		/*
 		 * Layout
 		 */
 
-		recipeDatabasesPane.getChildren().addAll(
-				new OnlineDatabaseButton("Chefkoch", "www.chefkoch.de", "German", "/img/chefkoch.png", new RecipeGetterChefkoch(), recipe, SearchType.ID, SearchType.LINK, SearchType.CATEGORY),
-				new OnlineDatabaseButton("Kochbar", "www.kochbar.de", "German", "/img/kochbar.jpg", new RecipeGetterKochbar(), recipe, SearchType.LINK),
-				new OnlineDatabaseButton("Food2Fork", "www.food2fork.com", "English", "/img/food2fork.jpg", null, recipe, SearchType.ID, SearchType.LINK)
-		);
+		recipeDatabasesPane.getChildren()
+				.addAll(new OnlineDatabaseButton("Chefkoch", "www.chefkoch.de", "German", "/img/chefkoch.png",
+						new RecipeGetterChefkoch(), recipe, SearchType.ID, SearchType.LINK, SearchType.CATEGORY),
+						new OnlineDatabaseButton("Kochbar", "www.kochbar.de", "German", "/img/kochbar.jpg",
+								new RecipeGetterKochbar(), recipe, SearchType.LINK),
+						new OnlineDatabaseButton("Food2Fork", "www.food2fork.com", "English", "/img/food2fork.jpg",
+								null, recipe, SearchType.ID, SearchType.LINK));
 		databases.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.DOWNLOAD));
 		importFromFile.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.DOWNLOAD));
 	}
+
 	public void initializeDiagrammViewer() {
 		System.out.println("1");
 
@@ -783,13 +852,15 @@ public class Controller implements Initializable {
 	public void parseRecipe() {
 		blockingPane.setVisible(true);
 		MESSAGES.clear();
+
 		try {
-			parser.parseRecipe(recipe.get());
-			updateRecipeSteps();
-			recipeParsed.set(true);
-		} catch (SentenceContainsNoVerbException e) {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setContentText("The Sentence '" + e.getSentence().getText() + "' contains no verb and can't be parsed");
+			new Thread(parseRecipe).start();
+		} catch (Exception e) {
+			if (e instanceof SentenceContainsNoVerbException) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setContentText("The Sentence '" + ((SentenceContainsNoVerbException) e).getSentence().getText()
+						+ "' contains no verb and can't be parsed");
+			}
 		}
 		blockingPane.setVisible(false);
 	}
@@ -831,14 +902,12 @@ public class Controller implements Initializable {
 		progressBar.setProgress(0);
 
 		switch ((int) processTracker.getActiveStep()) {
-			case 0: {
-				progressBar.progressProperty().bind(onlineDatabaseProgress);
-				break;
-			}
-			case 1: {
-				progressBar.progressProperty().bind(parser.progressProperty());
-				break;
-			}
+		case 0: {
+			break;
+		}
+		case 1: {
+			break;
+		}
 		}
 	}
 
@@ -850,12 +919,10 @@ public class Controller implements Initializable {
 			contentStack.getChildren().get(i).setVisible(i == processTracker.getActiveStep());
 		}
 
-		progressBar.progressProperty().unbind();
-		progressBar.setProgress(0);
+		setProgress(0);
 
 		switch ((int) processTracker.getActiveStep()) {
 		case 1: {
-			progressBar.progressProperty().bind(parser.progressProperty());
 			recipeParsed.set(false);
 			Recipe recipe = this.recipe.get();
 			recipe.getIngredients().clear();
@@ -875,32 +942,8 @@ public class Controller implements Initializable {
 			break;
 		}
 		case 2: {
-			Platform.runLater(() -> {
-				ProcessModeler processModeler = new ProcessModelerImpl();
-				progressBar.progressProperty().bind(processModeler.getProgress());
-
-				File temp = null;
-				try {
-					temp = File.createTempFile("diagram", ".bpmn");
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-				processModeler.setFile(temp);
-				try {
-					processModeler.createBpmn(recipe.get());
-					bpmnCode.set(processModeler.getXml());
-					callDiagram(new SimpleStringProperty(temp.toURI().toString()));
-				} catch (Exception e) {
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.setTitle("Error");
-					alert.setHeaderText("Error during model creation!");
-					alert.showAndWait();
-					e.printStackTrace();
-				}
-			});
-			break;
-		}
+			new Thread(createModel).start();
+			}
 		}
 	}
 
@@ -912,9 +955,9 @@ public class Controller implements Initializable {
 
 		Optional<ButtonType> result = alert.showAndWait();
 		result.ifPresent(buttonType -> {
-			if(buttonType == ButtonType.CANCEL) {
+			if (buttonType == ButtonType.CANCEL) {
 				return;
-			} else if (buttonType == ButtonType.OK){
+			} else if (buttonType == ButtonType.OK) {
 				FileChooser fc = new FileChooser();
 				fc.getExtensionFilters().add(new ExtensionFilter("BPMN File (*.bpmn)", ".bpmn"));
 				File bpmnFile = fc.showSaveDialog(null);
@@ -926,25 +969,25 @@ public class Controller implements Initializable {
 			recipeImportFilePathTF.setText("");
 			ingredientsTA.setText("");
 			preparationTA.setText("");
-			
+
 			messagesListView.getItems().clear();
-			
+
 			prevStep();
 			prevStep();
-			
+
 			removeDiagram();
 			identifiedTools.clear();
 			identifiedIngredients.clear();
-			identifiedActions.clear();			
+			identifiedActions.clear();
 		});
 	}
-	
+
 	public void resetParsing() {
 		recipe.get().getSteps().clear();
 		recipeParsed.set(false);
 		updateRecipeSteps();
 	}
-	
+
 	public KeyWordDatabase getKeyWordDatabase() {
 		return kwdb.get();
 	}
@@ -961,7 +1004,7 @@ public class Controller implements Initializable {
 			engine.executeScript(js2);
 		}
 	}
-	
+
 	private void removeDiagram() {
 		String js1 = "removeBpmnDiagram()";
 		engine.executeScript(js1);
@@ -970,11 +1013,16 @@ public class Controller implements Initializable {
 	public static void blockView() {
 		bPane.setVisible(true);
 	}
+
 	public static void unblockView() {
 		bPane.setVisible(false);
 	}
-	
-	public static IntegerProperty onlineDatabaseProgressProperty() {
-		return onlineDatabaseProgress;
+
+	public static void setProgress(double progress) {
+		Platform.runLater(() -> Controller.progress.set(progress));
+	}
+
+	public static void addMessage(String string) {
+		Platform.runLater(() -> MESSAGES.add(string));
 	}
 }

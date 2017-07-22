@@ -107,7 +107,7 @@ public class Parser {
 
 			sentences.add(sentence);
 			
-			progress.set((i+1) * 0.25 / taggedList.size());
+			Controller.setProgress((i+1) * 0.25 / taggedList.size());
 		}
 
 		return sentences;
@@ -137,20 +137,20 @@ public class Parser {
 	}
 
 	public void parseRecipe(Recipe recipe) throws SentenceContainsNoVerbException {
-		progress.set(0);
+		Controller.setProgress(0);
 		recipe.getSteps().clear();
 		
 		String text = recipe.getPreparation();
 		recipe.setPreparation(text);
 		
 		List<Sentence> sentences = analyzeText(text);
-		progress.set(0.25);
+		Controller.setProgress(0.25);
 		
 		for (int i = 0; i < sentences.size(); i++) {
 			sentences.get(i).init(kwdb);
-			progress.set(0.25 + (i+1) * 0.25 / sentences.size());
+			Controller.setProgress(0.25 + (i+1) * 0.25 / sentences.size());
 		}
-		progress.set(0.5);
+		Controller.setProgress(0.5);
 
 		IngredientList activeIngredients = new IngredientList();
 		List<BaseTool> chargedTools = new ArrayList<BaseTool>();
@@ -162,7 +162,7 @@ public class Parser {
 			if (ingredient != null) {
 				activeIngredients.add(ingredient.toObject());
 			} else {
-				Controller.MESSAGES.add("Unknown Ingredient: " + name);
+				Controller.addMessage("Unknown Ingredient: " + name);
 			}
 		}
 
@@ -174,8 +174,8 @@ public class Parser {
 			for (int k = 0; k < s.getParts().size(); k++) {
 				SentencePart sP = s.getParts().get(k);
 				if (sP.getCookingAction() == null) {
-					Controller.MESSAGES.add("Can't convert to Step:");
-					Controller.MESSAGES.add(sP.getText());
+					Controller.addMessage("Can't convert to Step:");
+					Controller.addMessage(sP.getText());
 				} else {
 					Step step = new Step();
 					BaseCookingAction action = sP.getCookingAction();
@@ -194,7 +194,7 @@ public class Parser {
 
 					if (sP.containsLastSentenceProductReference()) {
 						if (lastStep == null) {
-							Controller.MESSAGES.add("LastSentenceReference in first sentence!");
+							Controller.addMessage("LastSentenceReference in first sentence!");
 						} else {
 							step.getIngredients().addAll(lastStep.getProducts());
 						}
@@ -357,11 +357,11 @@ public class Parser {
 					
 					//System.out.println(activeIngredients);
 				}
-				progress.set(0.5 + j * maxProg + (k+1) * maxProg / s.getParts().size());
+				Controller.setProgress(0.5 + j * maxProg + (k+1) * maxProg / s.getParts().size());
 			}
-			progress.set(0.5 + (j+1) * maxProg);
+			Controller.setProgress(0.5 + (j+1) * maxProg);
 		}
-		progress.set(1);
+		Controller.setProgress(1);
 	}
 
 	public DoubleProperty progressProperty() {
