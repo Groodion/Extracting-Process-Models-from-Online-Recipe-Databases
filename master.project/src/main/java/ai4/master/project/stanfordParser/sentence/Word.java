@@ -141,7 +141,7 @@ public class Word extends PartialObject<Word> {
 					break;
 				}
 			}
-			
+						
 			return role;
 		} else if(!connections.isEmpty()) {
 			Role role = connections.get(0).getRole();
@@ -401,7 +401,7 @@ public class Word extends PartialObject<Word> {
 		case VMINF:
 		case VMPP:
 			isVerb = true;
-			System.out.println(getText() + " " + getPos());
+			//System.out.println(getText() + " " + getPos());
 			break;
 		case XY:
 			break;

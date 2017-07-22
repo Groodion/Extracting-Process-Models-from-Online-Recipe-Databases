@@ -13,8 +13,8 @@ import java.util.List;
 
 public class Transformation {
 
-	private Ingredient product;
-	private ObservableList<Ingredient> mandatoryIngredients;
+	private BaseIngredient product;
+	private ObservableList<BaseIngredient> mandatoryIngredients;
 	private IngredientTag tag;
 	private List<String> regexIds;	
 	
@@ -28,7 +28,7 @@ public class Transformation {
 		if(parent.product != null) {
 			product = parent.product.clone(kwdb);
 		}
-		for(Ingredient ingredient : parent.mandatoryIngredients) {
+		for(BaseIngredient ingredient : parent.mandatoryIngredients) {
 			mandatoryIngredients.add(ingredient.clone(kwdb));
 		}
 		if(parent.tag != null) {
@@ -37,10 +37,10 @@ public class Transformation {
 		regexIds.addAll(parent.regexIds);
 	}
 	
-	public Ingredient getProduct() {
+	public BaseIngredient getProduct() {
 		return product;
 	}
-	public void setProduct(Ingredient product) {
+	public void setProduct(BaseIngredient product) {
 		this.product = product;
 	}
 	public IngredientTag getTag() {
@@ -53,7 +53,7 @@ public class Transformation {
 		return regexIds;
 	}
 
-	public List<Ingredient> getMandatoryIngredients() {
+	public List<BaseIngredient> getMandatoryIngredients() {
 		return mandatoryIngredients;
 	}
 	
@@ -65,16 +65,15 @@ public class Transformation {
 	 * @return Testresultat
 	 */
 	public boolean matches(Ingredient ingredient, List<Ingredient> list) {
-		System.out.println(mandatoryIngredients);
 		if(mandatoryIngredients.isEmpty()) {
 			return true;
 		}
-		f:for(Ingredient mI : mandatoryIngredients) {
-			if(mI.getBaseObject() == ingredient.getBaseObject() && ingredient.getTags().containsAll(mI.getTags())) {
+		f:for(BaseIngredient mI : mandatoryIngredients) {
+			if(mI == ingredient.getBaseObject()) {
 				continue;
 			} else {
 				for(Ingredient i : list) {
-					if(mI.getBaseObject() == i.getBaseObject() && i.getTags().containsAll(mI.getTags())) {
+					if(mI == i.getBaseObject()) {
 						continue f;
 					}
 				}
@@ -99,7 +98,7 @@ public class Transformation {
 	 */
 	public Ingredient transform(Ingredient ingredient, List<Ingredient> list) {
 		if(product != null) {
-			return product;
+			return product.toObject();
 		} else if(tag != null) {
 			if(tag.getName().contains("INGREDIENT")) {
 				Ingredient product = ingredient;
@@ -123,7 +122,7 @@ public class Transformation {
 		
 		if(product != null) {
 			sB.append("Product: ");
-			sB.append(product.getCompleteName());
+			sB.append(product.getFirstName());
 		} else if(tag != null) {
 			if(tag instanceof QuantifierTag) {
 				sB.append("QuantifierTag: ");
@@ -149,15 +148,15 @@ public class Transformation {
 		}
 		sB.append("\">");
 		sB.append("<ingredients>");
-		for(Ingredient ingredient : mandatoryIngredients) {
+		for(BaseIngredient ingredient : mandatoryIngredients) {
 			sB.append("<Ingredient name=\"");
-			sB.append(ingredient.getName());
+			sB.append(ingredient.getFirstName());
 			sB.append("\"/>");
 		}
 		sB.append("</ingredients>");
 		if(product != null) {
 			sB.append("<Ingredient name=\"");
-			sB.append(product.getName());
+			sB.append(product.getFirstName());
 			sB.append("\"/>");			
 		} else if(tag != null) {
 			if(tag instanceof QuantifierTag) {

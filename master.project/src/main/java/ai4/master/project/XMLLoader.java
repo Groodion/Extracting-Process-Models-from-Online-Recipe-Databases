@@ -15,7 +15,6 @@ import org.jdom2.input.sax.XMLReaders;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
 
 
 public class XMLLoader {	
@@ -56,9 +55,7 @@ public class XMLLoader {
 		KeyWordDatabase kwdb = null;
 		
 		kwdb = new XMLLoader().load(new URL("file", "", path));
-		
-		System.out.println(kwdb);
-		
+				
 		return kwdb;
 	}
 
@@ -355,7 +352,7 @@ public class XMLLoader {
 	private void readTransformationProduct(Element element, KeyWordDatabase kwdb, Transformation transformation) {
 		String name = element.getAttributeValue(ATTRIBUTE_NAME);
 		
-		transformation.setProduct(kwdb.findIngredient(name).toObject());
+		transformation.setProduct(kwdb.findIngredient(name));
 	}
 	private void readTransformationIngredientes(Element element, KeyWordDatabase kwdb, Transformation transformation) {
 		for(Element child : element.getChildren()) {
@@ -369,7 +366,7 @@ public class XMLLoader {
 	private void readTransformationIngredient(Element element, KeyWordDatabase kwdb, Transformation transformation) {
 		String name = element.getAttributeValue(ATTRIBUTE_NAME);
 		
-		transformation.getMandatoryIngredients().add(kwdb.findIngredient(name).toObject());
+		transformation.getMandatoryIngredients().add(kwdb.findIngredient(name));
 	}
 	private void readRegs(Element element, KeyWordDatabase kwdb, BaseCookingAction cA) {
 		for(Element child : element.getChildren()) {

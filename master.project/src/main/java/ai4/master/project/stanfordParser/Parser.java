@@ -200,6 +200,7 @@ public class Parser {
 						}
 					}
 
+					System.out.println(k + " " + step.getIngredients());
 					if (lastStep != null) {
 						for (int i = 0; i < step.getIngredients().size(); i++) {
 							for (Ingredient product : lastStep.getProducts()) {
@@ -210,12 +211,15 @@ public class Parser {
 							}
 						}
 					}
+					System.out.println(k + " " + step.getIngredients());
 					for(ItemGroup<BaseIngredient, Ingredient> ingredientGroup : step.getCookingAction().getBaseObject().getImplicitIngredients()) {
 						if(!ingredientGroup.checkList(step.getIngredients())) {
 							step.getIngredients().add(ingredientGroup.getImpliedItem());
 						}
 					}
 
+					System.out.println(k + " " + step.getIngredients());
+					
 					boolean noResult = false;
 					boolean ingredientsNeeded = true;
 					Regex mRegex = new Regex(".*", Result.ALL);
@@ -350,6 +354,8 @@ public class Parser {
 					recipe.getSteps().add(step);
 					
 					lastStep = step;
+					
+					//System.out.println(activeIngredients);
 				}
 				progress.set(0.5 + j * maxProg + (k+1) * maxProg / s.getParts().size());
 			}

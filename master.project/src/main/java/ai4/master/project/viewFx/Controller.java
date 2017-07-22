@@ -877,10 +877,6 @@ public class Controller implements Initializable {
 		case 2: {
 			Platform.runLater(() -> {
 				ProcessModeler processModeler = new ProcessModelerImpl();
-				processModeler.getProgress().addListener((b, o, n) -> {
-					System.out.println(n);
-				});
-				System.out.println(processModeler.getProgress().get());
 				progressBar.progressProperty().bind(processModeler.getProgress());
 
 				File temp = null;
