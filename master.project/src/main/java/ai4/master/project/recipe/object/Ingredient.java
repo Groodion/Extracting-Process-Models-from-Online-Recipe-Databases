@@ -107,5 +107,5 @@ public class Ingredient extends ImplicitNamedObject<BaseIngredient> {
 
 	public Ingredient clone(KeyWordDatabase kwdb) {
 		return new Ingredient(getName(), kwdb.findIngredient(getName()));
-	}	
+	}
 }

@@ -51,6 +51,13 @@ public class ItemGroup<T extends BaseNamedObject<N, T>, N extends ImplicitNamedO
 			if(items.contains(object.getBaseObject())) {
 				return true;
 			}
+			if(object.getBaseObject() instanceof BaseIngredient) {
+				for(BaseIngredientGroup ingredientGroup : ((BaseIngredient) object.getBaseObject()).getIngredientGroups()) {
+					if(items.contains(ingredientGroup)) {
+						return true;
+					}
+				}
+			}
 		}
 		
 		return false;

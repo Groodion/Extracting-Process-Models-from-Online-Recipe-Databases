@@ -65,23 +65,21 @@ public class Transformation {
 	 * @return Testresultat
 	 */
 	public boolean matches(Ingredient ingredient, List<Ingredient> list) {
-		System.out.println("Test " + ingredient);
 		if(mandatoryIngredients.isEmpty()) {
-			System.out.println("noTest");
 			return true;
 		}
 		f:for(BaseIngredient mI : mandatoryIngredients) {
-			if(mI == ingredient.getBaseObject()) {
+			if(mI.equals(ingredient.getBaseObject())) {
 				continue;
 			} else {
 				for(Ingredient i : list) {
-					if(mI == i.getBaseObject()) {
+					if(mI.equals(i.getBaseObject())) {
 						continue f;
 					}
 				}
 			}
 			
-			System.out.println(mI);
+			System.out.println(mI + " " + ingredient.getBaseObject() + " " + list);
 			
 			return false;
 		}

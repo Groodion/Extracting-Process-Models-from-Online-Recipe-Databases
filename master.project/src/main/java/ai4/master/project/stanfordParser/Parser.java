@@ -160,7 +160,9 @@ public class Parser {
 			BaseIngredient ingredient = kwdb.findIngredient(name);
 
 			if (ingredient != null) {
-				activeIngredients.add(ingredient.toObject());
+				Ingredient i = ingredient.toObject();
+				i.setName(name);
+				activeIngredients.add(i);
 			} else {
 				Controller.addMessage("Unknown Ingredient: " + name);
 			}
@@ -202,7 +204,7 @@ public class Parser {
 					if (lastStep != null) {
 						for (int i = 0; i < step.getIngredients().size(); i++) {
 							for (Ingredient product : lastStep.getProducts()) {
-								if (step.getIngredients().get(i).getBaseObject() == product.getBaseObject()
+								if (step.getIngredients().get(i).getBaseObject().equals(product.getBaseObject())
 										&& step.getIngredients().get(i).getTags().isEmpty()) {
 									step.getIngredients().set(i, product);
 								}
@@ -214,22 +216,49 @@ public class Parser {
 							step.getIngredients().add(ingredientGroup.getImpliedItem());
 						}
 					}
-					
+										
 					boolean noResult = false;
 					boolean ingredientsNeeded = true;
 					Regex mRegex = new Regex(".*", Result.ALL);
 
-					for (Ingredient ingredient : step.getIngredients()) {
-						if (ingredient instanceof IngredientGroup) {
-							List<Ingredient> aIngredients = activeIngredients.get(ingredient.getBaseObject());
-							if(aIngredients.size() != 1 || aIngredients.get(0).getBaseObject() != ingredient.getBaseObject()) {
+					for (int i = 0; i < step.getIngredients().size(); i++) {
+						Ingredient ingredient = step.getIngredients().get(i);
+						List<Ingredient> aIngredients = activeIngredients.get(ingredient.getBaseObject());
+						if(ingredient instanceof IngredientGroup) {
+							if(aIngredients.size() != 1) {
 								((IngredientGroup) ingredient).getIngredients().addAll(aIngredients);
+							} else if(aIngredients.size() > 0) {
+								if(aIngredients.get(0).getBaseObject().equals(ingredient.getBaseObject())) {
+									int index = step.getIngredients().indexOf(ingredient) + 1;
+									if(index == step.getIngredients().size()) {
+										step.getIngredients().addAll(aIngredients);										
+									} else {
+										for(Ingredient aI : aIngredients) {
+											step.getIngredients().add(index, aI);
+										}
+									}
+									step.getIngredients().remove(ingredient);
+								} else {
+									((IngredientGroup) ingredient).getIngredients().addAll(aIngredients);	
+								}
 							}
+						} else if(aIngredients.size() != 0) {
+							int index = step.getIngredients().indexOf(ingredient) + 1;
+							if(index == step.getIngredients().size()) {
+								step.getIngredients().addAll(aIngredients);										
+							} else {
+								for(Ingredient aI : aIngredients) {
+									step.getIngredients().add(index, aI);
+								}
+							}
+							step.getIngredients().remove(ingredient);
 						}
 					}
 					
 					for(Tool tool : step.getTools()) {
+						System.out.println(tool + " " + chargedTools);
 						if(chargedTools.contains(tool.getBaseObject())) {
+							System.out.println("charge");
 							tool.setCharged(true);
 						}
 					}
@@ -348,9 +377,7 @@ public class Parser {
 					
 					recipe.getSteps().add(step);
 					
-					lastStep = step;
-					
-					//System.out.println(activeIngredients);
+					lastStep = step;					
 				}
 				Controller.setProgress(0.5 + j * maxProg + (k+1) * maxProg / s.getParts().size());
 			}

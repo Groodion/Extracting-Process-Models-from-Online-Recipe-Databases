@@ -397,25 +397,11 @@ class Element {
 	
 	public int getSyncLevel() {
 		if(syncLevel == -1) {
-			return getSyncLevel(1);
+			if(node instanceof EndEvent) syncLevel = 1;
+			else if(node instanceof ParallelGateway && next.size() == 1) syncLevel = next.get(0).getSyncLevel() + 1;
+			else syncLevel = next.get(0).getSyncLevel();
 		}
 		return syncLevel;
-	}
-	private int getSyncLevel(int s) {
-		if(node instanceof ParallelGateway) {
-			if(next.size() == 1) {
-				if(--s == 0) {
-					return level;
-				}
-			} else {
-				s++;
-			}
-		}
-		
-		if(next.isEmpty()) {
-			return level;
-		}
-		return next.get(0).getSyncLevel(s) + 1;
 	}
 
 	public void moveDown() {

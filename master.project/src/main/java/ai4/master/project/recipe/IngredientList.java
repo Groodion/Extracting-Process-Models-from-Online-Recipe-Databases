@@ -30,7 +30,7 @@ public class IngredientList extends ArrayList<Ingredient> {
 
 		Ingredient best = null;
 		for (Ingredient ingredient : this) {
-			if (ingredient.getBaseObject() == baseIngredient) {
+			if (ingredient.getBaseObject().equals(baseIngredient)) {
 				if (best == null || best.getTags().size() < ingredient.getTags().size()) {
 					best = ingredient;
 				}

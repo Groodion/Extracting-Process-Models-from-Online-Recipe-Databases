@@ -17,6 +17,9 @@ public abstract class NamedObject<T extends BaseNamedObject<?, T>> {
 	public String getName() {
 		return name;
 	}
+	public void setName(String name) {
+		this.name = name;
+	}
 	public T getBaseObject() {
 		return baseObject;
 	}
