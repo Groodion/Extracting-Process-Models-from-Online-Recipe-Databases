@@ -19,7 +19,7 @@ public interface ProcessModeler {
      * Converts a given process to a bpmn model
      * @param recipe The recipe containing the steps annd other informations for convesion
      */
-    void createBpmn(Recipe recipe);
+    void createBpmn(Recipe recipe, boolean withOutput);
 
     /**
      * Sets the filename of the file to create

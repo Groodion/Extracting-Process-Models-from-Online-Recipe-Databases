@@ -873,7 +873,7 @@ public class Controller implements Initializable {
 					processModeler.getProgress().addListener((b, o, n) -> {
 						setProgress((double) n);
 					});
-					processModeler.createBpmn(recipe.get());
+					processModeler.createBpmn(recipe.get(), false);
 					return processModeler.getXml();
 				}
 			};

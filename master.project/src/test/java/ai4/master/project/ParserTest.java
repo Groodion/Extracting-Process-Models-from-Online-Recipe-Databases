@@ -64,7 +64,7 @@ public class ParserTest {
                 ProcessModeler processModeler = new ProcessModelerImpl();
         		processModeler.setFile(new File("test.bpmn"));
         		processModeler.setFileName(ids[i]);
-                processModeler.createBpmn(recipe);
+                processModeler.createBpmn(recipe, true);
             } catch (Exception ex) {
                 System.err.println("Could not parse Recipe with id: " + currentRecipe);
                 System.err.println("Following error occured: ");

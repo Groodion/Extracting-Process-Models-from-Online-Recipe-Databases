@@ -64,11 +64,13 @@ public class ProcessModelerImpl implements ProcessModeler {
     private int doHeight = 60;
     private int doWidth = 36;
 
-    public void createBpmn(Recipe recipe) {
+    private boolean withOutput = false;
+
+    public void createBpmn(Recipe recipe, boolean withOutput) {
         if (progress == null) {
             progress = new SimpleDoubleProperty();
         }
-
+        this.withOutput = withOutput;
         progress.set(0);
         convertToProcess(recipe);
     }
@@ -129,7 +131,7 @@ public class ProcessModelerImpl implements ProcessModeler {
         progress.setValue(0.98);
 
         // validate and write model to file
-        //Bpmn.validateModel(modelInstance);
+        Bpmn.validateModel(modelInstance);
 //        createXml();
         createXmlFromFile();
         progress.setValue(1.00);
@@ -316,12 +318,19 @@ public class ProcessModelerImpl implements ProcessModeler {
                     dataObjects.add(dor);
                     i++;
 
-                    // TODO: DataOutputAssociation erstellen, wenn ein Ingredient vom vorherigen usertask zum dataObjectReference, wenn Ingredient bei beiden gleich
-
                     DataInputAssociation dia = createDataInputAssociation(process, dor, userTask, plane);
-                    DataOutputAssociation dao = createDataOutputAssociation(process, dor, userTask, plane);
+                    if (this.withOutput) {
+                        Node<Step> p = node.getParent();
+                        if (p.getData().getProducts().contains(ingredient)) {
+                            DataOutputAssociation dao = createDataOutputAssociation(process, dor, userTask, plane);
+                        }
+                    }
                     //dataOutputAssociations.add(doa);
                     dataInputAssociations.add(dia);
+                }
+
+                for (Ingredient ingredient : node.getData().getProducts()) {
+
                 }
 
                 /* Add tools as input parameter */
