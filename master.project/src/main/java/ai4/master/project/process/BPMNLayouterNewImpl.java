@@ -1,28 +1,13 @@
 package ai4.master.project.process;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
-import org.camunda.bpm.model.bpmn.instance.DataInputAssociation;
-import org.camunda.bpm.model.bpmn.instance.DataObjectReference;
-import org.camunda.bpm.model.bpmn.instance.DataOutputAssociation;
-import org.camunda.bpm.model.bpmn.instance.EndEvent;
-import org.camunda.bpm.model.bpmn.instance.FlowNode;
-import org.camunda.bpm.model.bpmn.instance.ItemAwareElement;
-import org.camunda.bpm.model.bpmn.instance.ParallelGateway;
-import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
-import org.camunda.bpm.model.bpmn.instance.StartEvent;
-import org.camunda.bpm.model.bpmn.instance.UserTask;
+import org.camunda.bpm.model.bpmn.instance.*;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnEdge;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnLabel;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
 import org.camunda.bpm.model.bpmn.instance.di.Waypoint;
+
+import java.util.*;
 
 public class BPMNLayouterNewImpl implements BPMNLayouter {
 	@Override
@@ -131,9 +116,7 @@ class Element {
 				}
 			}
 			for(DataOutputAssociation doa : ((UserTask) node).getDataOutputAssociations()) {
-				for(ItemAwareElement iae : doa.getSources()) {
-					outputDataObjectReferences.add((DataObjectReference) iae);
-				}
+				outputDataObjectReferences.add((DataObjectReference) doa.getTarget());
 			}
 		}
 	}
@@ -257,7 +240,7 @@ class Element {
 
 			sx += DEFAULT_DATA_OBJECT_SPACING_WIDTH + MAX_LABEL_WIDTH;
 		}
-		sx = 0;
+		sx = getOutputX()+DEFAULT_DATA_OBJECT_SPACING_WIDTH;
 		for(int i = 0; i < outputDataObjectReferences.size(); i++) {
 			Bounds doBounds = ((BpmnShape) outputDataObjectReferences.get(i).getDiagramElement()).getBounds();
 			doBounds.setX(sx + (MAX_LABEL_WIDTH - DEFAULT_DATA_OBJECT_WIDTH) / 2);
@@ -410,6 +393,7 @@ class Element {
 			i = 0;
 			for(DataOutputAssociation doa : ((UserTask) node).getDataOutputAssociations()) {
 				BpmnEdge edge = doa.getDiagramElement();
+
 				edge.getWaypoints().clear();
 				
 				Waypoint startPoint = processModeler.getModelInstance().newInstance(Waypoint.class);
@@ -471,7 +455,16 @@ class Element {
 						wP.setY(wP.getY() + dy);
 					}
 				}
-			}
+				/*for(DataObjectReference dor : outputDataObjectReferences) {
+					BpmnShape dorShape = ((BpmnShape) dor.getDiagramElement());
+					dorShape.getBounds().setY(dorShape.getBounds().getY() + dy);
+					dorShape.getBpmnLabel().getBounds().setY(dorShape.getBpmnLabel().getBounds().getY() + dy);
+				}*/
+				for(DataOutputAssociation dia :((UserTask) node).getDataOutputAssociations()) {
+					for(Waypoint wP : dia.getDiagramElement().getWaypoints()) {
+						wP.setY(wP.getY() + dy);
+					}
+				}			}
 			if(timer != null) {
 				timer.getDiagramElement().getBounds().setY(timer.getDiagramElement().getBounds().getY() + dy);
 			}

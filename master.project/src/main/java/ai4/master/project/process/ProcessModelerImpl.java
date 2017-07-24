@@ -65,9 +65,9 @@ public class ProcessModelerImpl implements ProcessModeler {
     private int doWidth = 36;
 
     public void createBpmn(Recipe recipe) {
-    	if(progress == null) {
-    		progress = new SimpleDoubleProperty();
-    	}
+        if (progress == null) {
+            progress = new SimpleDoubleProperty();
+        }
 
         progress.set(0);
         convertToProcess(recipe);
@@ -109,7 +109,6 @@ public class ProcessModelerImpl implements ProcessModeler {
         progress.setValue(0.60);
         // The first node is an empty root node. Every children from there has to be connected to the start node.
         createStartEventToConnections(t, startEvent, process, plane);
-
         endEvent = createElement(process, "end", "Ende", EndEvent.class, plane, 50, 50, false);
 
         //Every node without children belongs to the endEvent
@@ -120,6 +119,7 @@ public class ProcessModelerImpl implements ProcessModeler {
         // validate and write model to file
 
         Bpmn.validateModel(modelInstance);
+        this.setFileName("only_bpmn");
         createXml();
         progress.setValue(0.80);
         this.setFileName(this.fileName + "_layouted");
@@ -305,22 +305,28 @@ public class ProcessModelerImpl implements ProcessModeler {
 
                 /* Iterate over the Input parameter ( = ingredients) and output parameter ( = products) and add them */
                 int i = 0;
+                List<DataObjectReference> used = new ArrayList<>();
                 for (Ingredient ingredient : node.getData().getIngredients()) {
+                    if (used.contains(ingredient)) {
+                        continue;
+                    }
                     //userTask.builder().camundaInputParameter("Ingredient", ingredient.getName());
-                    DataObjectReference dor = createDataObject(process, createIdOf("dataObject_I" + i + createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getName(), plane, true);
+                    System.out.println("Creating dataObject_I" + i + "_" + createIdOf(ingredient.getCompleteName()));
+                    DataObjectReference dor = createDataObject(process, createIdOf("dataObject_I" + i + "_" + createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getName(), plane, true);
                     dataObjects.add(dor);
+                    i++;
 
                     // TODO: DataOutputAssociation erstellen, wenn ein Ingredient vom vorherigen usertask zum dataObjectReference, wenn Ingredient bei beiden gleich
 
-                    //DataOutputAssociation doa = createDataOutputAssociation(process,dor,userTask,plane);
                     DataInputAssociation dia = createDataInputAssociation(process, dor, userTask, plane);
+                    DataOutputAssociation dao = createDataOutputAssociation(process, dor, userTask, plane);
                     //dataOutputAssociations.add(doa);
                     dataInputAssociations.add(dia);
-                    i++;
                 }
 
                 /* Add tools as input parameter */
                 for (Tool tool : node.getData().getTools()) {
+
                     userTask.builder().camundaInputParameter("Tool", tool.getName());
                     DataObjectReference dor = createDataObject(process, createIdOf("dataObject_I" + i + createIdOf(tool.getName()) + createIdOf(node.getData().getText())), tool.getName(), plane, true);
                     dataObjects.add(dor);
@@ -335,9 +341,12 @@ public class ProcessModelerImpl implements ProcessModeler {
     }
 
     private DataOutputAssociation createDataOutputAssociation(Process process, DataObjectReference dor, UserTask userTask, BpmnPlane plane) {
-        String identifier = dor.getId() + "-" + userTask.getId();
+
+
+        String identifier = dor.getId() + "-" + userTask.getId() + "_prod";
         DataOutputAssociation dataOutputAssociation = modelInstance.newInstance(DataOutputAssociation.class);
         dataOutputAssociation.setAttributeValue("id", identifier, true);
+
 
         TargetRef targetRef = modelInstance.newInstance(TargetRef.class);
         targetRef.setTextContent(dor.getId());
@@ -348,6 +357,21 @@ public class ProcessModelerImpl implements ProcessModeler {
         dataOutputAssociation.addChildElement(targetRef);
         dataOutputAssociation.addChildElement(sourceRef);
         userTask.getDataOutputAssociations().add(dataOutputAssociation);
+
+        BpmnEdge edge = modelInstance.newInstance(BpmnEdge.class);
+        edge.setBpmnElement(dataOutputAssociation);
+
+        Waypoint w1 = modelInstance.newInstance(Waypoint.class);
+        w1.setX(0);
+        w1.setY(0);
+        Waypoint w2 = modelInstance.newInstance(Waypoint.class);
+        w2.setX(1);
+        w2.setY(1);
+        edge.addChildElement(w1);
+        edge.addChildElement(w2);
+        plane.addChildElement(edge);
+
+        dataOutputAssociations.add(dataOutputAssociation);
 
         return dataOutputAssociation;
     }
@@ -556,13 +580,13 @@ public class ProcessModelerImpl implements ProcessModeler {
     Creates a ID by replacing all spaces with _
      */
     private String createIdOf(String s) {
-        s = s.replace("ä", "ae");
-        s = s.replace("ö", "oe");
-        s = s.replace("ü", "ue");
+        s = s.replace("Ã¤", "ae");
+        s = s.replace("Ã¶", "oe");
+        s = s.replace("Ã¼", "ue");
         s = s.replace(",", "");
         s = s.replace(".", "");
         s = s.replace("/", "_durch_");
-        s = s.replace("°", "_Grad_");
+        s = s.replace("Â°", "_Grad_");
         s = s.replace(":", "_");
         s = s.replace("(", "_");
         s = s.replace(")", "_");
@@ -574,7 +598,7 @@ public class ProcessModelerImpl implements ProcessModeler {
      * Creates a XML-Instance of the given model
      */
     public void createXml() {
-    	Bpmn.validateModel(modelInstance);
+        Bpmn.validateModel(modelInstance);
         System.out.println("Writing to: " + file.getAbsolutePath());
         XMLWriter xmlWriter = new XMLWriter(fileName);
         xmlWriter.writeTo(Bpmn.convertToString(modelInstance));

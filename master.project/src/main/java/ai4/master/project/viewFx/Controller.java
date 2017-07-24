@@ -1,18 +1,5 @@
 package ai4.master.project.viewFx;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.URL;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.concurrent.ExecutionException;
-
 import ai4.master.project.KeyWordDatabase;
 import ai4.master.project.XMLLoader;
 import ai4.master.project.apirequests.RecipeGetterChefkoch;
@@ -23,36 +10,19 @@ import ai4.master.project.process.ProcessModelerImpl;
 import ai4.master.project.recipe.LANG_FLAG;
 import ai4.master.project.recipe.Recipe;
 import ai4.master.project.recipe.Step;
-import ai4.master.project.recipe.baseObject.BaseCookingAction;
-import ai4.master.project.recipe.baseObject.BaseIngredient;
-import ai4.master.project.recipe.baseObject.BaseIngredientGroup;
-import ai4.master.project.recipe.baseObject.BaseNamedObject;
-import ai4.master.project.recipe.baseObject.BaseTool;
-import ai4.master.project.recipe.baseObject.Regex;
+import ai4.master.project.recipe.baseObject.*;
 import ai4.master.project.recipe.baseObject.Regex.Result;
 import ai4.master.project.stanfordParser.Parser;
 import ai4.master.project.stanfordParser.exceptions.SentenceContainsNoVerbException;
-import ai4.master.project.viewFx.components.BridgeObjID;
-import ai4.master.project.viewFx.components.BridgeSize;
-import ai4.master.project.viewFx.components.LibEditor;
-import ai4.master.project.viewFx.components.OnlineDatabaseButton;
+import ai4.master.project.viewFx.components.*;
 import ai4.master.project.viewFx.components.OnlineDatabaseButton.SearchType;
-import ai4.master.project.viewFx.components.ProcessTracker;
-import ai4.master.project.viewFx.components.SettingsDialog;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -62,33 +32,11 @@ import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -96,6 +44,13 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Duration;
 import netscape.javascript.JSObject;
+
+import java.io.*;
+import java.net.URL;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
 
 public class Controller implements Initializable {
 
@@ -580,7 +535,7 @@ public class Controller implements Initializable {
 		FlowPane textFlowPane = new FlowPane();
 		textFlowPane.setMaxWidth(Double.MAX_VALUE);
 		HBox.setHgrow(textFlowPane, Priority.ALWAYS);
-		text = text.replaceAll("[!\"§$%&/()=?*+'#,;.:_<>\n]", " $0 ");
+		text = text.replaceAll("[!\"ï¿½$%&/()=?*+'#,;.:_<>\n]", " $0 ");
 		text = text.trim();
 
 		String[] words = text.split(" ");
@@ -1021,10 +976,10 @@ public class Controller implements Initializable {
 	}
 
 	public static void setProgress(double progress) {
-		Platform.runLater(() -> Controller.progress.set(progress));
+	//	Platform.runLater(() -> Controller.progress.set(progress));
 	}
 
 	public static void addMessage(String string) {
-		Platform.runLater(() -> MESSAGES.add(string));
+		//Platform.runLater(() -> MESSAGES.add(string));
 	}
 }
