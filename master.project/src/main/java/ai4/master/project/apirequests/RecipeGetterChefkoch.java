@@ -45,6 +45,7 @@ public class RecipeGetterChefkoch implements RecipeGetter {
      * @return a String in the format id1,id2,id3,..,idn. Null, if nothing was found or an error was thrown.
      */
     public String getRecipeIDs(String searchString, int maximumNumber) {
+        System.out.println("SEARCHING: " + searchString);
         String[] seperatedSearchInput = searchString.split(" ");
         StringBuilder stringBuilder = new StringBuilder();
         /* If the search string uses empty spaces, we replace them by "%20" */
@@ -199,7 +200,8 @@ public class RecipeGetterChefkoch implements RecipeGetter {
 
     @Override
     public Recipe getRecipeByCategory(String category) throws ServerOfflineException {
-        return getRecipe(getRecipeIDs(category, 1));
+
+        return getRecipe(getRecipeIDs(category, 1).replace(",",""));
     }
 
 

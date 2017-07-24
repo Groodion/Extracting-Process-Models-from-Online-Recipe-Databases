@@ -369,6 +369,7 @@ public class ProcessModelerImpl implements ProcessModeler {
         w2.setY(1);
         edge.addChildElement(w1);
         edge.addChildElement(w2);
+
         plane.addChildElement(edge);
 
         dataOutputAssociations.add(dataOutputAssociation);
