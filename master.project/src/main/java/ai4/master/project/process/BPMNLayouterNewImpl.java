@@ -71,13 +71,15 @@ class Element {
 	private FlowNode node;
 	private Bounds bounds;
 
-	private List<DataObjectReference> dataObjectReferences;
+	private List<DataObjectReference> inputDataObjectReferences;
+	private List<DataObjectReference> outputDataObjectReferences;
 	
 	private List<Element> next;
 	private List<Element> prev;
 	
 	private int x, y;
 	private int width, height;
+	private int overflow;
 	
 	private int level;
 	private boolean movedDown = false;
@@ -93,7 +95,8 @@ class Element {
 		
 		next = new ArrayList<Element>();
 		prev = new ArrayList<Element>();
-		dataObjectReferences = new ArrayList<DataObjectReference>();
+		inputDataObjectReferences = new ArrayList<DataObjectReference>();
+		outputDataObjectReferences = new ArrayList<DataObjectReference>();
 		
 		for(SequenceFlow sFlow : node.getOutgoing()) {
 			Element e = null;
@@ -111,6 +114,7 @@ class Element {
 			e.setLevel(level + 1);
 			next.add(e);
 			e.prev.add(this);
+			e.inputDataObjectReferences.removeAll(outputDataObjectReferences);
 		}
 		
 		if(node instanceof UserTask) {
@@ -123,12 +127,12 @@ class Element {
 			
 			for(DataInputAssociation dia : ((UserTask) node).getDataInputAssociations()) {
 				for(ItemAwareElement iae : dia.getSources()) {
-					dataObjectReferences.add((DataObjectReference) iae);
+					inputDataObjectReferences.add((DataObjectReference) iae);
 				}
 			}
 			for(DataOutputAssociation doa : ((UserTask) node).getDataOutputAssociations()) {
 				for(ItemAwareElement iae : doa.getSources()) {
-					System.out.println(iae);
+					outputDataObjectReferences.add((DataObjectReference) iae);
 				}
 			}
 		}
@@ -144,7 +148,7 @@ class Element {
 	}
 	
 	public int getRealHeight() {
-		if(dataObjectReferences.isEmpty()) {
+		if(inputDataObjectReferences.isEmpty()) {
 			return height;
 		} else {
 			return height + DEFAULT_DATA_OBJECT_SPACING_HEIGHT + DEFAULT_LABEL_HEIGHT + DEFAULT_DATA_OBJECT_HEIGHT;
@@ -182,9 +186,9 @@ class Element {
 		}
 		
 		if(node instanceof UserTask) {
-			int d = dataObjectReferences.size();
+			int d = inputDataObjectReferences.size();
 			
-			for(DataObjectReference dO : dataObjectReferences) {
+			for(DataObjectReference dO : inputDataObjectReferences) {
 				Bounds laBounds = ((BpmnShape) dO.getDiagramElement()).getBpmnLabel().getBounds();
 				Bounds doBounds = ((BpmnShape) dO.getDiagramElement()).getBounds();
 				laBounds.setWidth(MAX_LABEL_WIDTH);
@@ -210,10 +214,15 @@ class Element {
 		bounds.setWidth(width);
 		bounds.setHeight(height);
 		
+		overflow = MAX_LABEL_WIDTH * outputDataObjectReferences.size();
+		if(overflow != 0) {
+			overflow += (outputDataObjectReferences.size() + 1) * DEFAULT_DATA_OBJECT_SPACING_WIDTH;
+		}
+		
 		if(levelWidths.containsKey(level)) {
-			levelWidths.put(level, Math.max(levelWidths.get(level), width));
+			levelWidths.put(level, Math.max(levelWidths.get(level), width + overflow));
 		} else {
-			levelWidths.put(level, width);
+			levelWidths.put(level, width + overflow);
 		}
 	}
 	public void calcLocation() {
@@ -239,13 +248,20 @@ class Element {
 		minY = minY > y ? y : minY;
 		
 		int sx = x;
-		for(int i = 0; i < dataObjectReferences.size(); i++) {
-			Bounds doBounds = ((BpmnShape) dataObjectReferences.get(i).getDiagramElement()).getBounds();
+		for(int i = 0; i < inputDataObjectReferences.size(); i++) {
+			Bounds doBounds = ((BpmnShape) inputDataObjectReferences.get(i).getDiagramElement()).getBounds();
 			doBounds.setX(sx + (MAX_LABEL_WIDTH - DEFAULT_DATA_OBJECT_WIDTH) / 2);
 			doBounds.setY(y - DEFAULT_DATA_OBJECT_SPACING_HEIGHT  - DEFAULT_LABEL_HEIGHT - DEFAULT_DATA_OBJECT_HEIGHT);
 
 			minY = (int) (minY > doBounds.getY() ? doBounds.getY() : minY);
 
+			sx += DEFAULT_DATA_OBJECT_SPACING_WIDTH + MAX_LABEL_WIDTH;
+		}
+		sx = 0;
+		for(int i = 0; i < outputDataObjectReferences.size(); i++) {
+			Bounds doBounds = ((BpmnShape) outputDataObjectReferences.get(i).getDiagramElement()).getBounds();
+			doBounds.setX(sx + (MAX_LABEL_WIDTH - DEFAULT_DATA_OBJECT_WIDTH) / 2);
+			doBounds.setY(getOutputY() - DEFAULT_DATA_OBJECT_SPACING_HEIGHT  - DEFAULT_LABEL_HEIGHT - DEFAULT_DATA_OBJECT_HEIGHT);
 			sx += DEFAULT_DATA_OBJECT_SPACING_WIDTH + MAX_LABEL_WIDTH;
 		}
 		
@@ -279,7 +295,7 @@ class Element {
 
 	private void calcLabel() {
 		if(node instanceof UserTask) {
-			for(DataObjectReference doR : dataObjectReferences) {
+			for(DataObjectReference doR : inputDataObjectReferences) {
 				Bounds doBounds = ((BpmnShape) doR.getDiagramElement()).getBounds();
 				Bounds labelBounds = ((BpmnShape) doR.getDiagramElement()).getBpmnLabel().getBounds();
 
@@ -379,7 +395,7 @@ class Element {
 				Waypoint startPoint = processModeler.getModelInstance().newInstance(Waypoint.class);
 				Waypoint endPoint = processModeler.getModelInstance().newInstance(Waypoint.class);
 				
-				Bounds doBounds = ((BpmnShape) dataObjectReferences.get(i).getDiagramElement()).getBounds();
+				Bounds doBounds = ((BpmnShape) inputDataObjectReferences.get(i).getDiagramElement()).getBounds();
 				
 				startPoint.setX(doBounds.getX() + doBounds.getWidth() / 2);
 				startPoint.setY(doBounds.getY() + doBounds.getHeight());
@@ -391,6 +407,27 @@ class Element {
 				
 				i++;
 			}
+			i = 0;
+			for(DataOutputAssociation doa : ((UserTask) node).getDataOutputAssociations()) {
+				BpmnEdge edge = doa.getDiagramElement();
+				edge.getWaypoints().clear();
+				
+				Waypoint startPoint = processModeler.getModelInstance().newInstance(Waypoint.class);
+				Waypoint endPoint = processModeler.getModelInstance().newInstance(Waypoint.class);
+				
+				Bounds doBounds = ((BpmnShape) outputDataObjectReferences.get(i).getDiagramElement()).getBounds();
+				
+				startPoint.setX(doBounds.getX() + doBounds.getWidth() / 2);
+				startPoint.setY(doBounds.getY() + doBounds.getHeight());
+				endPoint.setX(startPoint.getX());
+				endPoint.setY(getOutputY());
+
+				edge.getWaypoints().add(startPoint);
+				edge.getWaypoints().add(endPoint);
+				
+				i++;
+			}
+
 		}
 		for(Element child : next) {
 			child.calcConnections(processModeler);
@@ -424,7 +461,7 @@ class Element {
 			}
 			
 			if(node instanceof UserTask) {
-				for(DataObjectReference dor : dataObjectReferences) {
+				for(DataObjectReference dor : inputDataObjectReferences) {
 					BpmnShape dorShape = ((BpmnShape) dor.getDiagramElement());
 					dorShape.getBounds().setY(dorShape.getBounds().getY() + dy);
 					dorShape.getBpmnLabel().getBounds().setY(dorShape.getBpmnLabel().getBounds().getY() + dy);
