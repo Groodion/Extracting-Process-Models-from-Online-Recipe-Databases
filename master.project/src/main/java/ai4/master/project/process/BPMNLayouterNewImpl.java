@@ -27,6 +27,8 @@ import org.camunda.bpm.model.bpmn.instance.di.Waypoint;
 public class BPMNLayouterNewImpl implements BPMNLayouter {
 	@Override
 	public void layout(ProcessModelerImpl modeler) {
+		Element.reset();
+		
 		Element startElement = new Element(modeler.getStartEvent(), modeler.getTimers());
 		startElement.sortLanes();
 		startElement.calcSize();
@@ -466,5 +468,11 @@ class Element {
 		}
 		
 		return sB.toString();
+	}
+
+	public static void reset() {
+		syncGates.clear();
+		levelWidths.clear();
+		minY = 0;
 	}
 }

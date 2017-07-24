@@ -14,6 +14,7 @@ import ai4.master.project.recipe.object.Tool;
 import ai4.master.project.stanfordParser.STTSTag;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -120,6 +121,7 @@ public class SentencePart extends PartialObject<SentencePart> {
 	
 	private String[] combinations;
 	private String[] textComb(boolean ignorePunctuationMarks, Set<String> tags) {
+		if(getText().contains("Brötchen")) System.out.println(tags);
 		if(combinations == null) {
 			List<StringBuilder> combinations = new ArrayList<StringBuilder>();
 			
@@ -158,6 +160,8 @@ public class SentencePart extends PartialObject<SentencePart> {
 			this.combinations = c;
 		}
 		
+		System.out.println(Arrays.toString(combinations));
+		
 		return combinations;
 	}
 	
@@ -170,6 +174,7 @@ public class SentencePart extends PartialObject<SentencePart> {
 				
 		for(String combination : combinations) {
 			if(combination.matches(reg)) {
+				System.out.println(reg + " -> " + combination);
 				return true;
 			}
 		}

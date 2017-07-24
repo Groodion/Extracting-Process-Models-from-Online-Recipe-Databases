@@ -48,6 +48,7 @@ public class ItemGroup<T extends BaseNamedObject<N, T>, N extends ImplicitNamedO
 
 	public boolean checkList(List<N> list) {
 		for(NamedObject<T> object : list) {
+			System.out.println(object.getBaseObject() + " " + items.contains(object.getBaseObject()));
 			if(items.contains(object.getBaseObject())) {
 				return true;
 			}

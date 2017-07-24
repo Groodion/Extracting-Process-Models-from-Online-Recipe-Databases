@@ -224,7 +224,7 @@ public class Parser {
 					for (int i = 0; i < step.getIngredients().size(); i++) {
 						Ingredient ingredient = step.getIngredients().get(i);
 						List<Ingredient> aIngredients = activeIngredients.get(ingredient.getBaseObject());
-						if(ingredient instanceof IngredientGroup) {
+						/*if(ingredient instanceof IngredientGroup) {
 							if(aIngredients.size() != 1) {
 								((IngredientGroup) ingredient).getIngredients().addAll(aIngredients);
 							} else if(aIngredients.size() > 0) {
@@ -242,7 +242,7 @@ public class Parser {
 									((IngredientGroup) ingredient).getIngredients().addAll(aIngredients);	
 								}
 							}
-						} else if(aIngredients.size() != 0) {
+						} else */if(aIngredients.size() != 0) {
 							int index = step.getIngredients().indexOf(ingredient) + 1;
 							if(index == step.getIngredients().size()) {
 								step.getIngredients().addAll(aIngredients);										
@@ -256,9 +256,7 @@ public class Parser {
 					}
 					
 					for(Tool tool : step.getTools()) {
-						System.out.println(tool + " " + chargedTools);
 						if(chargedTools.contains(tool.getBaseObject())) {
-							System.out.println("charge");
 							tool.setCharged(true);
 						}
 					}
@@ -376,6 +374,17 @@ public class Parser {
 					}
 					
 					recipe.getSteps().add(step);
+					
+					for(int i = 0; i < step.getTools().size(); i++) {
+						BaseTool a = step.getTools().get(i).getBaseObject();
+						for(int l = i+1; l < step.getTools().size(); l++) {
+							BaseTool b = step.getTools().get(l).getBaseObject();
+							if(a.equals(b)) {
+								step.getTools().remove(l);
+								l--;
+							}
+						}
+					}
 					
 					lastStep = step;					
 				}

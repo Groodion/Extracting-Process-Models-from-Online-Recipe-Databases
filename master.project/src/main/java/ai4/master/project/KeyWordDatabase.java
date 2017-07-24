@@ -63,7 +63,7 @@ public class KeyWordDatabase {
 		double e = 1.0;
 		
 		for(BaseTool tool : tools) {
-			if(tool.getStemmedNames().contains(text)) {
+			if(tool.getStemmedNames().contains(Word.stem(text))) {
 				return tool;
 			}
 			for(String name : tool.getNames()) {
@@ -99,7 +99,7 @@ public class KeyWordDatabase {
 		double e = 1.0;
 
 		for(BaseCookingAction cookingAction : cookingActions) {
-			if(cookingAction.getStemmedNames().contains(text)) {
+			if(cookingAction.getStemmedNames().contains(Word.stem(text))) {
 				return cookingAction;
 			}
 			for(String name : cookingAction.getNames()) {

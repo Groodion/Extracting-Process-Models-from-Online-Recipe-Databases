@@ -285,8 +285,8 @@ public class Word extends PartialObject<Word> {
 		case APZR:
 			break;
 		case ART:
-			Word noun = getNextNoun();
-			connections.add(noun);
+			/*Word noun = getNextNoun();
+			connections.add(noun);*/
 			break;
 		case CARD:
 			break;
@@ -314,12 +314,13 @@ public class Word extends PartialObject<Word> {
 			break;
 		case NE:
 		case NN:
-			role = kwdb.identify(stem(text));
+			role = kwdb.identify(text);
 			if(role == Role.TOOL) {
-				tools.add(kwdb.findTool(stem(getText())));
+				tools.add(kwdb.findTool(getText()));
 			} else if(role == Role.INGREDIENT) {
-				ingredients.add(kwdb.findIngredient(stem(getText())));
+				ingredients.add(kwdb.findIngredient(getText()));
 			}
+			System.out.println(getText() + " " + role);
 			break;
 		case PDAT:
 			break;
@@ -391,7 +392,7 @@ public class Word extends PartialObject<Word> {
 		case VVIZU:
 		case VVPP:
 			role = Role.ACTION;
-			cookingAction = kwdb.findCookingAction(stem(getText()));
+			cookingAction = kwdb.findCookingAction(getText());
 		case VAFIN:
 		case VAIMP:
 		case VAINF:
@@ -400,13 +401,13 @@ public class Word extends PartialObject<Word> {
 		case VMINF:
 		case VMPP:
 			isVerb = true;
-			//System.out.println(getText() + " " + getPos());
 			break;
 		case XY:
 			break;
 		default:
 			break;
 		}
+		System.out.println(getText() + " " + getPos());
 	}
 	public void lexConnectTo(Word word) {
 		if(word.isVerb()) {

@@ -86,6 +86,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -155,8 +156,7 @@ public class Controller implements Initializable {
 
 	private WebView webView;
 	private WebEngine engine;
-	
-	private ProcessModeler processModeler;
+		
 	private File temp;
 	
 	
@@ -166,19 +166,6 @@ public class Controller implements Initializable {
 		selectedObject = new SimpleObjectProperty<BaseNamedObject<?, ?>>();
 		recipeParsed = new SimpleBooleanProperty(false);
 		bpmnCode = new SimpleStringProperty();
-
-		processModeler = new ProcessModelerImpl();
-		
-		try {
-			temp = File.createTempFile("diagram", ".bpmn");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		processModeler.setFile(temp);
-		processModeler.getProgress().addListener((b, o, n) -> {
-			setProgress((double) n);
-		});
 		
 		kwdb.addListener((b, o, n) -> {
 			if (parser != null) {
@@ -568,6 +555,7 @@ public class Controller implements Initializable {
 		} else {
 			for (Step step : recipe.get().getSteps()) {
 				HBox stepPane = new HBox();
+				stepPane.setMaxWidth(Double.MAX_VALUE);
 				stepPane.setSpacing(10);
 				Label showStepInfoBtn = new Label("O");
 				showStepInfoBtn.setMaxHeight(Double.MAX_VALUE);
@@ -591,6 +579,7 @@ public class Controller implements Initializable {
 	public void createTextFlowPane(String text, Pane parent) {
 		FlowPane textFlowPane = new FlowPane();
 		textFlowPane.setMaxWidth(Double.MAX_VALUE);
+		HBox.setHgrow(textFlowPane, Priority.ALWAYS);
 		text = text.replaceAll("[!\"§$%&/()=?*+'#,;.:_<>\n]", " $0 ");
 		text = text.trim();
 
@@ -915,9 +904,20 @@ public class Controller implements Initializable {
 			break;
 		}
 		case 2: {
+			try {
+				temp = File.createTempFile("diagram", ".bpmn");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
 			Task<String> createModel = new Task<String>() {
 				@Override
 				protected String call() throws Exception {
+					ProcessModeler processModeler = new ProcessModelerImpl();
+					processModeler.setFile(temp);
+					processModeler.getProgress().addListener((b, o, n) -> {
+						setProgress((double) n);
+					});
 					processModeler.createBpmn(recipe.get());
 					return processModeler.getXml();
 				}
@@ -949,16 +949,17 @@ public class Controller implements Initializable {
 	}
 
 	public void finish() {
-		Alert alert = new Alert(AlertType.CONFIRMATION, "", ButtonType.OK, ButtonType.NO, ButtonType.CANCEL);
+		Alert alert = new Alert(AlertType.CONFIRMATION, null, ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
 		alert.setTitle("Information");
 		alert.setHeaderText("Not saved files would not be stored!");
 		alert.setContentText("Do you want to save your files?");
+		((Button) alert.getDialogPane().lookupButton(ButtonType.YES)).setDefaultButton(false);
 
 		Optional<ButtonType> result = alert.showAndWait();
 		result.ifPresent(buttonType -> {
 			if (buttonType == ButtonType.CANCEL) {
 				return;
-			} else if (buttonType == ButtonType.OK) {
+			} else if (buttonType == ButtonType.YES) {
 				FileChooser fc = new FileChooser();
 				fc.getExtensionFilters().add(new ExtensionFilter("BPMN File (*.bpmn)", ".bpmn"));
 				File bpmnFile = fc.showSaveDialog(null);

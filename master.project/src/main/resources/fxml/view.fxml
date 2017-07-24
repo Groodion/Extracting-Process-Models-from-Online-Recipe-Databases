@@ -122,9 +122,9 @@
 												</TitledPane>
 												<TitledPane maxHeight="Infinity" text="Steps" collapsible="false" VBox.vgrow="ALWAYS">
 													<content>
-														<ScrollPane maxWidth="Infinity" maxHeight="Infinity">
+														<ScrollPane fx:id="stepsPaneContainer">
 															<content>
-																<VBox fx:id="stepsPane" maxWidth="Infinity" maxHeight="Infinity" />
+																<VBox fx:id="stepsPane" prefWidth="${stepsPaneContainer.width - 5}" />
 															</content>
 														</ScrollPane>
 													</content>
