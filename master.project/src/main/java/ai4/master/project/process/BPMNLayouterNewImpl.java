@@ -83,6 +83,24 @@ class Element {
 		inputDataObjectReferences = new ArrayList<DataObjectReference>();
 		outputDataObjectReferences = new ArrayList<DataObjectReference>();
 		
+		if(node instanceof UserTask) {
+			for(BoundaryEvent t : timer) {
+				if(t.getAttachedTo() == node) {
+					this.timer = t;
+					break;
+				}
+			}
+			
+			for(DataInputAssociation dia : ((UserTask) node).getDataInputAssociations()) {
+				for(ItemAwareElement iae : dia.getSources()) {
+					inputDataObjectReferences.add((DataObjectReference) iae);
+				}
+			}
+			for(DataOutputAssociation doa : ((UserTask) node).getDataOutputAssociations()) {
+				outputDataObjectReferences.add((DataObjectReference) doa.getTarget());
+			}
+		}
+		
 		for(SequenceFlow sFlow : node.getOutgoing()) {
 			Element e = null;
 			if(sFlow.getTarget() instanceof ParallelGateway && sFlow.getTarget().getOutgoing().size() == 1) {
@@ -100,24 +118,6 @@ class Element {
 			next.add(e);
 			e.prev.add(this);
 			e.inputDataObjectReferences.removeAll(outputDataObjectReferences);
-		}
-		
-		if(node instanceof UserTask) {
-			for(BoundaryEvent t : timer) {
-				if(t.getAttachedTo() == node) {
-					this.timer = t;
-					break;
-				}
-			}
-			
-			for(DataInputAssociation dia : ((UserTask) node).getDataInputAssociations()) {
-				for(ItemAwareElement iae : dia.getSources()) {
-					inputDataObjectReferences.add((DataObjectReference) iae);
-				}
-			}
-			for(DataOutputAssociation doa : ((UserTask) node).getDataOutputAssociations()) {
-				outputDataObjectReferences.add((DataObjectReference) doa.getTarget());
-			}
 		}
 	}
 	public void setLevel(int level) {
@@ -244,7 +244,7 @@ class Element {
 		for(int i = 0; i < outputDataObjectReferences.size(); i++) {
 			Bounds doBounds = ((BpmnShape) outputDataObjectReferences.get(i).getDiagramElement()).getBounds();
 			doBounds.setX(sx + (MAX_LABEL_WIDTH - DEFAULT_DATA_OBJECT_WIDTH) / 2);
-			doBounds.setY(getOutputY() - DEFAULT_DATA_OBJECT_SPACING_HEIGHT  - DEFAULT_LABEL_HEIGHT - DEFAULT_DATA_OBJECT_HEIGHT);
+			doBounds.setY(getOutputY() - DEFAULT_DATA_OBJECT_SPACING_HEIGHT - DEFAULT_LABEL_HEIGHT - DEFAULT_DATA_OBJECT_HEIGHT);
 			sx += DEFAULT_DATA_OBJECT_SPACING_WIDTH + MAX_LABEL_WIDTH;
 		}
 		
@@ -279,6 +279,15 @@ class Element {
 	private void calcLabel() {
 		if(node instanceof UserTask) {
 			for(DataObjectReference doR : inputDataObjectReferences) {
+				Bounds doBounds = ((BpmnShape) doR.getDiagramElement()).getBounds();
+				Bounds labelBounds = ((BpmnShape) doR.getDiagramElement()).getBpmnLabel().getBounds();
+
+				labelBounds.setX((doBounds.getWidth() - labelBounds.getWidth()) / 2 + doBounds.getX());
+				labelBounds.setY(doBounds.getY() - labelBounds.getHeight());
+				
+				minY = (int) (minY > labelBounds.getY() ? labelBounds.getY() : minY);
+			}
+			for(DataObjectReference doR : outputDataObjectReferences) {
 				Bounds doBounds = ((BpmnShape) doR.getDiagramElement()).getBounds();
 				Bounds labelBounds = ((BpmnShape) doR.getDiagramElement()).getBpmnLabel().getBounds();
 
@@ -370,7 +379,6 @@ class Element {
 		}
 		
 		if(node instanceof UserTask) {
-			int i = 0;
 			for(DataInputAssociation dia : ((UserTask) node).getDataInputAssociations()) {
 				BpmnEdge edge = dia.getDiagramElement();
 				edge.getWaypoints().clear();
@@ -378,19 +386,17 @@ class Element {
 				Waypoint startPoint = processModeler.getModelInstance().newInstance(Waypoint.class);
 				Waypoint endPoint = processModeler.getModelInstance().newInstance(Waypoint.class);
 				
-				Bounds doBounds = ((BpmnShape) inputDataObjectReferences.get(i).getDiagramElement()).getBounds();
+				Bounds doBounds = ((BpmnShape) dia.getSources().iterator().next().getDiagramElement()).getBounds();
 				
 				startPoint.setX(doBounds.getX() + doBounds.getWidth() / 2);
 				startPoint.setY(doBounds.getY() + doBounds.getHeight());
 				endPoint.setX(startPoint.getX());
-				endPoint.setY(y);
+				endPoint.setY(startPoint.getY() + DEFAULT_DATA_OBJECT_SPACING_HEIGHT);
 
 				edge.getWaypoints().add(startPoint);
 				edge.getWaypoints().add(endPoint);
 				
-				i++;
 			}
-			i = 0;
 			for(DataOutputAssociation doa : ((UserTask) node).getDataOutputAssociations()) {
 				BpmnEdge edge = doa.getDiagramElement();
 
@@ -399,17 +405,15 @@ class Element {
 				Waypoint startPoint = processModeler.getModelInstance().newInstance(Waypoint.class);
 				Waypoint endPoint = processModeler.getModelInstance().newInstance(Waypoint.class);
 				
-				Bounds doBounds = ((BpmnShape) outputDataObjectReferences.get(i).getDiagramElement()).getBounds();
+				Bounds doBounds = ((BpmnShape) doa.getTarget().getDiagramElement()).getBounds();
 				
-				startPoint.setX(doBounds.getX() + doBounds.getWidth() / 2);
-				startPoint.setY(doBounds.getY() + doBounds.getHeight());
-				endPoint.setX(startPoint.getX());
-				endPoint.setY(getOutputY());
+				endPoint.setX(doBounds.getX() + doBounds.getWidth() / 2);
+				endPoint.setY(doBounds.getY() + doBounds.getHeight());
+				startPoint.setX(endPoint.getX());
+				startPoint.setY(getOutputY());
 
 				edge.getWaypoints().add(startPoint);
 				edge.getWaypoints().add(endPoint);
-				
-				i++;
 			}
 
 		}
@@ -455,16 +459,17 @@ class Element {
 						wP.setY(wP.getY() + dy);
 					}
 				}
-				/*for(DataObjectReference dor : outputDataObjectReferences) {
+				for(DataObjectReference dor : outputDataObjectReferences) {
 					BpmnShape dorShape = ((BpmnShape) dor.getDiagramElement());
 					dorShape.getBounds().setY(dorShape.getBounds().getY() + dy);
 					dorShape.getBpmnLabel().getBounds().setY(dorShape.getBpmnLabel().getBounds().getY() + dy);
-				}*/
+				}
 				for(DataOutputAssociation dia :((UserTask) node).getDataOutputAssociations()) {
 					for(Waypoint wP : dia.getDiagramElement().getWaypoints()) {
 						wP.setY(wP.getY() + dy);
 					}
-				}			}
+				}			
+			}
 			if(timer != null) {
 				timer.getDiagramElement().getBounds().setY(timer.getDiagramElement().getBounds().getY() + dy);
 			}
