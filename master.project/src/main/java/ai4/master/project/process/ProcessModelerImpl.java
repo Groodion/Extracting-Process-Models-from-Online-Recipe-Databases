@@ -9,6 +9,7 @@ import ai4.master.project.recipe.object.Tool;
 import ai4.master.project.tree.Node;
 import ai4.master.project.tree.Tree;
 import ai4.master.project.tree.TreeTraverser;
+import edu.stanford.nlp.io.EncodingPrintWriter.out;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -66,6 +67,9 @@ public class ProcessModelerImpl implements ProcessModeler {
 
     private boolean withOutput = false;
 
+    private Map<String, DataObjectReference> outputDataReferences = new HashMap<String, DataObjectReference>();
+    
+    
     public void createBpmn(Recipe recipe, boolean withOutput) {
         if (progress == null) {
             progress = new SimpleDoubleProperty();
@@ -73,6 +77,7 @@ public class ProcessModelerImpl implements ProcessModeler {
         this.withOutput = withOutput;
         progress.set(0);
         convertToProcess(recipe);
+        
     }
 
     /*
@@ -313,27 +318,36 @@ public class ProcessModelerImpl implements ProcessModeler {
                         continue;
                     }
                     //userTask.builder().camundaInputParameter("Ingredient", ingredient.getName());
-                    System.out.println("Creating dataObject_I" + i + "_" + createIdOf(ingredient.getCompleteName()));
-                    DataObjectReference dor = createDataObject(process, createIdOf("dataObject_I" + i + "_" + createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getName(), plane, true);
-                    dataObjects.add(dor);
-                    i++;
+                    
+                    DataObjectReference dor = null;
+                    if(outputDataReferences.containsKey(ingredient.getCompleteName())) {
+                    	dor = outputDataReferences.get(ingredient.getCompleteName());
+                    } else {
+	                    System.out.println("Creating dataObject_I" + i + "_" + createIdOf(ingredient.getCompleteName()));
+	                    dor = createDataObject(process, createIdOf("dataObject_I" + i + "_" + createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getName(), plane, true);
+	                    dataObjects.add(dor);
+	                    i++;
+                    }
                     
                     DataInputAssociation dia = createDataInputAssociation(process, dor, userTask, plane);
-                    if (this.withOutput) {
-                        Node<Step> p = node.getParent();
-                        if (p.getData().getProducts().contains(ingredient)) {
-                        	UserTask parent = getUserTaskTo(p);
-                            DataOutputAssociation dao = createDataOutputAssociation(process, dor, parent, plane);
-                        }
-                    }
-                    //dataOutputAssociations.add(doa);
+                  
                     dataInputAssociations.add(dia);
                 }
 
-                for (Ingredient ingredient : node.getData().getProducts()) {
-
+                if(this.withOutput) {
+	                for (Ingredient ingredient : node.getData().getProducts()) {
+	                	 System.out.println("Creating dataObject_I" + i + "_" + createIdOf(ingredient.getCompleteName()));
+	                     DataObjectReference dor = createDataObject(process, createIdOf("dataObject_I" + i + "_" + createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getName(), plane, true);
+	                     dataObjects.add(dor);
+	                     i++;
+	                     
+	                     DataOutputAssociation doa = createDataOutputAssociation(process, dor, userTask, plane);
+	                     
+	                     dataOutputAssociations.add(doa);
+	                     
+	                     outputDataReferences.put(ingredient.getCompleteName(), dor);
+	                }
                 }
-
                 /* Add tools as input parameter */
                 for (Tool tool : node.getData().getTools()) {
 

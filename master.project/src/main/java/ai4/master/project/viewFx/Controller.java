@@ -350,10 +350,10 @@ public class Controller implements Initializable {
 				
 				webView.setOnKeyPressed(e -> {
 					if(e.isControlDown()) {
-						if(e.getCode() == KeyCode.PLUS) {
+						if(e.getCode() == KeyCode.MINUS) {
 							zoomLevel.set(zoomLevel.get()+1);
 						}
-						else if(e.getCode() == KeyCode.MINUS) {
+						else if(e.getCode() == KeyCode.PLUS) {
 							zoomLevel.set(Math.max(0, zoomLevel.get()-1));
 						}
 					}
