@@ -35,6 +35,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -114,6 +115,7 @@ public class Controller implements Initializable {
 		
 	private File temp;
 	
+	private IntegerProperty zoomLevel;
 	
 	public Controller() {
 		recipe = new SimpleObjectProperty<Recipe>(new Recipe(LANG_FLAG.DE));
@@ -338,9 +340,25 @@ public class Controller implements Initializable {
 
 				webView = new WebView();
 
+				zoomLevel = new SimpleIntegerProperty();
+				zoomLevel.set(0);
 				webView.setContextMenuEnabled(false);
-				ScrollPane scrollPane = new ScrollPane(webView);
 
+				webView.scaleXProperty().bind(new SimpleDoubleProperty(1).divide(zoomLevel.add(10d).divide(10)));
+				webView.scaleYProperty().bind(new SimpleDoubleProperty(1).divide(zoomLevel.add(10d).divide(10)));
+				ScrollPane scrollPane = new ScrollPane(webView);
+				
+				webView.setOnKeyPressed(e -> {
+					if(e.isControlDown()) {
+						if(e.getCode() == KeyCode.PLUS) {
+							zoomLevel.set(zoomLevel.get()+1);
+						}
+						else if(e.getCode() == KeyCode.MINUS) {
+							zoomLevel.set(Math.max(0, zoomLevel.get()-1));
+						}
+					}
+				});
+				scrollPane.setOnMouseClicked(e -> webView.requestFocus());
 				engine = webView.getEngine();
 
 				// creating bridgeObjID for javascript injection
@@ -397,24 +415,25 @@ public class Controller implements Initializable {
 				saveAsSVG.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SAVE));
 				MenuItem saveAsBPMN = new MenuItem("Save as bpmn");
 				saveAsBPMN.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SAVE));
+				MenuItem saveAsBPMNWithDataOutputAssociations = new MenuItem("Save as bpmn with DataOutputAssociations");
+				saveAsBPMNWithDataOutputAssociations.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SAVE));
 
 				saveAsSVG.setOnAction(e -> {
 					String temp = engine
 							.executeScript("var svgCode; bpmnViewer.saveSVG(function(a, svg) {svgCode = svg}); svgCode")
 							.toString();
 					FileChooser fc = new FileChooser();
-					fc.getExtensionFilters().add(new ExtensionFilter("SVG File (*.svg)", ".svg"));
+					fc.getExtensionFilters().add(new ExtensionFilter("SVG File (*.svg)", "*.svg"));
 					File svgFile = fc.showSaveDialog(null);
 					if (svgFile != null) {
 						XMLWriter writer = new XMLWriter(svgFile.getName());
 						writer.writeTo(svgFile, temp);
 					}
-
 				});
 
 				saveAsBPMN.setOnAction(e -> {
 					FileChooser fc = new FileChooser();
-					fc.getExtensionFilters().add(new ExtensionFilter("BPMN File (*.bpmn)", ".bpmn"));
+					fc.getExtensionFilters().add(new ExtensionFilter("BPMN File (*.bpmn)", "*.bpmn"));
 					File bpmnFile = fc.showSaveDialog(null);
 					if (bpmnFile != null) {
 						XMLWriter writer = new XMLWriter(bpmnFile.getName());
@@ -422,9 +441,37 @@ public class Controller implements Initializable {
 					}
 
 				});
+				saveAsBPMNWithDataOutputAssociations.setOnAction(e -> {
+					blockView();
+					FileChooser fc = new FileChooser();
+					fc.getExtensionFilters().add(new ExtensionFilter("BPMN File (*.bpmn)", "*.bpmn"));
+					File bpmnFile = fc.showSaveDialog(null);
+					
+					Task<String> createBPMN = new Task<String>() {
+						@Override
+						protected String call() throws Exception {
+							ProcessModeler modeler = new ProcessModelerImpl();
+							modeler.setFile(bpmnFile);
+							modeler.createBpmn(recipe.get(), true);
+							return modeler.getXml();
+						}
+					};
+					createBPMN.setOnSucceeded(ev -> unblockView());
+					createBPMN.exceptionProperty().addListener((b, o, n) -> {
+						if(n != null) {
+							Alert alert = new Alert(AlertType.ERROR);
+							alert.setTitle("Error");
+							alert.setHeaderText("Error during model creation!");
+							alert.showAndWait();
+							n.printStackTrace();
+							unblockView();
+						}
+					});
+					
+					new Thread(createBPMN).start();
+				});
 
-				cmDiagrammSave.getItems().add(saveAsSVG);
-				cmDiagrammSave.getItems().add(saveAsBPMN);
+				cmDiagrammSave.getItems().addAll(saveAsSVG, saveAsBPMN, saveAsBPMNWithDataOutputAssociations);
 
 				webView.setOnMouseClicked(e -> {
 					if (e.getButton() == MouseButton.SECONDARY) {
@@ -757,7 +804,6 @@ public class Controller implements Initializable {
 			@Override
 			protected Recipe call() throws Exception {
 				parser.parseRecipe(recipe.get());
-
 				return recipe.get();
 			}
 		};
@@ -769,10 +815,13 @@ public class Controller implements Initializable {
 		parseRecipe.exceptionProperty().addListener((b, o, n) -> {
 			if(n != null) {
 				if(n instanceof SentenceContainsNoVerbException) {
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.setContentText("The Sentence '" + ((SentenceContainsNoVerbException) n).getSentence().getText()
-							+ "' contains no verb and can't be parsed");
-
+					Platform.runLater(() -> {
+						Alert alert = new Alert(AlertType.ERROR);
+						alert.setContentText("The Sentence '" + ((SentenceContainsNoVerbException) n).getSentence().getText()
+								+ "' contains no verb and can't be parsed");
+						alert.showAndWait();
+						unblockView();
+					});
 				}
 				
 				n.printStackTrace();
@@ -815,8 +864,7 @@ public class Controller implements Initializable {
 			contentStack.getChildren().get(i).setVisible(i == processTracker.getActiveStep());
 		}
 
-		progressBar.progressProperty().unbind();
-		progressBar.setProgress(0);
+		setProgress(0);
 
 		switch ((int) processTracker.getActiveStep()) {
 		case 0: {
@@ -859,46 +907,47 @@ public class Controller implements Initializable {
 			break;
 		}
 		case 2: {
-			try {
-				temp = File.createTempFile("diagram", ".bpmn");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-			Task<String> createModel = new Task<String>() {
-				@Override
-				protected String call() throws Exception {
-					ProcessModeler processModeler = new ProcessModelerImpl();
-					processModeler.setFile(temp);
-					processModeler.getProgress().addListener((b, o, n) -> {
-						setProgress((double) n);
-					});
-					processModeler.createBpmn(recipe.get(), false);
-					return processModeler.getXml();
-				}
-			};
-			createModel.setOnSucceeded(e -> {
 				try {
-					bpmnCode.set(createModel.get());
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				} catch (ExecutionException e1) {
-					e1.printStackTrace();
+					temp = File.createTempFile("diagram", ".bpmn");
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 				
-				callDiagram(new SimpleStringProperty(temp.toURI().toString()));
-			});
-			createModel.exceptionProperty().addListener((b, o, n) -> {
-				if(n != null) {
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.setTitle("Error");
-					alert.setHeaderText("Error during model creation!");
-					alert.showAndWait();
-					n.printStackTrace();
-				}
-			});
-			
-			new Thread(createModel).start();
+				Task<String> createModel = new Task<String>() {
+					@Override
+					protected String call() throws Exception {
+						ProcessModeler processModeler = new ProcessModelerImpl();
+						processModeler.setFile(temp);
+						processModeler.getProgress().addListener((b, o, n) -> {
+							setProgress((double) n);
+						});
+						processModeler.createBpmn(recipe.get(), false);
+						return processModeler.getXml();
+					}
+				};
+				createModel.setOnSucceeded(e -> {
+					try {
+						bpmnCode.set(createModel.get());
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					} catch (ExecutionException e1) {
+						e1.printStackTrace();
+					}
+					
+					callDiagram(new SimpleStringProperty(temp.toURI().toString()));
+				});
+				createModel.exceptionProperty().addListener((b, o, n) -> {
+					if(n != null) {
+						Alert alert = new Alert(AlertType.ERROR);
+						alert.setTitle("Error");
+						alert.setHeaderText("Error during model creation!");
+						alert.showAndWait();
+						n.printStackTrace();
+					}
+				});
+				
+				new Thread(createModel).start();
+				webView.requestFocus();
 			}
 		}
 	}
@@ -976,10 +1025,10 @@ public class Controller implements Initializable {
 	}
 
 	public static void setProgress(double progress) {
-	//	Platform.runLater(() -> Controller.progress.set(progress));
+		Platform.runLater(() -> Controller.progress.set(progress));
 	}
 
 	public static void addMessage(String string) {
-		//Platform.runLater(() -> MESSAGES.add(string));
+		Platform.runLater(() -> MESSAGES.add(string));
 	}
 }

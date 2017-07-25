@@ -58,14 +58,12 @@ public class RecipeGetterKochbar implements RecipeGetter {
     }
 
 	@Override
-	public Recipe getRecipeByLink(String link) {
-		// TODO Auto-generated method stub
-		return null;
+	public Recipe getRecipeByLink(String link) throws ServerOfflineException {
+		return getRecipe(link);
 	}
 
 	@Override
 	public Recipe getRecipeByCategory(String category) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
