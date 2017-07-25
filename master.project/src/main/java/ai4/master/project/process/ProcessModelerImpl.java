@@ -317,12 +317,13 @@ public class ProcessModelerImpl implements ProcessModeler {
                     DataObjectReference dor = createDataObject(process, createIdOf("dataObject_I" + i + "_" + createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getName(), plane, true);
                     dataObjects.add(dor);
                     i++;
-
+                    
                     DataInputAssociation dia = createDataInputAssociation(process, dor, userTask, plane);
                     if (this.withOutput) {
                         Node<Step> p = node.getParent();
                         if (p.getData().getProducts().contains(ingredient)) {
-                            DataOutputAssociation dao = createDataOutputAssociation(process, dor, userTask, plane);
+                        	UserTask parent = getUserTaskTo(p);
+                            DataOutputAssociation dao = createDataOutputAssociation(process, dor, parent, plane);
                         }
                     }
                     //dataOutputAssociations.add(doa);
@@ -590,13 +591,13 @@ public class ProcessModelerImpl implements ProcessModeler {
     Creates a ID by replacing all spaces with _
      */
     private String createIdOf(String s) {
-        s = s.replace("Ã¤", "ae");
-        s = s.replace("Ã¶", "oe");
-        s = s.replace("Ã¼", "ue");
+        s = s.replace("ä", "ae");
+        s = s.replace("ö", "oe");
+        s = s.replace("ü", "ue");
         s = s.replace(",", "");
         s = s.replace(".", "");
         s = s.replace("/", "_durch_");
-        s = s.replace("Â°", "_Grad_");
+        s = s.replace("°", "_Grad_");
         s = s.replace(":", "_");
         s = s.replace("(", "_");
         s = s.replace(")", "_");
