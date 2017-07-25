@@ -590,13 +590,13 @@ public class ProcessModelerImpl implements ProcessModeler {
     Creates a ID by replacing all spaces with _
      */
     private String createIdOf(String s) {
-        s = s.replace("Ã¤", "ae");
-        s = s.replace("Ã¶", "oe");
-        s = s.replace("Ã¼", "ue");
+        s = s.replace("ä", "ae");
+        s = s.replace("ö", "oe");
+        s = s.replace("ü", "ue");
         s = s.replace(",", "");
         s = s.replace(".", "");
         s = s.replace("/", "_durch_");
-        s = s.replace("Â°", "_Grad_");
+        s = s.replace("°", "_Grad_");
         s = s.replace(":", "_");
         s = s.replace("(", "_");
         s = s.replace(")", "_");

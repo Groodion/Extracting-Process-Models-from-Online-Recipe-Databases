@@ -137,6 +137,7 @@ public class Parser {
 	}
 
 	public void parseRecipe(Recipe recipe) throws SentenceContainsNoVerbException {
+		System.err.println(recipe);
 		Controller.setProgress(0);
 		recipe.getSteps().clear();
 		

@@ -12,12 +12,14 @@ import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.VPos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -89,8 +91,24 @@ public class OnlineDatabaseButton extends HBox {
 									ex.printStackTrace();
 								}
 								Controller.setProgress(0);
+								
+								if(recipe.get() == null || recipe.get().getPreparation() == null || recipe.get().getPreparation().length() == 0) {
+									Alert alert = new Alert(AlertType.ERROR);
+									alert.setTitle("Error");
+									alert.setHeaderText("Can't find or access recipe!");
+									alert.showAndWait();
+								}
 								Controller.unblockView();
 							});
+						});
+						task.exceptionProperty().addListener((b, o, n) -> {
+							if(n != null) {
+								Alert alert = new Alert(AlertType.ERROR);
+								alert.setTitle("Error");
+								alert.setHeaderText("Server Offline!");
+								alert.showAndWait();
+							}
+							Controller.unblockView();
 						});
 						new Thread(task).start();
 					} else {
