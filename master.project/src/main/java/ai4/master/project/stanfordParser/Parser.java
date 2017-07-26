@@ -380,8 +380,18 @@ public class Parser {
 						BaseTool a = step.getTools().get(i).getBaseObject();
 						for(int l = i+1; l < step.getTools().size(); l++) {
 							BaseTool b = step.getTools().get(l).getBaseObject();
-							if(a.equals(b)) {
+							if(a.getFirstName().equals(b.getFirstName())) {
 								step.getTools().remove(l);
+								l--;
+							}
+						}
+					}
+					for(int i = 0; i < step.getIngredients().size(); i++) {
+						BaseIngredient a = step.getIngredients().get(i).getBaseObject();
+						for(int l = i+1; l < step.getIngredients().size(); l++) {
+							BaseIngredient b = step.getIngredients().get(l).getBaseObject();
+							if(a.equals(b)) {
+								step.getIngredients().remove(l);
 								l--;
 							}
 						}

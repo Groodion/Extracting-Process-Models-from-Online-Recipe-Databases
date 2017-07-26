@@ -108,6 +108,7 @@ public class OnlineDatabaseButton extends HBox {
 								alert.setHeaderText("Server Offline!");
 								alert.showAndWait();
 							}
+							Controller.setProgress(0);
 							Controller.unblockView();
 						});
 						new Thread(task).start();

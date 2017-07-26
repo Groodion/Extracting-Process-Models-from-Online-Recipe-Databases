@@ -15,6 +15,7 @@ public class BPMNLayouterNewImpl implements BPMNLayouter {
 		Element.reset();
 		
 		Element startElement = new Element(modeler.getStartEvent(), modeler.getTimers());
+		startElement.removeOutputInputReferences();
 		startElement.sortLanes();
 		startElement.calcSize();
 		startElement.calcLocation();
@@ -26,6 +27,7 @@ public class BPMNLayouterNewImpl implements BPMNLayouter {
 class Element {
 	private static Map<String, Element> syncGates = new HashMap<String, Element>();
 	private static Map<Integer, Integer> levelWidths = new HashMap<Integer, Integer>();
+	private static List<DataObjectReference> outputReferences = new ArrayList<DataObjectReference>();
 
 	private static int minY = 0;
 	
@@ -101,6 +103,8 @@ class Element {
 			}
 		}
 		
+		outputReferences.addAll(outputDataObjectReferences);
+		
 		for(SequenceFlow sFlow : node.getOutgoing()) {
 			Element e = null;
 			if(sFlow.getTarget() instanceof ParallelGateway && sFlow.getTarget().getOutgoing().size() == 1) {
@@ -117,7 +121,6 @@ class Element {
 			e.setLevel(level + 1);
 			next.add(e);
 			e.prev.add(this);
-			e.inputDataObjectReferences.removeAll(outputDataObjectReferences);
 		}
 	}
 	public void setLevel(int level) {
@@ -160,6 +163,14 @@ class Element {
 			
 		for(Element child : next) {
 			child.sortLanes();
+		}
+	}
+
+	public void removeOutputInputReferences() {
+		inputDataObjectReferences.removeAll(outputReferences);
+		
+		for(Element e : next) {
+			e.removeOutputInputReferences();
 		}
 	}
 	
@@ -508,6 +519,7 @@ class Element {
 	public static void reset() {
 		syncGates.clear();
 		levelWidths.clear();
+		outputReferences.clear();
 		minY = 0;
 	}
 }

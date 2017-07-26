@@ -68,6 +68,7 @@ public class ProcessModelerImpl implements ProcessModeler {
     private boolean withOutput = false;
 
     private Map<String, DataObjectReference> outputDataReferences = new HashMap<String, DataObjectReference>();
+    private Map<String, DataObjectReference> inputDataReferences = new HashMap<String, DataObjectReference>();
     
     
     public void createBpmn(Recipe recipe, boolean withOutput) {
@@ -314,9 +315,6 @@ public class ProcessModelerImpl implements ProcessModeler {
                 int i = 0;
                 List<DataObjectReference> used = new ArrayList<>();
                 for (Ingredient ingredient : node.getData().getIngredients()) {
-                    if (used.contains(ingredient)) {
-                        continue;
-                    }
                     //userTask.builder().camundaInputParameter("Ingredient", ingredient.getName());
                     
                     DataObjectReference dor = null;
@@ -326,6 +324,7 @@ public class ProcessModelerImpl implements ProcessModeler {
 	                    System.out.println("Creating dataObject_I" + i + "_" + createIdOf(ingredient.getCompleteName()));
 	                    dor = createDataObject(process, createIdOf("dataObject_I" + i + "_" + createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getName(), plane, true);
 	                    dataObjects.add(dor);
+	                    inputDataReferences.put(ingredient.getCompleteName(), dor);
 	                    i++;
                     }
                     
@@ -336,11 +335,15 @@ public class ProcessModelerImpl implements ProcessModeler {
 
                 if(this.withOutput) {
 	                for (Ingredient ingredient : node.getData().getProducts()) {
-	                	 System.out.println("Creating dataObject_I" + i + "_" + createIdOf(ingredient.getCompleteName()));
-	                     DataObjectReference dor = createDataObject(process, createIdOf("dataObject_I" + i + "_" + createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getName(), plane, true);
-	                     dataObjects.add(dor);
-	                     i++;
-	                     
+	                	DataObjectReference dor = null;
+	                	if(inputDataReferences.containsKey(ingredient.getCompleteName())) {
+	                		dor = inputDataReferences.get(ingredient.getCompleteName());
+	                	} else {
+		                	 System.out.println("Creating dataObject_I" + i + "_" + createIdOf(ingredient.getCompleteName()));
+		                     dor= createDataObject(process, createIdOf("dataObject_I" + i + "_" + createIdOf(ingredient.getCompleteName()) + createIdOf(node.getData().getText())), ingredient.getName(), plane, true);
+		                     dataObjects.add(dor);
+		                     i++;
+	                	}
 	                     DataOutputAssociation doa = createDataOutputAssociation(process, dor, userTask, plane);
 	                     
 	                     dataOutputAssociations.add(doa);
