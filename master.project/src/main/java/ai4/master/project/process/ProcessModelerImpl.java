@@ -1,4 +1,4 @@
-package ai4.master.project.process;
+ï»¿package ai4.master.project.process;
 
 import ai4.master.project.output.XMLWriter;
 import ai4.master.project.recipe.CookingEvent;
@@ -9,7 +9,6 @@ import ai4.master.project.recipe.object.Tool;
 import ai4.master.project.tree.Node;
 import ai4.master.project.tree.Tree;
 import ai4.master.project.tree.TreeTraverser;
-import edu.stanford.nlp.io.EncodingPrintWriter.out;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -288,6 +287,12 @@ public class ProcessModelerImpl implements ProcessModeler {
 
     }
 
+    List<String> dorIds = new ArrayList<>();
+    /*
+    Creates a DataInputAssociation to a UserTask
+     */
+    int j = 0;
+
     /*
     Create all user tasks.
      */
@@ -316,7 +321,7 @@ public class ProcessModelerImpl implements ProcessModeler {
                 List<DataObjectReference> used = new ArrayList<>();
                 for (Ingredient ingredient : node.getData().getIngredients()) {
                     //userTask.builder().camundaInputParameter("Ingredient", ingredient.getName());
-                    
+
                     DataObjectReference dor = null;
                     if(outputDataReferences.containsKey(ingredient.getCompleteName())) {
                     	dor = outputDataReferences.get(ingredient.getCompleteName());
@@ -327,9 +332,9 @@ public class ProcessModelerImpl implements ProcessModeler {
 	                    inputDataReferences.put(ingredient.getCompleteName(), dor);
 	                    i++;
                     }
-                    
+
                     DataInputAssociation dia = createDataInputAssociation(process, dor, userTask, plane);
-                  
+
                     dataInputAssociations.add(dia);
                 }
 
@@ -344,10 +349,11 @@ public class ProcessModelerImpl implements ProcessModeler {
 		                     dataObjects.add(dor);
 		                     i++;
 	                	}
+
 	                     DataOutputAssociation doa = createDataOutputAssociation(process, dor, userTask, plane);
-	                     
+
 	                     dataOutputAssociations.add(doa);
-	                     
+
 	                     outputDataReferences.put(ingredient.getCompleteName(), dor);
 	                }
                 }
@@ -367,41 +373,12 @@ public class ProcessModelerImpl implements ProcessModeler {
 
     }
 
-    private DataOutputAssociation createDataOutputAssociation(Process process, DataObjectReference dor, UserTask userTask, BpmnPlane plane) {
-
-
-        String identifier = dor.getId() + "-" + userTask.getId() + "_prod";
-        DataOutputAssociation dataOutputAssociation = modelInstance.newInstance(DataOutputAssociation.class);
-        dataOutputAssociation.setAttributeValue("id", identifier, true);
-
-
-        TargetRef targetRef = modelInstance.newInstance(TargetRef.class);
-        targetRef.setTextContent(dor.getId());
-
-        SourceRef sourceRef = modelInstance.newInstance(SourceRef.class);
-        sourceRef.setTextContent(userTask.getId());
-
-        dataOutputAssociation.addChildElement(targetRef);
-        dataOutputAssociation.addChildElement(sourceRef);
-        userTask.getDataOutputAssociations().add(dataOutputAssociation);
-
-        BpmnEdge edge = modelInstance.newInstance(BpmnEdge.class);
-        edge.setBpmnElement(dataOutputAssociation);
-
-        Waypoint w1 = modelInstance.newInstance(Waypoint.class);
-        w1.setX(0);
-        w1.setY(0);
-        Waypoint w2 = modelInstance.newInstance(Waypoint.class);
-        w2.setX(1);
-        w2.setY(1);
-        edge.addChildElement(w1);
-        edge.addChildElement(w2);
-
-        plane.addChildElement(edge);
-
-        dataOutputAssociations.add(dataOutputAssociation);
-
-        return dataOutputAssociation;
+    private boolean isInDorIds(String id){
+        for(String i : dorIds){
+            if(id.equals(i)){
+                    return true;
+        }}
+        return false;
     }
 
     /*
@@ -488,11 +465,44 @@ public class ProcessModelerImpl implements ProcessModeler {
         return dataObject;
     }
 
-    /*
-    Creates a DataInputAssociation to a UserTask
-     */
+    private DataOutputAssociation createDataOutputAssociation(Process process, DataObjectReference dor, UserTask userTask, BpmnPlane plane) {
+        String identifier = "out_"+ dor.getId() + "-" + userTask.getId() + "_prod";
+        DataOutputAssociation dataOutputAssociation = modelInstance.newInstance(DataOutputAssociation.class);
+        dataOutputAssociation.setAttributeValue("id", identifier, true);
+
+
+        TargetRef targetRef = modelInstance.newInstance(TargetRef.class);
+        targetRef.setTextContent(dor.getId());
+
+        SourceRef sourceRef = modelInstance.newInstance(SourceRef.class);
+        sourceRef.setTextContent(userTask.getId());
+
+        dataOutputAssociation.addChildElement(targetRef);
+        dataOutputAssociation.addChildElement(sourceRef);
+        userTask.getDataOutputAssociations().add(dataOutputAssociation);
+
+        BpmnEdge edge = modelInstance.newInstance(BpmnEdge.class);
+        edge.setBpmnElement(dataOutputAssociation);
+
+        Waypoint w1 = modelInstance.newInstance(Waypoint.class);
+        w1.setX(0);
+        w1.setY(0);
+        Waypoint w2 = modelInstance.newInstance(Waypoint.class);
+        w2.setX(1);
+        w2.setY(1);
+        edge.addChildElement(w1);
+        edge.addChildElement(w2);
+
+        plane.addChildElement(edge);
+
+        dataOutputAssociations.add(dataOutputAssociation);
+
+        return dataOutputAssociation;
+    }
+
     private DataInputAssociation createDataInputAssociation(Process process, DataObjectReference dataObjectReference, UserTask userTask, BpmnPlane plane) {
-        String identifier = dataObjectReference.getId() + "-" + userTask.getId();
+        String identifier = "in_" + dataObjectReference.getId() + "-" + userTask.getId() + String.valueOf(j);
+        j++;
 
         DataInputAssociation dataInputAssociation = modelInstance.newInstance(DataInputAssociation.class);
         dataInputAssociation.setAttributeValue("id", identifier, true);
@@ -608,13 +618,13 @@ public class ProcessModelerImpl implements ProcessModeler {
     Creates a ID by replacing all spaces with _
      */
     private String createIdOf(String s) {
-        s = s.replace("ä", "ae");
-        s = s.replace("ö", "oe");
-        s = s.replace("ü", "ue");
+        s = s.replace("Ã¤", "ae");
+        s = s.replace("Ã¶", "oe");
+        s = s.replace("Ã¼", "ue");
         s = s.replace(",", "");
         s = s.replace(".", "");
         s = s.replace("/", "_durch_");
-        s = s.replace("°", "_Grad_");
+        s = s.replace("Â°", "_Grad_");
         s = s.replace(":", "_");
         s = s.replace("(", "_");
         s = s.replace(")", "_");
